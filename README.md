@@ -69,7 +69,8 @@ Project ATLAS delivers a robust, AI-powered solution that accelerates documentat
 
 # Methodology Details
 ## Architecture(Please do Zoom in or do go for the link for more details:
-![barclays-Page-1 drawio](https://github.com/user-attachments/assets/946ab494-2225-4495-8db9-ea25018a5100)
+![barclays-Page-1 (1)](https://github.com/user-attachments/assets/50108823-388d-48fb-8d61-6e497898695d)
+
 
 
 
