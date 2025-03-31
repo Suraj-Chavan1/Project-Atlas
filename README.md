@@ -73,7 +73,9 @@ Project ATLAS delivers a robust, AI-powered solution that accelerates documentat
 
 
 
-# Security Aspects
+# Security Aspects:
+![image](https://github.com/user-attachments/assets/2895df0e-651d-4ec4-a5a1-4cd2f1ae99e8)
+
 
 
 # Scalability
