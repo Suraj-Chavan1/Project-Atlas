@@ -28,27 +28,17 @@ Moreover, **Project ATLAS** streamlines the extraction of **requirements** from 
 - **Streamline Documentation**  
   Automatically generate standardized SRS, SOW documents, and JIRA user stories to accelerate the documentation process based on user input, speeding up documentation process by **90 percent**.
 
-- **Accelerate Testing**  
-  Utilize AI to generate test cases and automate code documentation, reducing test writing time and enhancing quality.
-
 - **Enhance Security**  
   Leverage privately deployed open source LLMs alongside Azure Blob Storage, MFA, and RBAC to ensure that all sensitive data remains secure and compliant.
 
 - **Integrate with JIRA & Workplace Automation**  
   Seamlessly push updates to JIRA and automate workflow processes to ensure efficient backlog management.
 
+- **Accelerate Testing**  
+  AI-powered test case generation and code documentation reducing manual efforts by 70 percent.
+  
 - **Enable Multi-User Collaboration**  
   Support scalable, concurrent usage with role-based access control and versioned document management.
-
-
-
-  Automate Requirement Extraction – AI analyzes documents and graphics to generate structured requirements.
-Streamline Documentation – Auto-generate Any requirement documents ( SRS, SOW,BRD )and JIRA user stories, speeding up documentation process by 90 percent.
-Integrate with JIRA & Workplace Automation – Seamless backlog updates. 
-Accelerate Testing – AI-powered test case generation and code documentation reducing manual efforts by 70 percent.
-Enhance Security – RBAC, MFA authentication, and locally deployed LLMs on secure VM ensure data privacy, controlled access and compliance.
-Enable Multi-User Collaboration – Role-based access and version control for scalability.
-
 
 # USPs
 
