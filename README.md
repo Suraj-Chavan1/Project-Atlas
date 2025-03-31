@@ -42,6 +42,13 @@ Project ATLAS delivers a robust, AI-powered solution that accelerates documentat
 - **Scalability** – Supports multi-user collaboration and integrates with workplace automation tools.
 
 # Methodology Details
+## Architecture:
+
+
+
+
+## Design Considerations:
+
 # Tech stack
 
 ![image](https://github.com/user-attachments/assets/7cb3e30f-1a3a-42e4-8e1e-bda50ef3085c)
@@ -49,6 +56,7 @@ Project ATLAS delivers a robust, AI-powered solution that accelerates documentat
 
 
 # Security Aspects
+
 
 # Scalability
 
