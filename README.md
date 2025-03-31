@@ -8,8 +8,7 @@
 
 In today's **fast-paced** software development landscape, traditional methods for **requirement gathering**, **documentation**, and **test case generation** are labor-intensive, error-prone, and time-consuming. At **Barclays**, where **precision** and **compliance** are critical, these challenges demand a transformative solution.
 
-**Project ATLAS** automates the entire lifecycle of **software documentation** using advanced **Generative AI**. By harnessing locally deployed open-source **LLMs**—specifically **Ollama with LLaMA 3B/7B** and the **LLAVA Vision Model**—on **Azure VMs**, the system ensures that sensitive data remains secure within **Barclays' infrastructure**. Moreover, **Project ATLAS** streamlines the extraction of **requirements** from both **textual** and **graphical inputs**, generates structured **SRS** and **SOW** documents, and seamlessly integrates with **JIRA** for automated backlog updates and efficient **workflow management**.
-
+**Project ATLAS** automates the entire lifecycle of **software documentation** using advanced **Generative AI**. By harnessing privately deployed open-source **LLMs**—specifically **Ollama with LLaMA 3B/7B** and the **LLAVA Vision Model**—on **Azure VMs**, the system ensures that sensitive data remains secure within **Barclays' infrastructure**. Moreover, **Project ATLAS** streamlines the extraction of **requirements** from both **textual** and **graphical inputs**, generates structured **SRS**/**BRD** or any types of requirement documents, and seamlessly integrates with **JIRA** for automated backlog updates and efficient **workflow management**.
 
 
 ## Objectives
