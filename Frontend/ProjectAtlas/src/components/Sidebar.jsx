@@ -14,8 +14,8 @@ const Sidebar = () => {
 
   const menuItems = [
     { label: 'Dashboard', path: '/projects', icon: <MdDashboard /> },
-    { label: 'AI Requirements Engineer', path: '/chat/2', icon: <PiSparkleFill /> },
-    { label: 'AI Requirements Generator', path: '/ai-requirements', icon: <BsRobot /> },
+    { label: 'AI Requirements Engineer', path: '/ai-requirements', icon: <PiSparkleFill /> },
+    { label: 'AI Requirements Generator', path: '/chat/2', icon: <BsRobot /> },
     { label: 'Documentation Manager', path: '/version-control', icon: <IoDocumentsSharp /> },
     { label: 'Integration Manager', path: '/integrations', icon: <MdViewKanban /> },
   ];

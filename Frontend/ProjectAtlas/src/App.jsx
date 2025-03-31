@@ -11,6 +11,7 @@ import UserStoriesMain from './components/UserStoriesMain'
 import UserStoriesPage from './pages/UserStoriesPage'
 import TestCasesPage from './pages/TestCasesPage'
 import AIRequirementsPage from './pages/AIRequirementsPage'
+import SingleProjectPage from './pages/SingleProjectPage'
 
 function App() {
 
@@ -22,11 +23,12 @@ function App() {
         <Route path="/version-control" element={<VersionControlPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
-        <Route path="/chat/:id" element={<ChatPage />} />
+        <Route path="/ai-requirements" element={<ChatPage />} />
         <Route path="/required-documents" element={<ReqDocPage />} />
         <Route path="/user-stories" element={<UserStoriesPage />} />
         <Route path="/test-cases" element={<TestCasesPage />} />
-        <Route path="/ai-requirements" element={<AIRequirementsPage />} />
+        <Route path="/chat/:id" element={<AIRequirementsPage />} />
+        <Route path="/project/:id" element={<SingleProjectPage />} />
       </Routes>
     </BrowserRouter>
   )
