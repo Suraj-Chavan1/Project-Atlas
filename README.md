@@ -1,7 +1,14 @@
-# 🏛️ Project ATLAS  🌐
 
 ## Problem statement chosen:
 ![image](https://github.com/user-attachments/assets/7ccf432c-c214-4141-9bd7-2e750374b226)
+
+
+# 🏛️ Project ATLAS  🌐
+
+
+![image](https://github.com/user-attachments/assets/34993e11-f641-4c2a-ac79-094cb676c636)
+
+
 
 
 ## Introduction
@@ -19,7 +26,7 @@ Moreover, **Project ATLAS** streamlines the extraction of **requirements** from 
   AI-driven analysis of documents and graphics to generate structured requirements, significantly reducing manual effort.
 
 - **Streamline Documentation**  
-  Automatically generate standardized SRS, SOW documents, and JIRA user stories to accelerate the documentation process based on user inputs
+  Automatically generate standardized SRS, SOW documents, and JIRA user stories to accelerate the documentation process based on user input, speeding up documentation process by **90 percent**.
 
 - **Accelerate Testing**  
   Utilize AI to generate test cases and automate code documentation, reducing test writing time and enhancing quality.
@@ -33,18 +40,36 @@ Moreover, **Project ATLAS** streamlines the extraction of **requirements** from 
 - **Enable Multi-User Collaboration**  
   Support scalable, concurrent usage with role-based access control and versioned document management.
 
-## Impact
 
+
+  Automate Requirement Extraction – AI analyzes documents and graphics to generate structured requirements.
+Streamline Documentation – Auto-generate Any requirement documents ( SRS, SOW,BRD )and JIRA user stories, speeding up documentation process by 90 percent.
+Integrate with JIRA & Workplace Automation – Seamless backlog updates. 
+Accelerate Testing – AI-powered test case generation and code documentation reducing manual efforts by 70 percent.
+Enhance Security – RBAC, MFA authentication, and locally deployed LLMs on secure VM ensure data privacy, controlled access and compliance.
+Enable Multi-User Collaboration – Role-based access and version control for scalability.
+
+
+# USPs
+
+
+The following are the Unique Selling Proposition Our Platform Offers
+
+![image](https://github.com/user-attachments/assets/b6abc38f-4c13-4b28-926d-741c534c66d4)
+## Impact
 Project ATLAS delivers a robust, AI-powered solution that accelerates documentation, reduces manual intervention, and accelerates software development cycles. By ensuring data security and compliance through locally deployed models and secure cloud infrastructure, the platform significantly enhances operational efficiency and quality at Barclays.
 
+# Market Analysis
 
-## Why ATLAS?
-- **Efficiency** – Reduces manual effort and accelerates the documentation lifecycle.
-- **Security** – Ensures data privacy with locally hosted AI models and enterprise-grade authentication.
-- **Scalability** – Supports multi-user collaboration and integrates with workplace automation tools.
+![image](https://github.com/user-attachments/assets/e7869f52-7b7e-496f-bb13-ad77e7fb4389)
+
+![image](https://github.com/user-attachments/assets/a57a8b13-d27d-4060-a9b3-e6383d56e3eb)
+
+
 
 # Methodology Details
-## Architecture:
+## Architecture(Please do Zoom in or do go for the link for more details:
+![barclays-Page-1 drawio](https://github.com/user-attachments/assets/946ab494-2225-4495-8db9-ea25018a5100)
 
 
 
