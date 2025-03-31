@@ -9,8 +9,6 @@
 ![image](https://github.com/user-attachments/assets/34993e11-f641-4c2a-ac79-094cb676c636)
 
 
-
-
 ## Introduction
 
 In today's **fast-paced** software development landscape, traditional methods for **requirement gathering**, **documentation**, and **test case generation** are labor-intensive, error-prone, and time-consuming. At **Barclays**, where **precision** and **compliance** are critical, these challenges demand a transformative solution.
@@ -29,7 +27,7 @@ Moreover, **Project ATLAS** streamlines the extraction of **requirements** from 
   Automatically generate standardized SRS, SOW documents, and JIRA user stories to accelerate the documentation process based on user input, speeding up documentation process by **90 percent**.
 
 - **Enhance Security**  
-  Leverage privately deployed open source LLMs alongside Azure Blob Storage, MFA, and RBAC to ensure that all sensitive data remains secure and compliant.
+  Leverage privately deployed open-source LLMs alongside Azure Blob Storage, MFA, and RBAC to ensure that all sensitive data remains secure and compliant.
 
 - **Integrate with JIRA & Workplace Automation**  
   Seamlessly push updates to JIRA and automate workflow processes to ensure efficient backlog management.
@@ -43,7 +41,7 @@ Moreover, **Project ATLAS** streamlines the extraction of **requirements** from 
 # USPs
 
 
-The following are the Unique Selling Proposition Our Platform Offers
+The following are the Unique Selling Propositions Our Platform Offers
 
 ![image](https://github.com/user-attachments/assets/b6abc38f-4c13-4b28-926d-741c534c66d4)
 ## Impact
@@ -55,6 +53,9 @@ Project ATLAS delivers a robust, AI-powered solution that accelerates documentat
 
 ![image](https://github.com/user-attachments/assets/a57a8b13-d27d-4060-a9b3-e6383d56e3eb)
 
+- The AI-driven requirement engineering market is rapidly growing with increased adoption of AI-powered documentation.
+- Project Atlas combines the best features of both product niches while adding AI-powered requirement gathering capabilities.
+- Large enterprises require automation due to compliance and efficiency demands.
 
 
 # Methodology Details
@@ -62,23 +63,72 @@ Project ATLAS delivers a robust, AI-powered solution that accelerates documentat
 ![barclays-Page-1 (1)](https://github.com/user-attachments/assets/50108823-388d-48fb-8d61-6e497898695d)
 
 
+## User Flow
 
+## Methodology
 
+![Image](https://github.com/user-attachments/assets/94748ea5-e69f-4a8c-b7cd-45e829995c27)
 
 ## Design Considerations:
+
+**Why Azure Functions?**
+We use Azure Functions for serverless, event-driven automation in our tool. This approach helps:
+- Handle document processing and user story generation
+- Provide real-time notifications and secure APIs
+- Ensure scalability and cost-efficiency
+- Integrate seamlessly with other Azure services
+
+**Why Privately Hosted LLMs/LVMs?**
+Using Gemini/OpenAI APIs would risk exposing enterprise data to third-party companies. Project Atlas deals with sensitive data, so we use Ollama and Azure VMs to privately host open-source LLMs/LVMs like LLama (3B, 7B) and LLAVA 7B parameter models to handle document inputs appropriately.
+
+**Why Use RAGs (Retrieval Augmented Generation)?**
+RAG systems help us quickly find and use only the most relevant information from a large database. By using Vector search with Cosmos DB and limiting the amount of data given to the language model, RAG systems create more accurate and useful outputs. This approach:
+- Improves context relevance
+- Reduces hallucinations in AI outputs
+- Enables more accurate requirement extraction
+- Maintains historical context for projects
+
+**Why Internal and External Context?**
+Requirement Gathering needs data from within the company (Business Team, DevOps Team, etc.) as well as from external markets, social trends, newer regulations, study groups, clients, and service providers. Both sources need to be accounted for, so we maintain separate internal and external contexts for each project.
+
+**Why and How Versioning with Blob Storage?**
+Project management involves drafting documents multiple times before approval. We use Azure Blob Storage for automatic version control. Documents are stored using Role-Based Access Control (RBAC), so only authorized employees can access the documents.
 
 # Tech stack
 
 ![image](https://github.com/user-attachments/assets/7cb3e30f-1a3a-42e4-8e1e-bda50ef3085c)
 
 
-
 # Security Aspects:
-![image](https://github.com/user-attachments/assets/2895df0e-651d-4ec4-a5a1-4cd2f1ae99e8)
 
+![Image](https://github.com/user-attachments/assets/4515460a-ced0-4887-946b-516f62939105)
 
-
+Security and data protection are paramount for Project ATLAS, especially when handling sensitive enterprise requirements and documentation. Our comprehensive security approach includes:
+1. **Keep Data in the Enterprise**
+***Local Open-Source LLMs deployed on Azure VMs***
+   - Deploying Ollama Local LLMs on Azure VMs (GPU/CPU) ensures that in-house data never leaves the corporate network
+   - Provides processing power for document analysis while maintaining data sovereignty
+   - Eliminates the risk of sending sensitive data to third-party API providers
+     
+2. **Need-to-Know Access Controls**
+***MFA and RBAC (Role-Based Access Control)***
+   - Azure Multi-Factor Authentication (MFA) for secure logins
+   - Role-Based Access Control (RBAC) to restrict access based on job functions
+   - Conditional Access Policies to enforce security based on device, location, and risk factors
+   - Least privilege principles ensure users only access what they need
+   - Read-only/Write-only permissions based on roles and responsibilities
+  
+3. **Industry-Standard Encryption**
+   ***Industry Level Data Encryption Standards***
+   - AES-256 for data encryption at rest
+   - TLS 1.2/1.3 for secure communication between components
+   - RSA-2048 for key exchange mechanisms
+   - SHA-256 for hashing and data integrity verification
+   - FIPS 140-2/3 compliance for regulated industries
+  
 # Scalability
+
+![Image](https://github.com/user-attachments/assets/7a5c2142-3b5a-441a-a00a-59261e8e109f)
 
 ## Infrastructure Readiness
 
@@ -98,6 +148,7 @@ Azure's cloud services enable both horizontal and vertical scaling, ensuring Pro
 
 
 # Implementation UI
+
 
 ## Closing Remarks
 
