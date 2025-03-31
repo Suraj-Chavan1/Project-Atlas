@@ -72,25 +72,25 @@ Project ATLAS delivers a robust, AI-powered solution that accelerates documentat
 
 1. **Why Azure Functions?**  
 We use Azure Functions for serverless, event-driven automation in our tool. This approach helps:
-- Handle document processing and user story generation
-- Provide real-time notifications and secure APIs
-- Ensure scalability and cost-efficiency
-- Integrate seamlessly with other Azure services
+    - Handle document processing and user story generation
+    - Provide real-time notifications and secure APIs
+    - Ensure scalability and cost-efficiency
+    - Integrate seamlessly with other Azure services
 
-2. **Why Privately Hosted LLMs/LVMs?**
+2. **Why Privately Hosted LLMs/LVMs?**  
 Using Gemini/OpenAI APIs would risk exposing enterprise data to third-party companies. Project Atlas deals with sensitive data, so we use Ollama and Azure VMs to privately host open-source LLMs/LVMs like LLama (3B, 7B) and LLAVA 7B parameter models to handle document inputs appropriately.
 
-3. **Why Use RAGs (Retrieval Augmented Generation)?**
+3. **Why Use RAGs (Retrieval Augmented Generation)?**  
 RAG systems help us quickly find and use only the most relevant information from a large database. By using Vector search with Cosmos DB and limiting the amount of data given to the language model, RAG systems create more accurate and useful outputs. This approach:
-- Improves context relevance
-- Reduces hallucinations in AI outputs
-- Enables more accurate requirement extraction
-- Maintains historical context for projects
+    - Improves context relevance
+    - Reduces hallucinations in AI outputs
+    - Enables more accurate requirement extraction
+    - Maintains historical context for projects
 
-4. **Why Internal and External Context?**
+4. **Why Internal and External Context?**  
 Requirement Gathering needs data from within the company (Business Team, DevOps Team, etc.) as well as from external markets, social trends, newer regulations, study groups, clients, and service providers. Both sources need to be accounted for, so we maintain separate internal and external contexts for each project.
 
-5. **Why and How Versioning with Blob Storage?**
+5. **Why and How Versioning with Blob Storage?**  
 Project management involves drafting documents multiple times before approval. We use Azure Blob Storage for automatic version control. Documents are stored using Role-Based Access Control (RBAC), so only authorized employees can access the documents.
 
 # Tech stack
@@ -110,7 +110,7 @@ Security and data protection are paramount for Project ATLAS, especially when ha
    - Eliminates the risk of sending sensitive data to third-party API providers
      
 2. **Need-to-Know Access Controls** 
-***[MFA and RBAC (Role-Based Access Control)]]***
+***[MFA and RBAC (Role-Based Access Control)]***
    - Azure Multi-Factor Authentication (MFA) for secure logins
    - Role-Based Access Control (RBAC) to restrict access based on job functions
    - Conditional Access Policies to enforce security based on device, location, and risk factors
