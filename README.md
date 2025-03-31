@@ -23,7 +23,7 @@ In today's **fast-paced** software development landscape, traditional methods fo
   Utilize AI to generate test cases and automate code documentation, reducing test writing time and enhancing quality.
 
 - **Enhance Security**  
-  Leverage locally deployed LLMs alongside Azure Blob Storage, AAD authentication, MFA, and RBAC to ensure that all sensitive data remains secure and compliant.
+  Leverage privately deployed open source LLMs alongside Azure Blob Storage, MFA, and RBAC to ensure that all sensitive data remains secure and compliant.
 
 - **Integrate with JIRA & Workplace Automation**  
   Seamlessly push updates to JIRA and automate workflow processes to ensure efficient backlog management.
