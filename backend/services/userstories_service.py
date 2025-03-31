@@ -20,8 +20,8 @@ API_KEY = os.getenv('GEMINI_API_KEY')
 genai.configure(api_key=API_KEY)
 
 # Jira configuration
-JIRA_DOMAIN = os.getenv('JIRA_DOMAIN', 'anujtadkase.atlassian.net')
-JIRA_EMAIL = os.getenv('JIRA_EMAIL', 'anujtadkase@gmail.com')
+JIRA_DOMAIN = os.getenv('JIRA_DOMAIN', 'prathamgadkari.atlassian.net')
+JIRA_EMAIL = os.getenv('JIRA_EMAIL', 'prathamgadkari@gmail.com')
 JIRA_API_TOKEN = os.getenv('JIRA_API_TOKEN')
 
 def load_file_text(file_path: str) -> str:
@@ -150,7 +150,7 @@ def push_story_to_jira(story: dict):
     
     payload = {
         "fields": {
-            "project": {"key": "PROJ"},
+            "project": {"key": "SCRUM"},
             "summary": story.get("title", "User Story"),
             "description": json.dumps(story, indent=2),
             "issuetype": {"name": "Story"}

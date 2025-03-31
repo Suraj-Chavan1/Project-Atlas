@@ -8,9 +8,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Jira configuration
-JIRA_DOMAIN = os.getenv('JIRA_DOMAIN', 'anujtadkase.atlassian.net')
+JIRA_DOMAIN = os.getenv('JIRA_DOMAIN', 'prathamgadkari.atlassian.net')
 JIRA_API_URL = f"https://{JIRA_DOMAIN}/rest/api/2/search"
-JIRA_EMAIL = os.getenv('JIRA_EMAIL', 'anujtadkase@gmail.com')
+JIRA_EMAIL = os.getenv('JIRA_EMAIL', 'prathamgadkari@gmail.com')
 JIRA_API_TOKEN = os.getenv('JIRA_API_TOKEN')
 PROJECT_KEY = os.getenv('PROJECT_KEY', 'PROJ')
 

@@ -1,3 +1,9 @@
+import os
+from dotenv import load_dotenv
+
+# Load environment variables first
+load_dotenv()
+
 from flask import Flask
 from flask_cors import CORS
 from routes.jira2code_routes import jira2code_bp

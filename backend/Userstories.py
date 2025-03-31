@@ -9,6 +9,7 @@ import pandas as pd
 import docx
 from PIL import Image
 import requests  # Ensure this is installed: pip install requests
+import os
 
 # Use your API key as provided.
 API_KEY = "AIzaSyDRVj0Z_4xI3fy55Ux657tHnNGoC7JHl5g"
@@ -103,7 +104,7 @@ def extract_user_stories_json(document: str) -> list:
         "Extract user stories from the following technical requirement document and output ONLY a valid JSON array. "
         "Each element in the array must be a JSON object with the keys: 'title', 'user_role', 'goal', 'benefit', "
         "'acceptance_criteria', 'priority', and 'document'. "
-        "The 'priority' field should be one of: 'Must Have', 'Should Have', 'Could Have', or 'Won’t Have'. "
+        "The 'priority' field should be one of: 'Must Have', 'Should Have', 'Could Have', or 'Won't Have'. "
         "Do not output anything else besides the JSON array.\n\n"
         "Document:\n\n{document}\n\n"
         "Guidelines:\n"
@@ -164,13 +165,21 @@ def push_story_to_jira(story: dict):
     Push a user story to Jira.
     Customize the Jira URL, authentication, and payload fields as required.
     """
-    jira_url = "https://anujtadkase.atlassian.net/rest/api/2/issue"
-    auth = ("anujtadkase@gmail.com", "ATATT3xFfGF00HFOIkd57qMbNI8TI-6iX7hVb706JDOyRiIqSbmaGP8BpFxIQcEBLn7w2ZFTp0AwvwZmVZlNm887O77QNJpkBuYyKo-oNO_XHev5CoxNvzrHj-4DzF5pIlqvBUKBKGVqtmRaqLGVn8BRFI3EZa5tpvzdFGbY-JGZTSDnOWNyYeU=088F8725")
+    jira_domain = os.getenv("JIRA_DOMAIN")
+    jira_email = os.getenv("JIRA_EMAIL")
+    jira_api_token = os.getenv("JIRA_API_TOKEN")
+    project_key = os.getenv("PROJECT_KEY")
+
+    if not all([jira_domain, jira_email, jira_api_token, project_key]):
+        raise ValueError("Missing required Jira configuration in environment variables")
+
+    jira_url = f"https://{jira_domain}/rest/api/2/issue"
+    auth = (jira_email, jira_api_token)
     headers = {"Content-Type": "application/json"}
     
     payload = {
         "fields": {
-            "project": {"key": "PROJ"},
+            "project": {"key": project_key},
             "summary": story.get("title", "User Story"),
             "description": json.dumps(story, indent=2),
             "issuetype": {"name": "Story"}
