@@ -219,9 +219,6 @@ const DocGeneratorBRDSRS = () => {
 
   return (
     <Box sx={{ p: 3, maxWidth: 1200, margin: '0 auto' }}>
-      <Typography variant="h4" gutterBottom>
-        Generate BRD/SRS Documents
-      </Typography>
 
       <Stepper activeStep={activeStep} sx={{ mb: 4 }}>
         {steps.map((label) => (
