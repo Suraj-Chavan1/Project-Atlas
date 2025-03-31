@@ -5,8 +5,7 @@
 
 # 🏛️ Project ATLAS  🌐
 
-
-![image](https://github.com/user-attachments/assets/34993e11-f641-4c2a-ac79-094cb676c636)
+![Image](https://github.com/user-attachments/assets/7f434684-b0da-4ca3-aeb9-b01a1df77a21)
 
 
 ## Introduction
@@ -71,27 +70,27 @@ Project ATLAS delivers a robust, AI-powered solution that accelerates documentat
 
 ## Design Considerations:
 
-**Why Azure Functions?**
+1. **Why Azure Functions?**  
 We use Azure Functions for serverless, event-driven automation in our tool. This approach helps:
 - Handle document processing and user story generation
 - Provide real-time notifications and secure APIs
 - Ensure scalability and cost-efficiency
 - Integrate seamlessly with other Azure services
 
-**Why Privately Hosted LLMs/LVMs?**
+2. **Why Privately Hosted LLMs/LVMs?**
 Using Gemini/OpenAI APIs would risk exposing enterprise data to third-party companies. Project Atlas deals with sensitive data, so we use Ollama and Azure VMs to privately host open-source LLMs/LVMs like LLama (3B, 7B) and LLAVA 7B parameter models to handle document inputs appropriately.
 
-**Why Use RAGs (Retrieval Augmented Generation)?**
+3. **Why Use RAGs (Retrieval Augmented Generation)?**
 RAG systems help us quickly find and use only the most relevant information from a large database. By using Vector search with Cosmos DB and limiting the amount of data given to the language model, RAG systems create more accurate and useful outputs. This approach:
 - Improves context relevance
 - Reduces hallucinations in AI outputs
 - Enables more accurate requirement extraction
 - Maintains historical context for projects
 
-**Why Internal and External Context?**
+4. **Why Internal and External Context?**
 Requirement Gathering needs data from within the company (Business Team, DevOps Team, etc.) as well as from external markets, social trends, newer regulations, study groups, clients, and service providers. Both sources need to be accounted for, so we maintain separate internal and external contexts for each project.
 
-**Why and How Versioning with Blob Storage?**
+5. **Why and How Versioning with Blob Storage?**
 Project management involves drafting documents multiple times before approval. We use Azure Blob Storage for automatic version control. Documents are stored using Role-Based Access Control (RBAC), so only authorized employees can access the documents.
 
 # Tech stack
@@ -104,22 +103,22 @@ Project management involves drafting documents multiple times before approval. W
 ![Image](https://github.com/user-attachments/assets/4515460a-ced0-4887-946b-516f62939105)
 
 Security and data protection are paramount for Project ATLAS, especially when handling sensitive enterprise requirements and documentation. Our comprehensive security approach includes:
-1. **Keep Data in the Enterprise**
-***Local Open-Source LLMs deployed on Azure VMs***
+1. **Keep Data in the Enterprise** 
+***[Local Open-Source LLMs deployed on Azure VMs]***
    - Deploying Ollama Local LLMs on Azure VMs (GPU/CPU) ensures that in-house data never leaves the corporate network
    - Provides processing power for document analysis while maintaining data sovereignty
    - Eliminates the risk of sending sensitive data to third-party API providers
      
-2. **Need-to-Know Access Controls**
-***MFA and RBAC (Role-Based Access Control)***
+2. **Need-to-Know Access Controls** 
+***[MFA and RBAC (Role-Based Access Control)]]***
    - Azure Multi-Factor Authentication (MFA) for secure logins
    - Role-Based Access Control (RBAC) to restrict access based on job functions
    - Conditional Access Policies to enforce security based on device, location, and risk factors
    - Least privilege principles ensure users only access what they need
    - Read-only/Write-only permissions based on roles and responsibilities
   
-3. **Industry-Standard Encryption**
-   ***Industry Level Data Encryption Standards***
+3. **Industry-Standard Encryption** 
+***[Industry Level Data Encryption Standards]***
    - AES-256 for data encryption at rest
    - TLS 1.2/1.3 for secure communication between components
    - RSA-2048 for key exchange mechanisms
