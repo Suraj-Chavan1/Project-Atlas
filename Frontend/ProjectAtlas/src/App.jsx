@@ -10,8 +10,7 @@ import ReqDocPage from './pages/ReqDocPage'
 import UserStoriesMain from './components/UserStoriesMain'
 import UserStoriesPage from './pages/UserStoriesPage'
 import TestCasesPage from './pages/TestCasesPage'
-
-
+import AIRequirementsPage from './pages/AIRequirementsPage'
 
 function App() {
 
@@ -27,6 +26,7 @@ function App() {
         <Route path="/required-documents" element={<ReqDocPage />} />
         <Route path="/user-stories" element={<UserStoriesPage />} />
         <Route path="/test-cases" element={<TestCasesPage />} />
+        <Route path="/ai-requirements" element={<AIRequirementsPage />} />
       </Routes>
     </BrowserRouter>
   )
