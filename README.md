@@ -35,7 +35,7 @@ Moreover, **Project ATLAS** streamlines the extraction of **requirements** from 
   AI-powered test case generation and code documentation reducing manual efforts by 70 percent.
   
 - **Enable Multi-User Collaboration**  
-  Support scalable, concurrent usage with role-based access control and versioned document management where each team (sde/dev ops / analyst) can edit / version document based on client requirement on 1
+  Supports scalable, concurrent usage with role-based access control and versioned document management where each team (sde/dev ops / analyst) can edit / version document based on client requirement on 1
   dashboard.
 
 # USPs
