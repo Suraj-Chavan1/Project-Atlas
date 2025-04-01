@@ -175,6 +175,12 @@ Azure's cloud services enable both horizontal and vertical scaling, ensuring Pro
 4. **Azure Blob Storage:** Handle massive volumes of unstructured data (e.g., SRS/SOW documents, test case files, multimedia inputs) with high durability.
 
 # Implementation UI
+![WhatsApp Image 2025-04-01 at 22 23 43_978416b0](https://github.com/user-attachments/assets/cd530a67-e2a6-4ed5-94fc-9bde1c2a2887)
+
+![WhatsApp Image 2025-03-30 at 13 17 41_346ff8c4](https://github.com/user-attachments/assets/0c8b01bd-457c-43f1-9ce1-b3a09cf52ba4)
+
+![WhatsApp Image 2025-03-29 at 22 20 51_2e5f02db](https://github.com/user-attachments/assets/fc90610b-31b6-4364-8546-a10bb6272ef8)
+
 
 ## Closing Remarks
 
