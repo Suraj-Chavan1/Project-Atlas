@@ -180,6 +180,22 @@ Azure's cloud services enable both horizontal and vertical scaling, ensuring Pro
 ![WhatsApp Image 2025-03-30 at 13 17 41_346ff8c4](https://github.com/user-attachments/assets/0c8b01bd-457c-43f1-9ce1-b3a09cf52ba4)
 
 ![WhatsApp Image 2025-03-29 at 22 20 51_2e5f02db](https://github.com/user-attachments/assets/fc90610b-31b6-4364-8546-a10bb6272ef8)
+![image](https://github.com/user-attachments/assets/671638b3-534f-4959-ae6f-e3795b3a5e37)
+<img width="959" alt="image" src="https://github.com/user-attachments/assets/aad91285-8912-47e1-a9f9-c952d0eef4b5" />
+
+<img width="957" alt="image" src="https://github.com/user-attachments/assets/059ee060-03ad-4197-9861-706cc0d7005c" />
+
+<img width="959" alt="image" src="https://github.com/user-attachments/assets/cfcf88d1-723d-45e4-94a6-d258b624724b" />
+
+
+<img width="959" alt="image" src="https://github.com/user-attachments/assets/0eca0721-a533-40f5-b2bc-e36473781920" />
+
+<img width="941" alt="image" src="https://github.com/user-attachments/assets/41e269bb-13be-44c6-90d1-9ddaef29acfa" />
+<img width="959" alt="image" src="https://github.com/user-attachments/assets/9b7a7f8d-1ef3-411c-810d-5ac856ed4414" />
+<img width="958" alt="image" src="https://github.com/user-attachments/assets/1c252be7-2dfe-4b05-ae48-a9e00617e587" />
+<img width="959" alt="image" src="https://github.com/user-attachments/assets/a891a529-1358-4f80-8ae7-1ed8160ca18c" />
+
+
 
 
 ## Closing Remarks
