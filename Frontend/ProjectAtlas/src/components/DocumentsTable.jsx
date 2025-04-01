@@ -2,9 +2,7 @@ import React from 'react';
 
 const DocumentsTable = () => {
   const documents = [
-    { name: 'Doc1.pdf', version: '1.0', uploadedBy: 'Alice', project: 'Project A', date: '2025-03-29' },
-    { name: 'Doc2.docx', version: '2.1', uploadedBy: 'Bob', project: 'Project B', date: '2025-03-28' },
-    { name: 'Doc3.xlsx', version: '3.0', uploadedBy: 'Charlie', project: 'Project C', date: '2025-03-27' }
+    { name: 'BRD.pdf', version: '1.0', uploadedBy: 'Mrs A', project: 'Finance SaaS', date: '2025-03-29' }
   ];
 
   return (

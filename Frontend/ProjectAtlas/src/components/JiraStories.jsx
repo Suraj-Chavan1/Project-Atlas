@@ -7,6 +7,22 @@ import {
   CircularProgress,
   Alert,
   TextField,
+  Card,
+  CardContent,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Divider,
+  IconButton,
+  Tooltip,
+  Checkbox,
+  FormControlLabel,
+  FormGroup,
+  FormLabel,
+  FormHelperText,
+  Grid,
+  ListSubheader,
   List,
   ListItem,
   Chip,
@@ -20,6 +36,9 @@ import SendIcon from '@mui/icons-material/Send';
 import axios from 'axios';
 
 const JiraStories = () => {
+  const [selectedDoc, setSelectedDoc] = useState('');
+
+  const hardcodedDocs = ['project123.pdf', 'requirements.docx', 'design_notes.txt'];
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -108,6 +127,27 @@ const JiraStories = () => {
       <Typography variant="h4" gutterBottom>
         Generate Jira Stories
       </Typography>
+
+      <Card sx={{ maxWidth: 400, p: 2, m: 2 }}>
+      <CardContent>
+        <Typography variant="h6" gutterBottom>
+          Select a Document
+        </Typography>
+        <FormControl fullWidth>
+          <InputLabel>Documents</InputLabel>
+          <Select
+            value={selectedDoc}
+            onChange={(e) => setSelectedDoc(e.target.value)}
+          >
+            {hardcodedDocs.map((doc, index) => (
+              <MenuItem key={index} value={doc}>
+                {doc}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </CardContent>
+    </Card>
 
       <Paper sx={{ p: 3, mb: 3 }}>
         <input
