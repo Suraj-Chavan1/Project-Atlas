@@ -2,8 +2,10 @@ import React from 'react';
 import Logo from '../assets/Logo-dark.png';
 import BarclaysLogo from '../assets/barclays-logo.png';
 import HomeBg from '../assets/homepage.png';
+import { useNavigate } from 'react-router-dom';
 
 const HomePage = () => {
+  const navigate = useNavigate(); // Assuming you're using react-router-dom for navigation
   return (
     <div
       className="w-full min-h-screen flex flex-col bg-cover bg-center"
@@ -21,8 +23,8 @@ const HomePage = () => {
         </div>
 
         <div className="bg-[#607D8B] rounded-full p-2 flex px-4 text-white justify-center gap-4 cursor-pointer">
-          <div>Signup</div>
-          <div>Login</div>
+          <button>Signup</button>
+          <button onClick={()=>navigate('/login')}>Login</button>
         </div>
       </div>
 

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Login = () => {
+  const navigate = useNavigate(); 
   const [formData, setFormData] = useState({
     username: '',
     password: '',
@@ -18,6 +19,7 @@ const Login = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     // Add your login logic here
+    navigate('/projects'); // Redirect to projects page after login
     console.log('Login form submitted:', formData);
   };
 
