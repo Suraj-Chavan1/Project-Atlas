@@ -5,7 +5,8 @@
 
 # 🏛️ Project ATLAS  🌐
 
-![Image](https://github.com/user-attachments/assets/7f434684-b0da-4ca3-aeb9-b01a1df77a21)
+![image](https://github.com/user-attachments/assets/539e9c60-50b0-4ee3-b786-b54bcefda38a)
+
 
 
 ## Introduction
