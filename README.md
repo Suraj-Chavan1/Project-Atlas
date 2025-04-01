@@ -175,13 +175,14 @@ Azure's cloud services enable both horizontal and vertical scaling, ensuring Pro
 4. **Azure Blob Storage:** Handle massive volumes of unstructured data (e.g., SRS/SOW documents, test case files, multimedia inputs) with high durability.
 
 # Implementation UI
+![image](https://github.com/user-attachments/assets/671638b3-534f-4959-ae6f-e3795b3a5e37)
+
+<img width="959" alt="image" src="https://github.com/user-attachments/assets/aad91285-8912-47e1-a9f9-c952d0eef4b5" />
+
+
 ![WhatsApp Image 2025-04-01 at 22 23 43_978416b0](https://github.com/user-attachments/assets/cd530a67-e2a6-4ed5-94fc-9bde1c2a2887)
 
 ![WhatsApp Image 2025-03-30 at 13 17 41_346ff8c4](https://github.com/user-attachments/assets/0c8b01bd-457c-43f1-9ce1-b3a09cf52ba4)
-
-![WhatsApp Image 2025-03-29 at 22 20 51_2e5f02db](https://github.com/user-attachments/assets/fc90610b-31b6-4364-8546-a10bb6272ef8)
-![image](https://github.com/user-attachments/assets/671638b3-534f-4959-ae6f-e3795b3a5e37)
-<img width="959" alt="image" src="https://github.com/user-attachments/assets/aad91285-8912-47e1-a9f9-c952d0eef4b5" />
 
 <img width="957" alt="image" src="https://github.com/user-attachments/assets/059ee060-03ad-4197-9861-706cc0d7005c" />
 
@@ -195,7 +196,9 @@ Azure's cloud services enable both horizontal and vertical scaling, ensuring Pro
 <img width="958" alt="image" src="https://github.com/user-attachments/assets/1c252be7-2dfe-4b05-ae48-a9e00617e587" />
 <img width="959" alt="image" src="https://github.com/user-attachments/assets/a891a529-1358-4f80-8ae7-1ed8160ca18c" />
 
+<img width="941" alt="image" src="https://github.com/user-attachments/assets/1a0053ba-e96c-426e-9891-c8c65c5687eb" />
 
+<img width="952" alt="image" src="https://github.com/user-attachments/assets/255af99e-c65f-40e5-a9a0-fac99df9f656" />
 
 
 ## Closing Remarks
