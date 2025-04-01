@@ -81,7 +81,8 @@ We use Azure Functions for serverless, event-driven automation in our tool. This
 Using Gemini/OpenAI APIs would risk exposing enterprise data to third-party companies. Project Atlas deals with sensitive data, so we use Ollama and Azure VMs to privately host open-source LLMs/LVMs like LLama (3B, 7B) and LLAVA 7B parameter models to handle document inputs appropriately.
 
 3. **Why Use RAGs (Retrieval Augmented Generation)?**  
-RAG systems help us quickly find and use only the most relevant information from a large database. By using Vector search with Cosmos DB and limiting the amount of data given to the language model, RAG systems create more accurate and useful outputs. This approach:
+RAG systems help us quickly find and use only the most relevant information from a large database. By using Vector search with Cosmos DB and limiting the amount of data given to the language model, RAG systems create more accurate and useful outputs. 
+This approach:
     - Improves context relevance
     - Reduces hallucinations in AI outputs
     - Enables more accurate requirement extraction
