@@ -71,8 +71,8 @@ User Flow Link : https://drive.google.com/file/d/1n4Zuw9-QC7NzIxbbDbrtynsAy_VaDj
 
 
 ## Methodology
+![image](https://github.com/user-attachments/assets/10ea4420-c20e-4be0-bfdd-9728060bc869)
 
-![Image](https://github.com/user-attachments/assets/94748ea5-e69f-4a8c-b7cd-45e829995c27)
 
 ## Design Considerations:
 
