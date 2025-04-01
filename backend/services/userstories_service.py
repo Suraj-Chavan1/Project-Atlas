@@ -150,7 +150,7 @@ def push_story_to_jira(story: dict):
     
     payload = {
         "fields": {
-            "project": {"key": "PROJ"},
+            "project": {"key": "SCRUM"},
             "summary": story.get("title", "User Story"),
             "description": json.dumps(story, indent=2),
             "issuetype": {"name": "Story"}

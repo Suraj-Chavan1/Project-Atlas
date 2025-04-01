@@ -9,17 +9,20 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Jira configuration from environment variables
-JIRA_DOMAIN = os.getenv("JIRA_DOMAIN", "anujtadkase.atlassian.net")
+JIRA_DOMAIN = os.getenv("JIRA_DOMAIN")
 JIRA_API_URL = f"https://{JIRA_DOMAIN}/rest/api/2/search"
 JIRA_EMAIL = os.getenv("JIRA_EMAIL")
 JIRA_API_TOKEN = os.getenv("JIRA_API_TOKEN")
-PROJECT_KEY = os.getenv("JIRA_PROJECT_KEY", "PROJ")
+PROJECT_KEY = os.getenv("PROJECT_KEY")
 
 # Gemini configuration
 API_KEY = os.getenv("GEMINI_API_KEY")
 if not API_KEY:
     raise ValueError("GEMINI_API_KEY environment variable is not set")
 genai.configure(api_key=API_KEY)
+
+if not all([JIRA_DOMAIN, JIRA_EMAIL, JIRA_API_TOKEN, PROJECT_KEY]):
+    raise ValueError("Missing required Jira configuration in environment variables")
 
 def get_jira_issues(jql: str = None, max_results: int = 50) -> list:
     """
@@ -209,7 +212,7 @@ Requirements:
             
             # Attempt to fix common JSON issues
             try:
-                # Try to fix truncated JSON
+                # Try to fix truncated SON
                 if not cleaned_text.endswith("}"):
                     cleaned_text = cleaned_text + "}"
                 if cleaned_text.count("{") > cleaned_text.count("}"):
