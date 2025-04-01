@@ -88,42 +88,55 @@ const Dropdown = () => {
     );
   };
 
-const NewProjectModal = ({setIsModalOpen, setter}) => {
+  const NewProjectModal = ({ isModalOpen, setter, onAddProject }) => {
     const navigate = useNavigate();
     const [projectName, setProjectName] = useState('');
-
-      const handleCreateProject = () => {
-        console.log('Creating project:', projectName);
-        setIsModalOpen(false);
-        setProjectName('');
+    const [selectedIntegration, setSelectedIntegration] = useState('');
+    const [stakeholders, setStakeholders] = useState([{ name: '', role: '', email: '' }]);
+  
+    const handleCreateProject = () => {
+      if (!projectName.trim()) return; 
+  
+      const newProject = {
+        id: `proj-${Date.now()}`, 
+        name: projectName,
+        integration: selectedIntegration,
+        stakeholders,
+        url: `/project/${projectName}`,
       };
-    
-  return (
-    
-    <div className='backdrop-blur-sm bg-blue bg-opacity-30  fixed inset-0 flex justify-center items-center'>
-          <div className='bg-white p-6 rounded-lg shadow-lg w-1/2 flex flex-col max-h-[80vh]'>
-            <h2 className='text-xl font-bold mb-4'>Create New Project</h2>
-            <div className='overflow-y-auto max-h-[50vh] px-2'>
-            <input 
-              type='text' 
-              placeholder='Enter project name' 
+  
+      onAddProject(newProject); // Update projects in parent
+      setter(false); // Close modal
+      
+    };
+  
+    return (
+      <div className='backdrop-blur-sm bg-blue bg-opacity-30 fixed inset-0 flex justify-center items-center'>
+        <div className='bg-white p-6 rounded-lg shadow-lg w-1/2 flex flex-col max-h-[80vh]'>
+          <h2 className='text-xl font-bold mb-4'>Create New Project</h2>
+          <div className='overflow-y-auto max-h-[50vh] px-2'>
+            <input
+              type='text'
+              placeholder='Enter project name'
               className='w-full p-2 border rounded-md mb-4'
               value={projectName}
               onChange={(e) => setProjectName(e.target.value)}
             />
-            <div className=''>Project ID: msharma.barclays.120sd-adax1-adaxa</div>
-            <div className='mt-2'>Select Integration<Dropdown /></div>
-            <div className='mt-2'>Add Stakeholders<StakeholdersForm /></div>
-
-            
-            <div className='flex justify-end space-x-2'>
-              <button onClick={() => setter(false)} className='bg-gray-300 px-4 py-2 rounded-md'>Cancel</button>
-              <button  className='bg-[#00AEEF] text-white px-4 py-2 rounded-md' onClick={()=>navigate('/project/msharma.barclays.120sd-adax1-adaxa')}>Create</button>
-            </div>
+            <div className='mt-2'>Select Integration <Dropdown onSelect={setSelectedIntegration} /></div>
+            <div className='mt-2'>Add Stakeholders <StakeholdersForm stakeholders={stakeholders} setStakeholders={setStakeholders} /></div>
+  
+            <div className='flex justify-end space-x-2 mt-4'>   
+              <button onClick={() => setter(false)} className='bg-gray-300 px-4 py-2 rounded-md'>
+                Cancel
+              </button>
+              <button onClick={handleCreateProject} className='bg-[#00AEEF] text-white px-4 py-2 rounded-md'>
+                Create
+              </button>
             </div>
           </div>
         </div>
-  )
-}
-
-export default NewProjectModal
+      </div>
+    );
+  };
+  
+  export default NewProjectModal;
