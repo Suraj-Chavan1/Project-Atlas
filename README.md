@@ -97,6 +97,45 @@ Project management involves drafting documents multiple times before approval. W
 
 ![image](https://github.com/user-attachments/assets/7cb3e30f-1a3a-42e4-8e1e-bda50ef3085c)
 
+# Project Atlas
+
+Generative AI Powered Requirement Automation & Intelligent Documentation
+
+## Overview
+
+Project Atlas automates the manual processes of software documentation, requirement gathering, and test case generation by leveraging advanced AI models, serverless cloud services, and containerized deployments. It integrates tightly with enterprise systems to ensure security, scalability, and seamless collaboration.
+
+## Tech Stack
+
+### Frontend
+- **React JS:** For building a dynamic and responsive user interface.
+- **Tailwind CSS:** For a clean, modern, and customizable design.
+
+### Backend
+- **Flask & Python:** For developing RESTful APIs, handling backend logic, and integrating with Azure services and AI models.
+
+### Cloud & Serverless
+- **Azure Function Apps:** For event-driven, serverless automation that processes inputs and triggers workflows.
+- **Azure Blob Storage:** For storing uploaded documents and large datasets with built-in versioning.
+- **Azure Cosmos DB:** For scalable, low-latency storage and querying of structured data.
+
+### Machine Learning & AI
+- **LLAVA (Open Source Vision Model) & OLLAMA LLMs (Open Source Text Models)/ AZURE OPEN AI:** For processing diverse input types including text and images.
+
+### Deployment & Containerization
+- **Docker:** For containerizing applications to ensure consistency across development, testing, and production.
+- **Azure VMs:** For hosting containerized services and scaling as required.
+
+### Integration & Automation
+- **Jira REST API:** For seamless integration with project management tools, enabling automated user story creation and backlog management.
+- **Azure Logic Apps:** For automating workflows and integrating with external systems.
+
+### Security
+- **Azure Multi-Factor Authentication (MFA):** For secure user access.
+- **Role-Based Access Control (RBAC):** For managing permissions and ensuring data security.
+- **Industry-standard Encryption:** AES-256, TLS 1.2/1.3, RSA-2048, and SHA-256 to protect data in transit and at rest.
+
+
 
 # Security Aspects:
 
