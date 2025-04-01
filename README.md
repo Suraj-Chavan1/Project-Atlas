@@ -98,16 +98,6 @@ Project management involves drafting documents multiple times before approval. W
 
 ![image](https://github.com/user-attachments/assets/7cb3e30f-1a3a-42e4-8e1e-bda50ef3085c)
 
-# Project Atlas
-
-Generative AI Powered Requirement Automation & Intelligent Documentation
-
-## Overview
-
-Project Atlas automates the manual processes of software documentation, requirement gathering, and test case generation by leveraging advanced AI models, serverless cloud services, and containerized deployments. It integrates tightly with enterprise systems to ensure security, scalability, and seamless collaboration.
-
-## Tech Stack
-
 ### Frontend
 - **React JS:** For building a dynamic and responsive user interface.
 - **Tailwind CSS:** For a clean, modern, and customizable design.
@@ -135,7 +125,6 @@ Project Atlas automates the manual processes of software documentation, requirem
 - **Azure Multi-Factor Authentication (MFA):** For secure user access.
 - **Role-Based Access Control (RBAC):** For managing permissions and ensuring data security.
 - **Industry-standard Encryption:** AES-256, TLS 1.2/1.3, RSA-2048, and SHA-256 to protect data in transit and at rest.
-
 
 
 # Security Aspects:
@@ -185,9 +174,7 @@ Azure's cloud services enable both horizontal and vertical scaling, ensuring Pro
 3. **Azure Vector DB:** Dynamically scale for managing semantic embeddings and context indexing with low latency.
 4. **Azure Blob Storage:** Handle massive volumes of unstructured data (e.g., SRS/SOW documents, test case files, multimedia inputs) with high durability.
 
-
 # Implementation UI
-
 
 ## Closing Remarks
 
