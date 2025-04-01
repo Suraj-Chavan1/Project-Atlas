@@ -13,10 +13,9 @@
 
 In today's **fast-paced** software development landscape, traditional methods for **requirement gathering**, **documentation**, and **test case generation** are labor-intensive, error-prone, and time-consuming. At **Barclays**, where **precision** and **compliance** are critical, these challenges demand a transformative solution.
 
-**Project ATLAS** automates the entire lifecycle of **software documentation** using advanced **Generative AI**. By harnessing privately deployed open-source **LLMs** specifically **Ollama with LLaMA 3B/7B** and the **LLAVA Vision Model** on **Azure VMs**, the system ensures that sensitive data remains secure within **Barclays' infrastructure**. 
+**Project ATLAS** automates the entire lifecycle of **software documentation** using advanced **Generative AI**. 
 
 Moreover, **Project ATLAS** streamlines the extraction of **requirements** from both **textual** and **graphical inputs**, generates structured **SRS**/**BRD** or any types of requirement documents, and seamlessly integrates with **JIRA** for automated backlog updates and efficient **workflow management**.
-
 
 ## Objectives
 
@@ -27,7 +26,7 @@ Moreover, **Project ATLAS** streamlines the extraction of **requirements** from 
   Automatically generate standardized SRS, SOW documents, and JIRA user stories to accelerate the documentation process based on user input, speeding up documentation process by **90 percent**.
 
 - **Enhance Security**  
-  Leverage privately deployed open-source LLMs alongside Azure Blob Storage, MFA, and RBAC to ensure that all sensitive data remains secure and compliant.
+  Leverage MFA, and RBAC(Role based Access Control)  to ensure that all sensitive data remains secure and compliant.
 
 - **Integrate with JIRA & Workplace Automation**  
   Seamlessly push updates to JIRA and automate workflow processes to ensure efficient backlog management.
@@ -36,10 +35,10 @@ Moreover, **Project ATLAS** streamlines the extraction of **requirements** from 
   AI-powered test case generation and code documentation reducing manual efforts by 70 percent.
   
 - **Enable Multi-User Collaboration**  
-  Support scalable, concurrent usage with role-based access control and versioned document management.
+  Support scalable, concurrent usage with role-based access control and versioned document management where each team (sde/dev ops / analyst) can edit / version document based on client requirement on 1
+  dashboard.
 
 # USPs
-
 
 The following are the Unique Selling Propositions Our Platform Offers
 
