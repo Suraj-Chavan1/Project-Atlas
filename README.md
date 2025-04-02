@@ -10,6 +10,7 @@
 - It is a request to go through the readme first before going through the video for better understanding
 - Work is still in progress for quality documentation and fine tuning of llms
 - **(for demo purposes we have only used the most accessible tech we had)**
+
 ![image](https://github.com/user-attachments/assets/539e9c60-50b0-4ee3-b786-b54bcefda38a)
 ## Problem statement :
 
