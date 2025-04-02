@@ -119,7 +119,7 @@ User Flow Link : https://drive.google.com/file/d/1n4Zuw9-QC7NzIxbbDbrtynsAy_VaDj
 ### Cloud & Serverless
 - **Azure Function Apps:** For event-driven, serverless automation that processes inputs and triggers workflows.
 - **Azure Blob Storage:** For storing uploaded documents and large datasets with built-in versioning.
-- **Azure Cosmos DB:** For scalable, low-latency storage and querying of structured data.
+- **Azure Cosmos DB:** For scalable, low-latency storage of embeddings , which could be accessed through vector search
 
 ### Machine Learning & AI
 - **LLAVA (Open Source Vision Model) & OLLAMA LLMs (Open Source Text Models)/ AZURE OPEN AI:** For processing diverse input types including text and images.
@@ -143,7 +143,7 @@ User Flow Link : https://drive.google.com/file/d/1n4Zuw9-QC7NzIxbbDbrtynsAy_VaDj
 ![Image](https://github.com/user-attachments/assets/82b0f594-c93b-46d3-bbf4-8e8c43a653fd)
 
 Security and data protection are paramount for Project ATLAS, especially when handling sensitive enterprise requirements and documentation. Our comprehensive security approach includes:
-1. **Local Open-Source LLMs Deployed on Azure VMs**
+1. **Local Open-Source LLMs Deployed on Azure VMs**(Terms and conditions applied, do see the architecture diagram)
    - Deploying Ollama Local LLMs on Azure VMs (GPU/CPU) ensures that  in-house data is not leaked and ensures integrity
    - Such a setup makes an LLM fully customizable; however, scaling needs to be taken care of
      
@@ -163,11 +163,11 @@ Security and data protection are paramount for Project ATLAS, especially when ha
 
 ![Image](https://github.com/user-attachments/assets/89059016-8319-4d97-baf7-573bda53cafd)
 
-1. **Azure Functions** - Provides serverless compute resources that automatically scale based on demand, allowing us to efficiently process document inputs, LLM requests, and user story generation without managing infrastructure.
+1. **Azure Cloud** - Enterprise-grade cloud platform that seamlessly integrates with Barclays' existing tech infrastructure, providing compliance controls and unified security policies across all Project Atlas components.
 
-2. **Blob Storage** - Highly scalable cloud storage solution that securely manages document versioning with automatic redundancy, allowing teams to track changes and restore previous versions of requirement documents.
+2. **Azure Functions** - Provides serverless compute resources that automatically scale based on demand, allowing us to efficiently process document inputs, LLM requests, and user story generation without managing infrastructure.
 
-3. **Azure Cloud** - Enterprise-grade cloud platform that seamlessly integrates with Barclays' existing tech infrastructure, providing compliance controls and unified security policies across all Project Atlas components.
+3. **Blob Storage** - Highly scalable cloud storage solution that securely manages document versioning with automatic redundancy, allowing teams to track changes and restore previous versions of requirement documents.
 
 4. **Containerized Services** - Docker-based deployment approach that packages application components with their dependencies, ensuring consistent operation across development, testing, and production environments.
 
