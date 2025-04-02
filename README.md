@@ -1,6 +1,7 @@
 
 ## Problem statement chosen:
-![image](https://github.com/user-attachments/assets/7ccf432c-c214-4141-9bd7-2e750374b226)
+<img src="https://github.com/user-attachments/assets/7ccf432c-c214-4141-9bd7-2e750374b226" alt="Wider Image" style="width:100%;">
+
 
 
 # 🏛️ Project ATLAS  🌐
