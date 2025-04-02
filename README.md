@@ -3,7 +3,7 @@
 ![image](https://github.com/user-attachments/assets/16b7a14a-2920-4fda-852b-4f43fdfd962e)
 
 
-## Project Proof of Concept Demo:
+##  Demo   Project Proof of Concept:
 
 [![Watch the demo video](https://img.youtube.com/vi/ODOydtV3UBA/hqdefault.jpg)](https://www.youtube.com/watch?v=ODOydtV3UBA)
 
@@ -231,6 +231,10 @@ Security and data protection are paramount for Project ATLAS, especially when ha
 - Generated Boilerplate code along with test case modules built based on the User Stories generated previously.
 - Users can easily download the code and push to GitHub
 - Future integrations include adding a bot that pushes all the code to GitHub.
+
+##  Demo   Project Proof of Concept:
+
+[![Watch the demo video](https://img.youtube.com/vi/ODOydtV3UBA/hqdefault.jpg)](https://www.youtube.com/watch?v=ODOydtV3UBA)
 
 
 ## Closing Remarks
