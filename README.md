@@ -123,7 +123,9 @@ User Flow Link : https://drive.google.com/file/d/1n4Zuw9-QC7NzIxbbDbrtynsAy_VaDj
 
 ### Machine Learning & AI
 - **LLAVA (Open Source Vision Model) & OLLAMA LLMs (Open Source Text Models)/ AZURE OPEN AI:** For processing diverse input types including text and images.
-
+- **Whisper (Open Source Speech To Text):** For collecting inputs through speech in various english dialects.
+- **Azure Cognitive Services:** For input document processing and NLP
+ 
 ### Deployment & Containerization
 - **Docker:** For containerizing applications to ensure consistency across development, testing, and production.
 - **Azure VMs:** For hosting containerized services and scaling as required.
