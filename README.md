@@ -79,7 +79,7 @@ User Flow Link : https://drive.google.com/file/d/1n4Zuw9-QC7NzIxbbDbrtynsAy_VaDj
 
 
 ## Understanding the Flow
-![image](https://github.com/user-attachments/assets/10ea4420-c20e-4be0-bfdd-9728060bc869)
+![image](https://github.com/user-attachments/assets/603ed3e3-9f7a-441f-928c-6e443e1be1cf)
 
 
 ## Design Considerations:
@@ -111,7 +111,8 @@ User Flow Link : https://drive.google.com/file/d/1n4Zuw9-QC7NzIxbbDbrtynsAy_VaDj
 
 # Tech stack
 
-![image](https://github.com/user-attachments/assets/4e0b3d5a-d5ab-49f4-9d1b-bdfb85524c80)
+![image](https://github.com/user-attachments/assets/f2fdad20-c76b-462e-97f7-62e8813f673e)
+
 
 
 ### Frontend
@@ -189,9 +190,12 @@ Security and data protection are paramount for Project ATLAS, especially when ha
 ![image](https://github.com/user-attachments/assets/d5c1d809-2ab5-45d7-91b6-b25f3157f163)
 - Business Analysts, SCRUM Managers, DevOps Team Members, SDE Team Members login here
 
-![WhatsApp Image 2025-04-01 at 22 23 43_978416b0](https://github.com/user-attachments/assets/cd530a67-e2a6-4ed5-94fc-9bde1c2a2887)
-- Project page that shows all integrations, stakeholders and whether they have answered the LLM or not. Along with that, a graphical summary is shown
+![concurrentuserdashboard](https://github.com/user-attachments/assets/ce991ea1-ad8c-4e21-9403-cb59dd96e365)
 
+- Project page that shows all integrations, stakeholders .
+- Along with that, a graphical summary is shown.
+- This is where the llm gets its internal context from all stakeholders to generate documents.
+- **(FOR SRS we will consider sde team, for brd we will consider the customer req and the business analyst docs etc)**
 
 ![image](https://github.com/user-attachments/assets/47e2897d-b488-469b-a873-61d9e1acd75e)
 - Generating Standard Documents from requirements extracted from stakeholders
