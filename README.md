@@ -43,16 +43,17 @@ Moreover, **Project ATLAS** streamlines the extraction of **requirements** from 
 
 The following are the Unique Selling Propositions Our Platform Offers
 
-![image](https://github.com/user-attachments/assets/b6abc38f-4c13-4b28-926d-741c534c66d4)
+![Image](https://github.com/user-attachments/assets/25e681b8-7b60-4c8c-bfde-a9264bc9f357)
+
 ## Impact
 Project ATLAS delivers a robust, AI-powered solution that accelerates documentation, reduces manual intervention, and accelerates software development cycles. By ensuring data security and compliance through locally deployed models and secure cloud infrastructure, the platform significantly enhances operational efficiency and quality at Barclays.
 
 
 # Market Analysis
 
-![image](https://github.com/user-attachments/assets/e7869f52-7b7e-496f-bb13-ad77e7fb4389)
+![Image](https://github.com/user-attachments/assets/29efb695-f7c6-47f8-9b64-9ad129e31c1d)
 
-![image](https://github.com/user-attachments/assets/a57a8b13-d27d-4060-a9b3-e6383d56e3eb)
+![Image](https://github.com/user-attachments/assets/6002f0fe-e42b-4072-b063-b385394303e1)
 
 Project Atlas is superior by combining features of both Requirements Management Software (RMS) and Agile Project Management & Documentation Tools. Rather than competing directly, we provide an end-to-end solution for Requirement Engineering with:
 - AI-Powered Requirement Gathering
@@ -139,7 +140,7 @@ User Flow Link : https://drive.google.com/file/d/1n4Zuw9-QC7NzIxbbDbrtynsAy_VaDj
 
 # Security Aspects:
 
-![Image](https://github.com/user-attachments/assets/4515460a-ced0-4887-946b-516f62939105)
+![Image](https://github.com/user-attachments/assets/82b0f594-c93b-46d3-bbf4-8e8c43a653fd)
 
 Security and data protection are paramount for Project ATLAS, especially when handling sensitive enterprise requirements and documentation. Our comprehensive security approach includes:
 1. **Local Open-Source LLMs Deployed on Azure VMs**
@@ -160,7 +161,7 @@ Security and data protection are paramount for Project ATLAS, especially when ha
   
 # Scalability
 
-![Image](https://github.com/user-attachments/assets/7a5c2142-3b5a-441a-a00a-59261e8e109f)
+![Image](https://github.com/user-attachments/assets/89059016-8319-4d97-baf7-573bda53cafd)
 
 1. **Azure Functions** - Provides serverless compute resources that automatically scale based on demand, allowing us to efficiently process document inputs, LLM requests, and user story generation without managing infrastructure.
 
