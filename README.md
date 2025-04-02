@@ -177,44 +177,48 @@ Security and data protection are paramount for Project ATLAS, especially when ha
 
 # Implementation UI
 ![image](https://github.com/user-attachments/assets/671638b3-534f-4959-ae6f-e3795b3a5e37)
-Homepage of Project Atlas.
-<img width="959" alt="image" src="https://github.com/user-attachments/assets/aad91285-8912-47e1-a9f9-c952d0eef4b5" />
- Business Analysts, SCRUM Managers, DevOps Team Members, SDE Team Members login here
+- Homepage of Project Atlas.
 
+![image](https://github.com/user-attachments/assets/d5c1d809-2ab5-45d7-91b6-b25f3157f163)
+- Business Analysts, SCRUM Managers, DevOps Team Members, SDE Team Members login here
 
 ![WhatsApp Image 2025-04-01 at 22 23 43_978416b0](https://github.com/user-attachments/assets/cd530a67-e2a6-4ed5-94fc-9bde1c2a2887)
-Project page that shows all integrations, stakeholders and whether they have answered the LLM or not. Along with that, a graphical summary is shown
-
-![WhatsApp Image 2025-03-30 at 13 17 41_346ff8c4](https://github.com/user-attachments/assets/0c8b01bd-457c-43f1-9ce1-b3a09cf52ba4)
-Requirements are taken from clients and stakeholders using LLM. (Implementation shown in demo). These requirements are summarized at regular points and saved into the project context.
-
-<img width="959" alt="image" src="https://github.com/user-attachments/assets/cfcf88d1-723d-45e4-94a6-d258b624724b" />
-Generating Standard Documents from requirements extracted from stakeholders
-
-<img width="957" alt="image" src="https://github.com/user-attachments/assets/059ee060-03ad-4197-9861-706cc0d7005c" />
-All documents generated before and uploaded are versioned and stored using Azure Blob Storage
-
-<img width="959" alt="image" src="https://github.com/user-attachments/assets/0eca0721-a533-40f5-b2bc-e36473781920" />
-User stories generated from Standard Documents built before.
-
-<img width="941" alt="image" src="https://github.com/user-attachments/assets/41e269bb-13be-44c6-90d1-9ddaef29acfa" />
-User Stories generated based on all the requirements and standard documents. Each story is tagged as per MoSCoW schematic.
-
-<img width="958" alt="image" src="https://github.com/user-attachments/assets/1c252be7-2dfe-4b05-ae48-a9e00617e587" />
-BRD Document generated after LLM interviews stakeholders and extracts requirement from them. 
-
-<img width="959" alt="image" src="https://github.com/user-attachments/assets/a891a529-1358-4f80-8ae7-1ed8160ca18c" />
-BRD is editable as shown to account for multiple iterations. All drafts are versioned and saved
-
-<img width="959" alt="image" src="https://github.com/user-attachments/assets/9b7a7f8d-1ef3-411c-810d-5ac856ed4414" />
-User stories are pulled directly from JIRA and test cases can be generated using AI model here.
-
-<img width="941" alt="image" src="https://github.com/user-attachments/assets/1a0053ba-e96c-426e-9891-c8c65c5687eb" />
-Generated Boilerplate code along with test cases modules built based on User Stories generated previously.
+- Project page that shows all integrations, stakeholders and whether they have answered the LLM or not. Along with that, a graphical summary is shown
 
 
-<img width="952" alt="image" src="https://github.com/user-attachments/assets/255af99e-c65f-40e5-a9a0-fac99df9f656" />
-Product User Stories pushed directly to Backlog on JIRA from ATLAS. All user stories are generated with the assistance of AI models made in Project Atlas. 
+![image](https://github.com/user-attachments/assets/47e2897d-b488-469b-a873-61d9e1acd75e)
+- Generating Standard Documents from requirements extracted from stakeholders
+
+![image](https://github.com/user-attachments/assets/720f0646-dec1-4e9e-9236-8f0ccd0fe5f3)
+ - BRD Document generated after gathering internal context from stakeholders aswell as external missing context through websearch ai agent. 
+
+![image](https://github.com/user-attachments/assets/98015bac-b339-48e7-bb38-b99237b53cdf)
+- BRD is editable as shown to account for multiple iterations.
+- All drafts are versioned and saved.
+- Users can edit with ai, manually or with added context.
+
+![image](https://github.com/user-attachments/assets/fc91275e-8df4-4135-b9dc-8a60d6a6417c)
+- All documents generated before and uploaded are versioned and stored using Azure Blob Storage
+
+![image](https://github.com/user-attachments/assets/c1afb563-6585-492e-bf75-7a43c9966364)
+- User stories generated from Standard Documents built before.
+
+![image](https://github.com/user-attachments/assets/62774e5e-4900-4c1f-855c-38296ae47930)
+- User Stories generated based on all the requirements and standard documents. Each story is tagged as per MoSCoW schematic.
+
+![image](https://github.com/user-attachments/assets/95f29ee5-7186-4b42-b11a-8dd9cb67e981)
+
+- Product User Stories pushed directly to Backlog on JIRA from ATLAS.
+- All user stories are generated with the assistance of AI models made in Project Atlas. 
+
+![image](https://github.com/user-attachments/assets/33d98290-110e-4997-a926-b4897ecd8338)
+- User stories are pulled directly from JIRA and test cases along with code are generated using AI model here.
+
+![image](https://github.com/user-attachments/assets/73919b31-7c29-4d12-9bad-8168bd2b4780)
+- Generated Boilerplate code along with test cases modules built based on User Stories generated previously.
+- Users can easily download the code and push to github
+- Future integrations include adding a bot which pushes all the code to github.
+
 
 ## Closing Remarks
 
