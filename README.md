@@ -8,7 +8,6 @@
 ![image](https://github.com/user-attachments/assets/539e9c60-50b0-4ee3-b786-b54bcefda38a)
 
 
-
 ## Introduction
 
 In today's **fast-paced** software development landscape, traditional methods for **requirement gathering**, **documentation**, and **test case generation** are labor-intensive, error-prone, and time-consuming. At **Barclays**, where **precision** and **compliance** are critical, these challenges demand a transformative solution.
@@ -17,13 +16,14 @@ In today's **fast-paced** software development landscape, traditional methods fo
 
 Moreover, **Project ATLAS** streamlines the extraction of **requirements** from both **textual** and **graphical inputs**, generates structured **SRS**/**BRD** or any types of requirement documents, and seamlessly integrates with **JIRA** for automated backlog updates and efficient **workflow management**.
 
+
 ## Objectives
 
 - **Automate Requirement Extraction**  
   AI-driven analysis of documents and graphics to generate structured requirements, significantly reducing manual effort.
 
 - **Streamline Documentation**  
-  Automatically generate standardized SRS, SOW documents, and JIRA user stories to accelerate the documentation process based on user input, speeding up documentation process by **90 percent**.
+  Automatically generate standardized SRS, SOW, BRD documents, and JIRA user stories to accelerate the documentation process based on user input, speeding up documentation process by **90 percent**.
 
 - **Enhance Security**  
   Leverage MFA, and RBAC(Role based Access Control)  to ensure that all sensitive data remains secure and compliant.
@@ -35,8 +35,9 @@ Moreover, **Project ATLAS** streamlines the extraction of **requirements** from 
   AI-powered test case generation and code documentation reducing manual efforts by 70 percent.
   
 - **Enable Multi-User Collaboration**  
-  Supports scalable, concurrent usage with role-based access control and versioned document management where each team (sde/dev ops / analyst) can edit / version document based on client requirement on 1
+  Supports scalable, concurrent usage with role-based access control and versioned document management where each team (sde / dev ops / analyst) can edit / version document based on client requirement on 1
   dashboard.
+
 
 # USPs
 
@@ -46,23 +47,25 @@ The following are the Unique Selling Propositions Our Platform Offers
 ## Impact
 Project ATLAS delivers a robust, AI-powered solution that accelerates documentation, reduces manual intervention, and accelerates software development cycles. By ensuring data security and compliance through locally deployed models and secure cloud infrastructure, the platform significantly enhances operational efficiency and quality at Barclays.
 
+
 # Market Analysis
 
 ![image](https://github.com/user-attachments/assets/e7869f52-7b7e-496f-bb13-ad77e7fb4389)
 
 ![image](https://github.com/user-attachments/assets/a57a8b13-d27d-4060-a9b3-e6383d56e3eb)
 
-- The AI-driven requirement engineering market is rapidly growing with increased adoption of AI-powered documentation.
-- Project Atlas combines the best features of both product niches while adding AI-powered requirement gathering capabilities.
-- Large enterprises require automation due to compliance and efficiency demands.
+Project Atlas is superior by combining features of both Requirements Management Software (RMS) and Agile Project Management & Documentation Tools. Rather than competing directly, we provide an end-to-end solution for Requirement Engineering with:
+- AI-Powered Requirement Gathering
+- JIRA Integration
+- Automated User Story Generation
+- Traceability & Compliance
+- Collaboration & Documentation 
 
 
 # Methodology Details
 ## Architecture(Please do Zoom in or do go for the link for more details:
 ![barclays-Page-1 (8)](https://github.com/user-attachments/assets/77392e6a-3493-4ec2-a371-7e1a91c62f8b)
-Architecture Link : https://drive.google.com/file/d/1ucTztsu5L4DT479pYkpMUvZxqiQtP89q/view?usp=sharing
-
-
+Architecture Link: https://drive.google.com/file/d/1ucTztsu5L4DT479pYkpMUvZxqiQtP89q/view?usp=sharing
 
 
 ## User Flow
@@ -70,35 +73,36 @@ Architecture Link : https://drive.google.com/file/d/1ucTztsu5L4DT479pYkpMUvZxqiQ
 User Flow Link : https://drive.google.com/file/d/1n4Zuw9-QC7NzIxbbDbrtynsAy_VaDjm9/view?usp=sharing
 
 
-## Methodology
+## Understanding the Flow
 ![image](https://github.com/user-attachments/assets/10ea4420-c20e-4be0-bfdd-9728060bc869)
 
 
 ## Design Considerations:
 
-1. **Why Azure Functions?**  
-We use Azure Functions for serverless, event-driven automation in our tool. This approach helps:
-    - Handle document processing and user story generation
-    - Provide real-time notifications and secure APIs
-    - Ensure scalability and cost-efficiency
-    - Integrate seamlessly with other Azure services
+1. **Why Azure Functions?**
+   - We use Azure Functions for serverless, event-driven automation in our tool. This approach helps:
+      - Handle document processing
+      - User story generation
+      - Editing and prompting LLMs
+      - Secure APIs with scalability and cost-efficiency
+      - Integrate seamlessly with other Azure services
 
-2. **Why Privately Hosted LLMs/LVMs?**  
-Using Gemini/OpenAI APIs would risk exposing enterprise data to third-party companies. Project Atlas deals with sensitive data, so we use Ollama and Azure VMs to privately host open-source LLMs/LVMs like LLama (3B, 7B) and LLAVA 7B parameter models to handle document inputs appropriately.
+2. **Why Privately Hosted LLMs/LVMs?**
+   - Using Gemini/Grok APIs would risk exposing enterprise data to third-party companies.
+   - Project Atlas deals with sensitive data, so we use Ollama and Azure VMs to privately host open-source LLMs/LVMs like LLama (3B, 7B) and LLAVA 7B parameter models to handle document inputs appropriately OR Azure OpenAI is also a choice where we have enterprise grade security and cost effectiveness with ease of integration with Barclays.
 
-3. **Why Use RAGs (Retrieval Augmented Generation)?**  
-RAG systems help us quickly find and use only the most relevant information from a large database. By using Vector search with Cosmos DB and limiting the amount of data given to the language model, RAG systems create more accurate and useful outputs. 
-This approach:
-    - Improves context relevance
-    - Reduces hallucinations in AI outputs
-    - Enables more accurate requirement extraction
-    - Maintains historical context for projects
+3. **Why Use RAGs (Retrieval Augmented Generation)?**
+   - RAG systems help us quickly find and use only the most relevant information from a large database.
+   - By using Vector search with Cosmos DB and limiting the amount of data given to the language model, RAG systems create more accurate and useful outputs. 
 
-4. **Why Internal and External Context?**  
-Requirement Gathering needs data from within the company (Business Team, DevOps Team, etc.) as well as from external markets, social trends, newer regulations, study groups, clients, and service providers. Both sources need to be accounted for, so we maintain separate internal and external contexts for each project.
+4. **Why Internal Context and AI Agent for External Context?**
+   - Requirement Gathering needs data from within the company (Business Team, DevOps Team, etc.) as well as from external markets, social trends, newer regulations, study groups, clients, and service providers.
+   - Both sources need to be accounted for, and thus we maintain internal and external contexts, and an AI agent helps search for the information missing from the internal contexts with the tool of web search.
 
-5. **Why and How Versioning with Blob Storage?**  
-Project management involves drafting documents multiple times before approval. We use Azure Blob Storage for automatic version control. Documents are stored using Role-Based Access Control (RBAC), so only authorized employees can access the documents.
+5. **Why and How Versioning with Blob Storage?**
+   - Project management involves drafting documents multiple times before approval.
+   - We use Azure Blob Storage for automatic version control.
+   - Users from each team can track, manage, and restore versions, ensuring integrity, transparency, and accountability.
 
 # Tech stack
 
@@ -138,47 +142,37 @@ Project management involves drafting documents multiple times before approval. W
 ![Image](https://github.com/user-attachments/assets/4515460a-ced0-4887-946b-516f62939105)
 
 Security and data protection are paramount for Project ATLAS, especially when handling sensitive enterprise requirements and documentation. Our comprehensive security approach includes:
-1. **Keep Data in the Enterprise** 
-***[Local Open-Source LLMs deployed on Azure VMs]***
-   - Deploying Ollama Local LLMs on Azure VMs (GPU/CPU) ensures that in-house data never leaves the corporate network
-   - Provides processing power for document analysis while maintaining data sovereignty
-   - Eliminates the risk of sending sensitive data to third-party API providers
+1. **Local Open-Source LLMs Deployed on Azure VMs**
+   - Deploying Ollama Local LLMs on Azure VMs (GPU/CPU) ensures that  in-house data is not leaked and ensures integrity
+   - Such a setup makes an LLM fully customizable; however, scaling needs to be taken care of
      
-2. **Need-to-Know Access Controls** 
-***[MFA and RBAC (Role-Based Access Control)]***
+2. **MFA (Multi-Factor Authentication) and RBAC (Role-Based Access Control)**
    - Azure Multi-Factor Authentication (MFA) for secure logins
    - Role-Based Access Control (RBAC) to restrict access based on job functions
-   - Conditional Access Policies to enforce security based on device, location, and risk factors
+   - Conditional Access Policies to enforce security
    - Least privilege principles ensure users only access what they need
-   - Read-only/Write-only permissions based on roles and responsibilities
   
-3. **Industry-Standard Encryption** 
-***[Industry Level Data Encryption Standards]***
+3. **Industry Level Data Encryption Standards**
    - AES-256 for data encryption at rest
    - TLS 1.2/1.3 for secure communication between components
    - RSA-2048 for key exchange mechanisms
    - SHA-256 for hashing and data integrity verification
-   - FIPS 140-2/3 compliance for regulated industries
   
 # Scalability
 
 ![Image](https://github.com/user-attachments/assets/7a5c2142-3b5a-441a-a00a-59261e8e109f)
 
-## Infrastructure Readiness
+1. **Azure Functions** - Provides serverless compute resources that automatically scale based on demand, allowing us to efficiently process document inputs, LLM requests, and user story generation without managing infrastructure.
 
-Azure's cloud services enable both horizontal and vertical scaling, ensuring Project ATLAS can handle increased user numbers and application volumes without compromising performance, specifically for features like requirement extraction, document generation, and test case creation.
+2. **Blob Storage** - Highly scalable cloud storage solution that securely manages document versioning with automatic redundancy, allowing teams to track changes and restore previous versions of requirement documents.
 
-**Horizontal Scaling:**  
-- Add more resource instances using Azure Virtual Machine Scale Sets and Azure Functions based on demand, ensuring efficient processing of high-volume textual and graphical inputs.
+3. **Azure Cloud** - Enterprise-grade cloud platform that seamlessly integrates with Barclays' existing tech infrastructure, providing compliance controls and unified security policies across all Project Atlas components.
 
-**Vertical Scaling:**  
-- Upgrade existing resources with flexible VM sizes and scale Azure Vector DB to support intensive data ingestion and real-time processing needs.
+4. **Containerized Services** - Docker-based deployment approach that packages application components with their dependencies, ensuring consistent operation across development, testing, and production environments.
 
-**Key Considerations for Scalability:**  
-1. **Virtual Machine Scale Sets:** Automatically scale VM instances to support locally deployed LLMs (Ollama with LLaMA 3B/7B and LLAVA Vision Model) during high-demand processing.
-2. **Azure Functions:** Scale out automatically to handle event-triggered tasks such as document parsing and data extraction.
-3. **Azure Vector DB:** Dynamically scale for managing semantic embeddings and context indexing with low latency.
-4. **Azure Blob Storage:** Handle massive volumes of unstructured data (e.g., SRS/SOW documents, test case files, multimedia inputs) with high durability.
+5. **Azure VMs** - Customizable virtual machines with flexible compute options that host the web application and LLMs, allowing for rapid vertical scaling during peak usage periods without compromising data integrity.
+
+6. **Azure Cosmos DB** - Globally distributed, multi-model database service that efficiently stores and queries vector embeddings with low latency, enabling fast semantic search capabilities for requirement extraction.
 
 # Implementation UI
 ![image](https://github.com/user-attachments/assets/671638b3-534f-4959-ae6f-e3795b3a5e37)
