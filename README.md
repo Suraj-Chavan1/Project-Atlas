@@ -1,6 +1,7 @@
 
 ## Problem statement chosen:
-<img src="https://github.com/user-attachments/assets/7ccf432c-c214-4141-9bd7-2e750374b226" alt="Wider Image" style="width:100%;">
+![image](https://github.com/user-attachments/assets/16b7a14a-2920-4fda-852b-4f43fdfd962e)
+
 
 ## Project Proof of concept demo:
 
