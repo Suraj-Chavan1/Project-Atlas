@@ -2,13 +2,15 @@
 ## Problem statement chosen:
 <img src="https://github.com/user-attachments/assets/7ccf432c-c214-4141-9bd7-2e750374b226" alt="Wider Image" style="width:100%;">
 
-## Problem statement demo:
-[![Project Atlas Demo](https://img.youtube.com/vi/ODOydtV3UBA/maxresdefault.jpg)](https://www.youtube.com/watch?v=ODOydtV3UBA)
-## It is a request to go through the readme first before going through the video for better understanding:
+## Project Proof of concept demo:
+
+[![Watch the demo video](https://img.youtube.com/vi/ODOydtV3UBA/hqdefault.jpg)](https://www.youtube.com/watch?v=ODOydtV3UBA)
+
+## It is a request to go through the readme first before going through the video for better understanding, Work is still in progress for quality documentation and fine tuning of llms
 # 🏛️ Project ATLAS  🌐
 
 ![image](https://github.com/user-attachments/assets/539e9c60-50b0-4ee3-b786-b54bcefda38a)
-
+## Problem statement :
 
 ## Introduction
 
