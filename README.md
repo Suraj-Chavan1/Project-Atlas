@@ -111,7 +111,8 @@ User Flow Link : https://drive.google.com/file/d/1n4Zuw9-QC7NzIxbbDbrtynsAy_VaDj
 
 # Tech stack
 
-![image](https://github.com/user-attachments/assets/7cb3e30f-1a3a-42e4-8e1e-bda50ef3085c)
+![image](https://github.com/user-attachments/assets/4e0b3d5a-d5ab-49f4-9d1b-bdfb85524c80)
+
 
 ### Frontend
 - **React JS:** For building a dynamic and responsive user interface.
