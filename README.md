@@ -95,9 +95,12 @@ User Flow Link: https://drive.google.com/file/d/1n4Zuw9-QC7NzIxbbDbrtynsAy_VaDjm
       - Secure APIs with scalability and cost-efficiency
       - Integrate seamlessly with other Azure services
 
-2. **Why Privately Hosted LLMs/LVMs?**
+2. **Choice of LLMs/LVMs?(PLEASE DO SEE THE TERMS AND CONDITIONS IN ARCHITECTURE)**
    - Using **Gemini/Grok APIs** would risk exposing enterprise data to third-party companies.
-   - Project Atlas deals with sensitive data, so we use **Ollama** and **Azure VMs** to privately host open-source LLMs/LVMs like **LLama (3B, 7B)** and **LLAVA 7B** parameter models to handle document inputs appropriately OR **Azure OpenAI** is also a choice where we have enterprise grade security and cost effectiveness with ease of integration with Barclays.
+   - Project Atlas deals with sensitive data, so we use **Ollama** and **Azure VMs** to privately host open-source LLMs/LVMs like **LLama (3B, 7B)** and **LLAVA 7B** parameter models to handle document inputs appropriately
+   - OR
+   -  **Azure OpenAI** is also a choice where we have enterprise grade security and cost effectiveness with ease of integration with Barclays.(Microsoft azure gurantees that the customer info wont be used for open ai to train its outputs on...so its a choice which would depend on barclays.)
+
 
 3. **Why Use RAGs (Retrieval Augmented Generation)?**
    - **RAG systems** help us quickly find and use only the most relevant information from a large database.
@@ -125,7 +128,7 @@ User Flow Link: https://drive.google.com/file/d/1n4Zuw9-QC7NzIxbbDbrtynsAy_VaDjm
 ### Backend
 - **Flask & Python:** For developing RESTful APIs, handling backend logic, and integrating with Azure services and AI models.
 
-### Cloud & Serverless
+### Cloud
 - **Azure Function Apps:** For event-driven, serverless automation that processes inputs and triggers workflows.
 - **Azure Blob Storage:** For storing uploaded documents and large datasets with built-in versioning.
 - **Azure Cosmos DB:** For scalable, low-latency storage of embeddings, which could be accessed through vector search.
