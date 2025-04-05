@@ -133,7 +133,7 @@ User Flow Link: https://drive.google.com/file/d/1n4Zuw9-QC7NzIxbbDbrtynsAy_VaDjm
 
 ### Cloud
 - **Azure Function Apps:** For event-driven, serverless automation that processes inputs and triggers workflows.
-- **Azure Blob Storage:** For storing uploaded documents and large datasets with built-in versioning.
+- **Azure Blob Storage:** For storing uploaded documents  with built-in versioning.
 - **Azure Cosmos DB:** For scalable, low-latency storage of embeddings, which could be accessed through vector search.
 
 ### Machine Learning & AI
