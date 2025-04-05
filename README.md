@@ -162,6 +162,7 @@ Security and data protection are paramount for Project ATLAS, especially when ha
 1. **Local Open-Source LLMs Deployed on Azure VMs** (Terms and conditions applied, do see the architecture diagram)
    - Deploying Ollama Local LLMs on Azure VMs (GPU/CPU) ensures that  in-house data is not leaked and **ensures integrity**.
    - Such a setup makes an LLM fully customizable; however, scaling needs to be taken care of.
+   - So current choice is of **Azure OpenAI** as Microsoft ensures security and  the cost of vms(for testing is very high) but in future if **Barclays** is concerned about security we could use this approach.
      
 2. **MFA (Multi-Factor Authentication) and RBAC (Role-Based Access Control)**
    - Azure Multi-Factor Authentication (MFA) for **secure logins**.
