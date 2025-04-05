@@ -102,6 +102,7 @@ User Flow Link: https://drive.google.com/file/d/1n4Zuw9-QC7NzIxbbDbrtynsAy_VaDjm
    - Project Atlas deals with sensitive data, so we use **Ollama** and **Azure VMs** to privately host open-source LLMs/LVMs like **LLama (3B, 7B)** and **LLAVA 7B** parameter models to handle document inputs appropriately
    - OR
    -  **Azure OpenAI** is also a choice where we have enterprise grade security and cost effectiveness with ease of integration with Barclays.(Microsoft azure gurantees that the customer info wont be used for open ai to train its outputs on...so its a choice which would depend on barclays.)
+   - AzureOpenAI Security Clause: https://learn.microsoft.com/en-us/legal/cognitive-services/openai/data-privacy?utm_source=chatgpt.com&tabs=azure-portal
 
 
 3. **Why Use RAGs (Retrieval Augmented Generation)?**
@@ -162,7 +163,9 @@ Security and data protection are paramount for Project ATLAS, especially when ha
 1. **Local Open-Source LLMs Deployed on Azure VMs** (Terms and conditions applied, do see the architecture diagram)
    - Deploying Ollama Local LLMs on Azure VMs (GPU/CPU) ensures that  in-house data is not leaked and **ensures integrity**.
    - Such a setup makes an LLM fully customizable; however, scaling needs to be taken care of.
-   - So current choice is of **Azure OpenAI** as Microsoft ensures security and  the cost of vms(for testing is very high) but in future if **Barclays** is concerned about security we could use this approach.
+   - So current choice is of **Azure OpenAI** as Microsoft ensures security and  the cost of vms(for testing is very high) but in future if **Barclays** is concerned about security we would use the approach of privately deployed llms.
+   - **Microsoft Azure OpenAI Data privacy clause**
+   - https://learn.microsoft.com/en-us/legal/cognitive-services/openai/data-privacy?utm_source=chatgpt.com&tabs=azure-portal
      
 2. **MFA (Multi-Factor Authentication) and RBAC (Role-Based Access Control)**
    - Azure Multi-Factor Authentication (MFA) for **secure logins**.
