@@ -7,6 +7,8 @@
 
 [![Watch the demo video](https://img.youtube.com/vi/ODOydtV3UBA/hqdefault.jpg)](https://www.youtube.com/watch?v=ODOydtV3UBA)
 
+- https://www.youtube.com/watch?v=ODOydtV3UBA
+
 - It is a request to go through the readme first before going through the video for better understanding
 - Work is still in progress for quality documentation and fine-tuning of LLMs
 - **(For demo purposes we have only used the most accessible technology we had)**
@@ -238,6 +240,8 @@ Security and data protection are paramount for Project ATLAS, especially when ha
 ##  Demo Video: Project Proof of Concept:( Click on pic)
 
 [![Watch the demo video](https://img.youtube.com/vi/ODOydtV3UBA/hqdefault.jpg)](https://www.youtube.com/watch?v=ODOydtV3UBA)
+- https://www.youtube.com/watch?v=ODOydtV3UBA
+
 
 
 ## Closing Remarks
