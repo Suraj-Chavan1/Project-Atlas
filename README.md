@@ -91,9 +91,7 @@ User Flow Link: https://drive.google.com/file/d/1n4Zuw9-QC7NzIxbbDbrtynsAy_VaDjm
 
 1. **Why Azure Functions?**
    - We use Azure Functions for **serverless, event-driven automation** in our tool. This approach helps:
-      - Handle document processing
-      - User story generation
-      - Editing and prompting LLMs
+      - Handle diverse type of  inputs and for processing them.
       - Secure APIs with scalability and cost-efficiency
       - Integrate seamlessly with other Azure services
 
@@ -105,9 +103,10 @@ User Flow Link: https://drive.google.com/file/d/1n4Zuw9-QC7NzIxbbDbrtynsAy_VaDjm
    - AzureOpenAI Security Clause: https://learn.microsoft.com/en-us/legal/cognitive-services/openai/data-privacy?utm_source=chatgpt.com&tabs=azure-portal
 
 
-3. **Why Use RAGs (Retrieval Augmented Generation)?**
+3. **Why Use RAG (Retrieval Augmented Generation)?**
    - **RAG systems** help us quickly find and use only the most relevant information from a large database.
-   - By using vector search with **Cosmos DB** and limiting the amount of data given to the language model, RAG systems create more accurate and useful outputs. 
+   - By using vector search with **Cosmos DB** and limiting the amount of data given to the language model, RAG systems create more accurate and insightful outputs.
+  
 
 4. **Why Internal Context and AI Agent for External Context?**
    - Requirement gathering needs data from within the company (Business Team, DevOps Team, etc.) as well as from external markets, social trends, newer regulations, study groups, clients, and service providers.
@@ -117,7 +116,6 @@ User Flow Link: https://drive.google.com/file/d/1n4Zuw9-QC7NzIxbbDbrtynsAy_VaDjm
    - Project management involves drafting documents multiple times before approval.
    - We use **Azure Blob Storage** for **automatic version control**.
    - Users from each team can track, manage, and restore versions, ensuring integrity, transparency, and accountability.
-
 
 # Tech stack
 
