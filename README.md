@@ -2,12 +2,14 @@
 ## Problem Statement chosen:
 ![image](https://github.com/user-attachments/assets/16b7a14a-2920-4fda-852b-4f43fdfd962e)
 
+
+
 # Table of Contents
 
 | Section                                                   | Link/Reference                                                         |
 |-----------------------------------------------------------|------------------------------------------------------------------------|
 | [Problem Statement chosen](#problem-statement-chosen)     | Overview of the chosen problem statement                               |
-| [Demo Video: Project Proof of Concept](#demo-video-project-proof-of-concept) | Video demonstration link and explanation                              |
+| [Demo Video Project Proof of Concept](#demo-video-project-proof-of-concept) | Video demonstration link and explanation             |
 | [Problem Statement](#problem-statement)                   | Detailed problem statement with images                                 |
 | [Introduction](#introduction)                             | Project context, background, and scope                                 |
 | [Objectives](#objectives)                                 | Project goals and deliverables                                         |
@@ -25,7 +27,9 @@
 | [Implementation UI](#implementation-ui)                   | UI snapshots, features, and navigation details                         |
 | [Closing Remarks](#closing-remarks)                       | Final thoughts, acknowledgments, and feedback links                    |
 
-##  Demo Video:   Project Proof of Concept:( Click on pic)
+
+## Demo Video Project Proof of Concept
+
 
 [![Watch the demo video](https://img.youtube.com/vi/ODOydtV3UBA/hqdefault.jpg)](https://www.youtube.com/watch?v=ODOydtV3UBA)
 
