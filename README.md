@@ -2,6 +2,28 @@
 ## Problem Statement chosen:
 ![image](https://github.com/user-attachments/assets/16b7a14a-2920-4fda-852b-4f43fdfd962e)
 
+# Table of Contents
+
+| Section                                                   | Link/Reference                                                         |
+|-----------------------------------------------------------|------------------------------------------------------------------------|
+| [Problem Statement chosen](#problem-statement-chosen)     | Overview of the chosen problem statement                               |
+| [Demo Video: Project Proof of Concept](#demo-video-project-proof-of-concept) | Video demonstration link and explanation                              |
+| [Problem Statement](#problem-statement)                   | Detailed problem statement with images                                 |
+| [Introduction](#introduction)                             | Project context, background, and scope                                 |
+| [Objectives](#objectives)                                 | Project goals and deliverables                                         |
+| [USPs](#usps)                                             | Unique Selling Propositions overview                                   |
+| [Impact](#impact)                                         | Impact assessment and benefits                                         |
+| [Market Analysis](#market-analysis)                       | Comparative analysis and market positioning                            |
+| [Methodology Details](#methodology-details)               | In-depth methodology and technical approaches                          |
+| &emsp; [Architecture](#architecture)                     | Architecture diagram and detailed link                                 |
+| &emsp; [User Flow](#user-flow)                           | User flow diagram and reference link                                   |
+| &emsp; [Understanding the Flow](#understanding-the-flow) | Visual representation of process flow                                  |
+| [Design Considerations](#design-considerations)           | Key design decisions and reasoning                                     |
+| [Tech Stack](#tech-stack)                                 | Technologies and tools used (Frontend, Backend, Cloud, etc.)             |
+| [Security Aspects](#security-aspects)                     | Security strategy and encryption methods                               |
+| [Scalability](#scalability)                               | Scalability approaches and cloud infrastructure details                |
+| [Implementation UI](#implementation-ui)                   | UI snapshots, features, and navigation details                         |
+| [Closing Remarks](#closing-remarks)                       | Final thoughts, acknowledgments, and feedback links                    |
 
 ##  Demo Video:   Project Proof of Concept:( Click on pic)
 
