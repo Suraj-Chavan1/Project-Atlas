@@ -168,8 +168,8 @@ User Flow Link: https://drive.google.com/file/d/1n4Zuw9-QC7NzIxbbDbrtynsAy_VaDjm
 - **Azure Blob Storage:** For storing uploaded documents  with built-in versioning.
 - **Azure Cosmos DB:** For scalable, low-latency storage of embeddings, which could be accessed through vector search.
 
-### Machine Learning & AI
-- **LLAVA (Open Source Vision Model) & OLLAMA LLMs (Open Source Text Models)/Azure OpenAI:** For processing diverse input types, including text and images.
+### Generative AI and ML
+- **LLAVA (Open Source Vision Model) ,  OLLAMA LLMs (7B,16B) Parameters  (Open Source Text Models), Azure OpenAI:** For processing diverse input types, including text and images.
 - **Whisper (Open Source Speech To Text):** For collecting inputs through speech in various English dialects.
 - **Azure Cognitive Services:** For input document processing and NLP.
  
