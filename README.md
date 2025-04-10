@@ -2,7 +2,16 @@
 ## Problem Statement chosen:
 ![image](https://github.com/user-attachments/assets/16b7a14a-2920-4fda-852b-4f43fdfd962e)
 
+## Some Points to Consider and Future Work:
 
+- It is a request to go through the readme first before going through the video for better understanding.
+- There is also our frontend implementation , which shows the flow , which you can go through.
+- Please also do see our architecture and user flow diagrams for clarity.
+
+## Future work:
+- We are working on a microsoft teams integration , which would directly send all the meeting documents, transcripts etc directly to Project Atlas dashboard, so that requirement documents can be formed directly from your meets.
+- We are also working on fine tuning the large language models so that the document output is precise.
+- Along with this we are also working towards github bot integration so that you can push your codes directly from project Atlas to github.
 
 # Table of Contents
 
@@ -36,7 +45,6 @@
 - https://www.youtube.com/watch?v=ODOydtV3UBA
 
 - It is a request to go through the readme first before going through the video for better understanding
-- Work is still in progress for quality documentation and fine-tuning of LLMs
 - **(For demo purposes we have only used the most accessible technology we had)**
 
 
