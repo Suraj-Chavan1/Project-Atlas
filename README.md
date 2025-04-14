@@ -107,7 +107,8 @@ Project Atlas is superior by combining features of both **Requirements Managemen
 
 
 # Methodology Details
-## Architecture(Please do Zoom in or do go for the link for more details:
+## Architecture
+## (Please do Zoom in or do go for the link for more details:)
 ![barclays-Page-1 (8)](https://github.com/user-attachments/assets/77392e6a-3493-4ec2-a371-7e1a91c62f8b)
 Architecture Link: https://drive.google.com/file/d/1ucTztsu5L4DT479pYkpMUvZxqiQtP89q/view?usp=sharing
 
