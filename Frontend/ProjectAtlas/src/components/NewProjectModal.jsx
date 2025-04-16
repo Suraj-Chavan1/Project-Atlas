@@ -122,7 +122,7 @@ const Dropdown = () => {
               value={projectName}
               onChange={(e) => setProjectName(e.target.value)}
             />
-            <div className='mt-2'>Select Integration <Dropdown onSelect={setSelectedIntegration} /></div>
+            <input className='p-1 border border-gray-300 rounded-md mb-4' type='text' placeholder='Project Key on JIRA' />
             <div className='mt-2'>Add Stakeholders <StakeholdersForm stakeholders={stakeholders} setStakeholders={setStakeholders} /></div>
   
             <div className='flex justify-end space-x-2 mt-4'>   

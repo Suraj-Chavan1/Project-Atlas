@@ -27,11 +27,7 @@ const Login = () => {
     <div className="flex min-h-screen bg-white">
       {/* Left side with background image */}
       <div 
-        className="hidden md:flex md:w-1/2 flex-col justify-start p-12 relative bg-cover bg-center" 
-        style={{ 
-          backgroundImage: "url('/src/assets/loginBg.png')",
-          //backgroundColor: '#00AEEF' // Fallback color if image fails to load
-        }}
+        className="hidden md:flex md:w-1/2 flex-col bg-[#00AEEF] justify-start p-12 relative bg-cover bg-center" 
       >
         {/* Semi-transparent overlay to ensure text remains readable */}
         <div className="absolute inset-0 bg-opacity-50"></div>

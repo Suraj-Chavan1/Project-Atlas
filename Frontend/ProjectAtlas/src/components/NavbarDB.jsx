@@ -12,7 +12,7 @@ const NavbarDB = ({title, byline}) => {
             <div className='flex justify-center'>
                 <div className='w-10 h-10 rounded-full bg-orange-400 text-white font-bold flex justify-center items-center'>AB</div>
                 <div className='flex flex-col ml-2 justify-center text-left'>
-                <div className='text-sm font-bold'>AB Choudhary</div>
+                <div className='text-sm font-bold'>Demo User</div>
                 <div className='text-sm'>SCRUM Master</div>
             </div>
         </div>
