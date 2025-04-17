@@ -2,7 +2,7 @@ import React from 'react'
 
 const NavbarDB = ({title, byline}) => {
   return (
-    <div className='p-3 flex justify-between h-full items-center border-b border-[#989898]'>
+    <div className='bg-white p-3 flex justify-between h-full items-center border-b border-[#989898]'>
 
             <div className='flex flex-col'>
                 <div className='font-bold text-xl'>{title}</div>

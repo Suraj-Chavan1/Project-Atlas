@@ -14,8 +14,7 @@ const Sidebar = () => {
 
   const menuItems = [
     { label: 'Dashboard', path: '/projects', icon: <MdDashboard /> },
-    { label: 'AI Requirements Engineer', path: '/ai-requirements', icon: <PiSparkleFill /> },
-    { label: 'AI Requirements Generator', path: '/chat/2', icon: <BsRobot /> },
+    { label: 'Requirements Monitoring', path: '/requirements', icon: <MdDashboard /> },
     { label: 'Documentation Manager', path: '/version-control', icon: <IoDocumentsSharp /> },
     { label: 'Integration Manager', path: '/integrations', icon: <MdViewKanban /> },
   ];
@@ -27,7 +26,7 @@ const Sidebar = () => {
   ];
 
   return (
-    <div className='border-r border-[#989898] w-1/5 h-screen flex flex-col'>
+    <div className='border-r border-[#989898] bg-white w-1/5 h-screen flex flex-col'>
       {/* Logo Section */}
       <div className='p-3 flex items-center border-b border-[#989898]'>
         <img src={Logo} alt='Logo' className='w-10 h-10 mr-3'/>
