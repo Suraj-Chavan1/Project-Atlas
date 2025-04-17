@@ -70,7 +70,7 @@ const SingleProjectDocs = () => {
         </div>
         <div className="">Version: 2</div>
 
-        <div className="mt-3 text-sm leading-relaxed text-gray-800 bg-white p-4 rounded-md shadow-sm">
+        <div className="mt-3 text-sm leading-relaxed text-gray-800 bg-white p-4 rounded-md ">
   <h2 className="text-lg font-semibold mb-2">SRS Summary</h2>
 
   <p className="mb-2">
