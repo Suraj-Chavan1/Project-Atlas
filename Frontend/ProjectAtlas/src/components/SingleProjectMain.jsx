@@ -6,6 +6,7 @@ import SingleProjectHome from './SingleProjectHome';
 import SingleProjectReqs from './SingleProjectReqs';
 import SingleProjectDocs from './SingleProjectDocs';
 import SingleProjectStories from './SingleProjectStories';
+import SingleProjectTestCases from './SingleProjectTestCases';
 
 const requirementsData = [
     { name: "Stakeholders ", Iterations: 4 },
@@ -44,6 +45,7 @@ const SingleProjectMain = () => {
         {categeory === 'Requirements' ? <SingleProjectReqs /> : <></>}
         {categeory === 'Documents' ? <SingleProjectDocs /> : <></>}
         {categeory === 'User Stories' ? <SingleProjectStories /> : <></>}
+        {categeory === 'Test Cases' ? <SingleProjectTestCases /> : <></>}
     </div>
   )
 }
