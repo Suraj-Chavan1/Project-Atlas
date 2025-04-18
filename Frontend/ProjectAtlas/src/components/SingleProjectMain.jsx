@@ -5,6 +5,7 @@ import NavbarDB from './NavbarDB'
 import SingleProjectHome from './SingleProjectHome';
 import SingleProjectReqs from './SingleProjectReqs';
 import SingleProjectDocs from './SingleProjectDocs';
+import SingleProjectStories from './SingleProjectStories';
 
 const requirementsData = [
     { name: "Stakeholders ", Iterations: 4 },
@@ -42,6 +43,7 @@ const SingleProjectMain = () => {
         {categeory === 'Home'? <SingleProjectHome /> : <></>}
         {categeory === 'Requirements' ? <SingleProjectReqs /> : <></>}
         {categeory === 'Documents' ? <SingleProjectDocs /> : <></>}
+        {categeory === 'User Stories' ? <SingleProjectStories /> : <></>}
     </div>
   )
 }
