@@ -15,7 +15,7 @@ const SingleProjectStories = () => {
         <div className='col-span-1 row-span-1 border border-gray-400 p-3 flex flex-col rounded-md bg-white h-full'>
           <div className='flex justify-between'>
             <div className='text-lg font-semibold'>All Stories</div>
-            <button className='text-xs bg-blue-500 px-2 rounded-md text-white flex justify-center items-center gap-2'><PiSparkleFill />Generate Stories</button>
+            <button className='text-xs bg-blue-500 px-2 rounded-md text-white flex justify-center items-center gap-2'><PiSparkleFill />Generate Stories sdsdd</button>
           </div>
           
           <div className='flex justify-start items-center mt-2 p-1 bg-blue-200 rounded-md border border-blue-400'>
