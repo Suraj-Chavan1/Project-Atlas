@@ -132,10 +132,9 @@ User Flow Link: https://drive.google.com/file/d/1n4Zuw9-QC7NzIxbbDbrtynsAy_VaDjm
 
 2. **Choice of LLMs/LVMs?(PLEASE DO SEE THE TERMS AND CONDITIONS IN ARCHITECTURE)**
    - Using **Gemini/Grok APIs** would risk exposing enterprise data to third-party companies.
-   - Project Atlas deals with sensitive data, so we use **Ollama** and **Azure VMs** to privately host open-source LLMs/LVMs like **LLama (3B, 7B)** and **LLAVA 7B** parameter models to handle document inputs appropriately
-   - OR
+   - Project Atlas deals with sensitive data, so we use **Ollama** and **Azure VMs** to privately host open-source LLMs/LVMs like **LLama (3B, 7B)** and **LLAVA 7B** parameter models to handle document inputs appropriately **OR**
    -  **Azure OpenAI** is also a choice where we have enterprise grade security and cost effectiveness with ease of integration with Barclays.(Microsoft azure gurantees that the customer info wont be used for open ai to train its outputs on...so its a choice which would depend on barclays.)
-   - AzureOpenAI Security Clause: https://learn.microsoft.com/en-us/legal/cognitive-services/openai/data-privacy?utm_source=chatgpt.com&tabs=azure-portal
+   - AzureOpenAI Security Clause: https://learn.microsoft.com/en-us/legal/cognitive-services/openai/data-privacy?utm_source=chatgpt.com&tabs=azure-portal.
 
 
 3. **Why Use RAG (Retrieval Augmented Generation)?**
