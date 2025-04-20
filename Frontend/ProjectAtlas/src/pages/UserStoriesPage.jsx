@@ -1,0 +1,17 @@
+import React from 'react'
+import Sidebar from '../components/Sidebar'
+import ProjectsMain from '../components/ProjectsMain'
+import UserStoriesMain from '../components/UserStoriesMain'
+
+const UserStoriesPage = () => {
+  return (
+    <div className='w-full flex justify-center'>
+        <Sidebar />
+        <div className='w-4/5 h-screen'>
+            <UserStoriesMain />
+        </div>
+    </div>
+  )
+}
+
+export default UserStoriesPage
