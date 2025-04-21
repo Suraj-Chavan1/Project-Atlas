@@ -1,1 +1,21 @@
 @import "tailwindcss";
+.react-calendar-heatmap .react-calendar-heatmap-empty {
+    fill: #e5e7eb; /* Tailwind's gray-200 */
+  }
+  
+  .react-calendar-heatmap .react-calendar-heatmap-1 {
+    fill: #bfdbfe; /* Tailwind's blue-200 */
+  }
+  
+  .react-calendar-heatmap .react-calendar-heatmap-2 {
+    fill: #60a5fa; /* Tailwind's blue-400 */
+  }
+  
+  .react-calendar-heatmap .react-calendar-heatmap-3 {
+    fill: #3b82f6; /* Tailwind's blue-500 */
+  }
+  
+  .react-calendar-heatmap .react-calendar-heatmap-4 {
+    fill: #1d4ed8; /* Tailwind's blue-700 */
+  }
+  

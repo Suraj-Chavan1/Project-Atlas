@@ -49,11 +49,10 @@ const NavbarDB = ({ title, byline }) => {
   };
 
   return (
-    <AppBar position="static" color="default" elevation={1}>
-      <Toolbar className="flex justify-between items-center p-2">
+    <div position="static" color="default" >
+      <div className="m-1 flex justify-between items-center h-18 p-3 border-[#989898] bg-white border rounded-md">
         {/* Left section - Logo and Title */}
         <div className="flex items-center gap-4">
-          <img src={Logo} alt="Logo" className="w-10 h-10" />
           <div>
             <Typography variant="h6" className="font-bold">
               {title}
@@ -66,34 +65,25 @@ const NavbarDB = ({ title, byline }) => {
 
         {/* Right section - User Info and Menu */}
         <div className="flex items-center gap-4">
-          {/* Display user's roles */}
-          <Box className="flex gap-2">
-            {user?.roles?.map((role) => (
-              <Chip
-                key={role}
-                label={role}
-                size="small"
-                color="primary"
-                variant="outlined"
-              />
-            ))}
-          </Box>
 
-          {/* User Avatar and Name */}
           <Button
-            onClick={handleMenuOpen}
-            color="inherit"
-            className="text-gray-700"
-            startIcon={
-              <Avatar className="bg-[#00AEEF]">
-                {user?.name ? getInitials(user.name) : <AccountCircleIcon />}
-              </Avatar>
-            }
-          >
-            <Typography variant="subtitle2" className="ml-2">
-              {user?.name || 'User'}
-            </Typography>
-          </Button>
+  onClick={handleMenuOpen}
+  color="inherit"
+  className="text-gray-700"
+  startIcon={
+    <div className="w-10 h-10 flex justify-center items-center rounded-full bg-yellow-400 font-semibold text-white">
+      {user?.name ? getInitials(user.name) : <AccountCircleIcon />}
+    </div>
+  }
+>
+  <div className="flex flex-col items-start text-left">
+    <span className="font-bold">{user?.name || 'User'}</span>
+    <span className="text-xs text-gray-500">
+      {user?.role || user?.roles?.[0] || 'No role'}
+    </span>
+  </div>
+</Button>
+
 
           {/* User Menu */}
           <Menu
@@ -125,8 +115,8 @@ const NavbarDB = ({ title, byline }) => {
             </MenuItem>
           </Menu>
         </div>
-      </Toolbar>
-    </AppBar>
+      </div>
+    </div>
   );
 };
 

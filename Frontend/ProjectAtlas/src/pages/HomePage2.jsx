@@ -25,7 +25,7 @@ const HomePage2 = () => {
         {/* Navigation Links */}
         <div className='flex justify-center gap-5'>
             <button className='text-black hover:underline cursor-pointer' onClick={()=> navigate('/login')}>Login</button>
-            <button className='bg-[#002546] py-2 px-4 rounded-full hover:underline hover:bg-blue-700 cursor-pointer' onClick={()=> navigate('/signup')}>Signup</button>
+            <button className='bg-[#002546] py-2 px-4 rounded-full hover:underline cursor-pointer' onClick={()=> navigate('/signup')}>Signup</button>
         </div>
       </nav>
 

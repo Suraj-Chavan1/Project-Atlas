@@ -111,7 +111,7 @@ const SignupPage = () => {
             </Alert>
           )}
 
-          <div className="space-y-4">
+          <div className="space-y-4 flex flex-col gap-2">
             <TextField
               required
               fullWidth

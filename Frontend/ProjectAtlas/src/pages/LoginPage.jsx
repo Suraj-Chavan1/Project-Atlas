@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useUser } from '../contexts/UserContext.jsx';
 import Logo from '../assets/Logo-dark.png';
 import {
-  TextField,
   Button,
   CircularProgress,
   Alert,
@@ -79,7 +78,7 @@ const LoginPage = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <Paper elevation={3} className="max-w-md w-full space-y-8 p-8">
         <div className="flex flex-col items-center">
-          <img src={Logo} alt="Logo" className="w-20 h-20" />
+          <img src={Logo} alt="Logo" className="w-20 h-20 m-4 rounded-md" />
           <Typography component="h1" variant="h5" className="mt-4">
             Sign in to Project Atlas
           </Typography>
@@ -93,27 +92,31 @@ const LoginPage = () => {
           )}
 
           <div className="space-y-4">
-            <TextField
-              required
-              fullWidth
-              label="Email Address"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              disabled={loading}
-              error={!!localError}
-            />
+            <div className='my-4'>
+              <input
+                required
+                type="email"
+                name="email"
+                placeholder="Email Address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={loading}
+                className="w-full p-4 border border-gray-300 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#00AEEF] focus:border-transparent"
+              />
+            </div>
 
-            <TextField
-              required
-              fullWidth
-              label="Password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              disabled={loading}
-              error={!!localError}
-            />
+            <div className='my-4'>
+              <input
+                required
+                type="password"
+                name="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                disabled={loading}
+                className="w-full p-4 border border-gray-300 rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#00AEEF] focus:border-transparent"
+              />
+            </div>
           </div>
 
           <div className="flex flex-col gap-4">

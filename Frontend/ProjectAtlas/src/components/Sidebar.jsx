@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import Logo from '../assets/Logo-dark.png';
+import Logo from '../assets/Logo-light.png';
 import { MdDashboard, MdViewKanban } from "react-icons/md";
 import { PiSparkleFill, PiAsteriskFill } from "react-icons/pi";
 import { IoDocumentsSharp } from "react-icons/io5";
@@ -13,7 +13,7 @@ const Sidebar = () => {
   const location = useLocation();  // 🔹 Get the current URL path
 
   const menuItems = [
-    { label: 'Dashboard', path: '/projects', icon: <MdDashboard /> },
+    { label: 'Projects', path: '/projects', icon: <MdDashboard /> },
     { label: 'Requirements Monitoring', path: '/requirements', icon: <MdDashboard /> },
     { label: 'Documentation Manager', path: '/version-control', icon: <IoDocumentsSharp /> },
     { label: 'Integration Manager', path: '/integrations', icon: <MdViewKanban /> },
@@ -26,24 +26,27 @@ const Sidebar = () => {
   ];
 
   return (
-    <div className='border-r border-[#989898] bg-white w-1/5 h-screen flex flex-col'>
+    <div className='border-r border-[#989898] bg-[#002546]  w-1/5 h-screen flex flex-col'>
       {/* Logo Section */}
       <div className='p-3 flex items-center border-b border-[#989898]'>
+        <div className='w-10 h-10 rounded-md mr-3 bg-white'>
         <img src={Logo} alt='Logo' className='w-10 h-10 mr-3'/>
+        </div>
+        
         <div className='flex flex-col'>
           <div className='text-xl font-bold text-[#00AEEF]'>Project Atlas</div>
-          <div className='text-sm font-semibold text-[#4D4D4D]'>Team Dashboard</div>
+          <div className='text-sm font-semibold text-white'> Team Dashboard</div>
         </div>
       </div>
 
       {/* General Section */}
       <div className='mt-2 ml-4 flex flex-col text-sm'>
-        <div className='text-[#4D4D4D] text-sm'>GENERAL</div>
+        <div className='text-white text-sm'>GENERAL</div>
         {menuItems.map((item) => (
           <button
             key={item.path}
             className={`mt-1 font-semibold rounded-md p-2 text-left mr-5 flex items-center gap-2 
-              ${location.pathname === item.path ? 'bg-[#00AEEF] text-white' : 'text-[#4D4D4D] hover:bg-gray-200'}`}
+              ${location.pathname === item.path ? 'bg-[#00AEEF] text-white' : 'text-white hover:bg-white hover:text-blue-400'}`}
             onClick={() => navigate(item.path)}
           >
             {item.icon} {item.label}
@@ -53,12 +56,12 @@ const Sidebar = () => {
 
       {/* Downloads Section */}
       <div className='mt-4 ml-4 flex flex-col text-sm'>
-        <div className='text-[#4D4D4D] text-sm'>DOWNLOADS</div>
+        <div className='text-white text-sm'>DOWNLOADS</div>
         {downloadItems.map((item) => (
           <button
             key={item.path}
             className={`mt-1 font-semibold rounded-md p-2 text-left mr-5 flex items-center gap-2 
-              ${location.pathname === item.path ? 'bg-[#00AEEF] text-white' : 'text-[#4D4D4D] hover:bg-gray-200'}`}
+              ${location.pathname === item.path ? 'bg-[#00AEEF] text-white' : 'text-white hover:bg-white hover:text-blue-400'}`}
             onClick={() => navigate(item.path)}
           >
             {item.icon} {item.label}
