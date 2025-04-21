@@ -13,6 +13,7 @@ import TestCasesPage from './pages/TestCasesPage'
 import AIRequirementsPage from './pages/AIRequirementsPage'
 import SingleProjectPage from './pages/SingleProjectPage'
 import RequirementsPage from './pages/RequirementsPage'
+import HomePage2 from './pages/HomePage2'
 
 function App() {
 
@@ -21,7 +22,7 @@ function App() {
       <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <Routes>
           {/* Public Routes */}
-          <Route path="/" element={<HomePage />} />
+          <Route path="/" element={<HomePage2 />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
 
