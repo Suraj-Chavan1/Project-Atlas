@@ -283,7 +283,9 @@ const SingleProjectDocs = () => {
             {documents.map((doc) => (
               <div 
                 key={doc.id} 
-                className='flex flex-col border-y p-2 cursor-pointer hover:bg-gray-50'
+                className={`flex flex-col border-y p-2 cursor-pointer 
+                  ${selectedDoc?.id === doc.id ? 'bg-blue-100 border-l-4 border-blue-500' : 'hover:bg-gray-50'}
+                `}
                 onClick={() => setSelectedDoc(doc)}
               >
                 <div className='flex justify-between items-center'>

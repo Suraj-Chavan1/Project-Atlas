@@ -25,8 +25,10 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  IconButton
+  IconButton, 
+  Backdrop
 } from '@mui/material';
+
 import { AttachFile, TextFields } from '@mui/icons-material';
 
 const sampleUsers = [
@@ -45,6 +47,7 @@ const SingleProjectReqs = ({ projectId }) => {
   const [projectUsers, setProjectUsers] = useState([]);
   const [resources, setResources] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [tableLoading, setTableLoading] = useState(true);
   const [error, setError] = useState(null);
   const [inputType, setInputType] = useState('text'); // 'text' or 'file'
   const [selectedTextContent, setSelectedTextContent] = useState(null);
@@ -81,6 +84,8 @@ const SingleProjectReqs = ({ projectId }) => {
       }
     } catch (err) {
       console.error('Error fetching resources:', err);
+    }finally {
+      setTableLoading(false);
     }
   };
 
@@ -269,7 +274,7 @@ const SingleProjectReqs = ({ projectId }) => {
 
         <div className='col-span-1 row-span-1 border border-gray-400 bg-white p-3 flex flex-col rounded-md'>
           <div>Total Listed Requirements</div>
-          <div className='text-4xl'>12</div>
+          <div className='text-4xl'>{resources.length}</div>
         </div>
 
         <div className='col-span-1 row-span-1 border-gray-400 bg-white flex flex-col rounded-md'>
@@ -300,7 +305,9 @@ const SingleProjectReqs = ({ projectId }) => {
             </Button>
           </div>
 
-          <TableContainer>
+          {tableLoading ? <div className="flex justify-center items-center h-32">
+    <CircularProgress />
+  </div> : <>          <TableContainer>
             <Table>
               <TableHead>
                 <TableRow>
@@ -361,6 +368,7 @@ const SingleProjectReqs = ({ projectId }) => {
               </TableBody>
             </Table>
           </TableContainer>
+          </>}
         </div>
 
         <div className='col-span-1 border border-gray-400 bg-white p-3 flex flex-col rounded-md'>
