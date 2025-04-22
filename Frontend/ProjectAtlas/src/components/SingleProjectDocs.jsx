@@ -18,7 +18,8 @@ const SingleProjectDocs = () => {
   const [editMode, setEditMode] = useState(false);
   const [editedContent, setEditedContent] = useState('');
   const [additionalContext, setAdditionalContext] = useState('');
-  const [isGenerating, setIsGenerating] = useState(false);
+  const [isGeneratingSRS, setIsGeneratingSRS] = useState(false);
+  const [isGeneratingBRD, setIsGeneratingBRD] = useState(false);
   const [showEvaluations, setShowEvaluations] = useState(false);
   const [evaluations, setEvaluations] = useState({});
   const [evaluationsLoading, setEvaluationsLoading] = useState(false);
@@ -50,13 +51,19 @@ const SingleProjectDocs = () => {
   };
 
   const handleGenerateDocument = async (docType) => {
+    const endpoint = docType === 'SRS' ? '/generate-srs' : '/generate-brd';
+  
     try {
-      setIsGenerating(true);
-      const endpoint = docType === 'SRS' ? '/generate-srs' : '/generate-brd';
+      if (docType === 'SRS') {
+        setIsGeneratingSRS(true);
+      } else {
+        setIsGeneratingBRD(true);
+      }
+  
       const response = await axios.post(`http://localhost:5000/srs_brd${endpoint}`, {
         project_id: projectId
       });
-
+  
       if (response.data.success) {
         await fetchDocuments();
         setSelectedDoc(response.data.document);
@@ -65,9 +72,14 @@ const SingleProjectDocs = () => {
       setError(`Failed to generate ${docType}`);
       console.error(`Error generating ${docType}:`, err);
     } finally {
-      setIsGenerating(false);
+      if (docType === 'SRS') {
+        setIsGeneratingSRS(false);
+      } else {
+        setIsGeneratingBRD(false);
+      }
     }
   };
+  
 
   const handleEditDocument = async () => {
     if (!selectedDoc) {
@@ -268,17 +280,17 @@ const SingleProjectDocs = () => {
           <div className="flex justify-center gap-2 text-sm">
             <button 
               onClick={() => handleGenerateDocument('SRS')}
-              disabled={isGenerating}
+              disabled={isGeneratingSRS}
               className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-400"
             >
-              {isGenerating ? 'Generating...' : 'Generate SRS'}
+              {isGeneratingSRS ? 'Generating...' : 'Generate SRS'}
             </button>
             <button 
               onClick={() => handleGenerateDocument('BRD')}
-              disabled={isGenerating}
+              disabled={isGeneratingBRD}
               className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-400"
             >
-              {isGenerating ? 'Generating...' : 'Generate BRD'}
+              {isGeneratingBRD ? 'Generating...' : 'Generate BRD'}
             </button>
           </div>
 
