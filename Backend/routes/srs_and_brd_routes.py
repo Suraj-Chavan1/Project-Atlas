@@ -4,7 +4,7 @@ import json
 import base64
 from pathlib import Path
 from typing import List, Dict
-import datetime
+from datetime import datetime
 import threading
 import sys
 import time
@@ -1346,7 +1346,7 @@ def generate_standard_doc():
             'context': generated_doc,
             'blob_url': blob_url,
             'pdf_filename': f"{doc_type}_{project_id}.pdf",
-            'timestamp': datetime.datetime.utcnow().isoformat(),
+            'timestamp': datetime.utcnow().isoformat(),
             'version': 1
         }
 
@@ -1567,7 +1567,7 @@ def generate_srs():
             'context': generated_doc,
             'blob_url': blob_url,
             'pdf_filename': f"SRS_{project_id}.pdf",
-            'timestamp': datetime.datetime.utcnow().isoformat(),
+            'timestamp': datetime.utcnow().isoformat(),
             'version': 1
         }
 
@@ -1774,7 +1774,7 @@ def generate_brd():
             'context': generated_doc,
             'blob_url': blob_url,
             'pdf_filename': f"BRD_{project_id}.pdf",
-            'timestamp': datetime.datetime.utcnow().isoformat(),
+            'timestamp': datetime.utcnow().isoformat(),
             'version': 1
         }
 
