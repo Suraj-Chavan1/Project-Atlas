@@ -197,16 +197,36 @@ def save_test_cases_to_db(story_key: str, project_id: str, standard_doc_id: str,
         # Generate a unique test case ID
         test_case_id = f"test_{project_id}_{standard_doc_id}_{user_story_id}_{int(datetime.now().timestamp())}"
         
-        # Create the test case document
+        # Extract test steps and expected results from the first test file
+        test_steps = []
+        expected_results = ""
+        if test_files and len(test_files) > 0:
+            first_test = test_files[0]
+            content = first_test.get('content', '')
+            
+            # Simple parsing to extract test steps and expected results
+            lines = content.split('\n')
+            for line in lines:
+                if line.strip().startswith('def test_'):
+                    # This is likely a test function, extract steps
+                    test_steps = [step.strip() for step in lines if step.strip() and not step.strip().startswith(('def', 'import', 'from', 'class', '@'))]
+                elif 'assert' in line:
+                    expected_results = line.strip()
+        
+        # Create the test case document with the required structure
         test_case_doc = {
             "id": test_case_id,
-            "story_key": story_key,
             "project_id": project_id,
             "standard_doc_id": standard_doc_id,
             "user_story_id": user_story_id,
-            "test_files": test_files,
-            "blob_url": blob_url,
-            "timestamp": datetime.utcnow().isoformat()
+            "title": f"Test Cases for {story_key}",
+            "description": f"Automated test cases for story {story_key}",
+            "test_steps": test_steps,
+            "expected_results": expected_results or "Tests should pass successfully",
+            "github_issue_id": story_key,
+            "status": "To Do",
+            "created_at": datetime.utcnow().isoformat(),
+            "blob_url": blob_url  # Add the blob URL to access the test files
         }
         
         # Create the item in Cosmos DB
@@ -686,13 +706,26 @@ def generate_tests():
             # Construct the blob URL with SAS token
             blob_url = f"https://{account_name}.blob.core.windows.net/{container_name}/{blob_name}?{sas_token}"
 
+            # Save to Cosmos DB with the correct structure
+            test_case_id = save_test_cases_to_db(
+                story_key=story_key,
+                project_id=project_id,
+                standard_doc_id=f"std_{story_key}",  # Generate a standard doc ID based on story key
+                user_story_id=story_key,  # Use story key as user story ID
+                test_files=test_files,
+                blob_url=blob_url
+            )
+
+            if not test_case_id:
+                return jsonify({'success': False, 'error': 'Failed to save test cases to database'}), 500
+
             return jsonify({
                 'success': True,
                 'folder': folder_name,
                 'blob_url': blob_url,
-                'test_case_id': f"test_{project_id}_{story_key}_{int(datetime.now().timestamp())}"
+                'test_case_id': test_case_id
             })
-
+        
     except Exception as e:
         print(f"Error generating and uploading tests: {str(e)}")
         traceback.print_exc()
