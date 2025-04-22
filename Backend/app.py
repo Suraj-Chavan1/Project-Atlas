@@ -9,6 +9,7 @@ from routes.devops_routes import devops
 from routes.client_routes import client
 from routes.srs_and_brd_routes import srs_brd_bp
 from routes.srs_and_brd_to_userstories import srs_brd_to_stories_bp
+from routes.testcode_route import testcode_bp
 from azure.cosmos import CosmosClient
 import os
 
@@ -38,6 +39,7 @@ app.register_blueprint(devops)
 app.register_blueprint(client)
 app.register_blueprint(srs_brd_bp, url_prefix='/srs_brd')
 app.register_blueprint(srs_brd_to_stories_bp, url_prefix='/srs_brd_to_stories')
+app.register_blueprint(testcode_bp, url_prefix='/testcode')
 
 @app.route('/', methods=['GET'])
 def hello_world():
