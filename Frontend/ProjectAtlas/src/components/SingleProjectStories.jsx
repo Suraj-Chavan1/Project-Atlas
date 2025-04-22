@@ -429,7 +429,7 @@ const SingleProjectStories = () => {
                       className={`flex justify-between items-center mt-2 p-1 rounded-md border bg-${
                         selectedStory?.id == story.id ? 
                         (story.priority === 'Must Have' ? 'red-200' :
-                        story.priority === 'Should Have' ? 'yellow-100' : 'green-200') :
+                        story.priority === 'Should Have' ? 'yellow-300' : 'green-200') :
                         'bg-yellow-300'
                       } ${
                         story.priority === 'Must Have' ? 'border-red-40' :
@@ -491,7 +491,7 @@ const SingleProjectStories = () => {
                         } bg-${
                           selectedStory?.id == story.id ? 
                           (story.priority === 'Must Have' ? 'red-200' :
-                          story.priority === 'Should Have' ? 'yellow-100' : 'green-200') :
+                          story.priority === 'Should Have' ? 'yellow-200' : 'green-200') :
                           'bg-yellow-300'
                         }  cursor-pointer`}
                         onClick={() => {

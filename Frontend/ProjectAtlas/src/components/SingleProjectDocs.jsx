@@ -6,6 +6,8 @@ import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import SectionEvaluations from './SectionEvaluations';
+import { FaUser, FaClock  } from "react-icons/fa";
+
 
 const SingleProjectDocs = () => {
   const { id: projectId } = useParams();
@@ -23,6 +25,7 @@ const SingleProjectDocs = () => {
   const [author, setAuthor] = useState('');
   const [isFinal, setIsFinal] = useState(false);
   const [loadingStates, setLoadingStates] = useState({});
+  const [testFinal, setTestFinal] = useState(false);
 
   useEffect(() => {
     if (projectId) {
@@ -292,52 +295,67 @@ const SingleProjectDocs = () => {
                   <div className='text-md font-bold'>
                     {doc.template_type === 'srs' ? 'Software Requirement Specification' : 'Business Requirement Document'}
                   </div>
-                  <div className={`text-sm p-2 rounded-full ${
-                    doc.template_type === 'srs' ? 'bg-green-200 border border-green-400' : 'bg-red-200 border border-red-400'
-                  }`}>
-                    Ver {doc.version}
-                  </div>
+                  
                 </div>
                 
                 {doc.is_final && (
-                  <div className="mt-1 text-sm text-green-600">
-                    Final Version
-                    <br />
-                    <span className="text-xs text-gray-500">
-                      By: {doc.finalized_by}
-                      <br />
-                      On: {new Date(doc.finalized_at).toLocaleDateString()}
-                    </span>
+                  <div className='flex flex-col h-full'>
+                    {/*<div className='mt-1 text-green-600'>Final Version</div>*/}
+                    <div className='flex justify-start items-center gap-2'>
+                      <div><FaUser /></div>
+                      <div>{doc.finalized_by}</div>
+                    </div>
+
+                    <div className='flex justify-start items-center gap-2'>
+                      <div><FaClock /></div>
+                      <div>{new Date(doc.timestamp).toLocaleDateString()}</div>
+                    </div>
                   </div>
+                  
                 )}
                 
-                <div className='text-sm'>Uploaded on: {new Date(doc.timestamp).toLocaleDateString()}</div>
+
                 <div className='text-sm'>Author: System Generated</div>
+
                 
-                <div className="flex justify-end mt-2">
-                  {!doc.is_final ? (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleSetFinal(doc.id);
-                      }}
-                      disabled={loadingStates[doc.id]}
-                      className="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600 disabled:opacity-50"
-                    >
-                      {loadingStates[doc.id] ? 'Setting...' : 'Set Final'}
-                    </button>
-                  ) : (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleUnsetFinal(doc.id);
-                      }}
-                      disabled={loadingStates[doc.id]}
-                      className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 disabled:opacity-50"
-                    >
-                      {loadingStates[doc.id] ? 'Unsetting...' : 'Unset Final'}
-                    </button>
-                  )}
+
+                
+                <div className="w-full items-center flex justify-between mt-2">
+                <div className={`w-1/4 text-sm p-2 font-bold `}>
+                    Version: {doc.version}
+                  </div>
+                
+                  <div className='w-3/4'>
+                  {loadingStates[doc.id] ? <div className=' text-sm px-4 w-56 py-1 rounded-md text-center border'>Setting..</div> :
+                <div className="w-full flex justify-center">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleUnsetFinal(doc.id);
+                    }}
+                    className={`text-sm px-4 w-28 rounded-l-md border ${
+                      !doc.is_final
+                        ? 'bg-red-500 text-white border-red-400'
+                        : 'bg-white text-red-500 border-red-400 hover:bg-red-50'
+                    }`}
+                    disabled={loadingStates[doc.id]}
+                  >Not Final
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleSetFinal(doc.id);
+                    }}
+                    className={`text-sm py-1 px-4 w-28 rounded-r-md border ${
+                      doc.is_final
+                    ? 'bg-green-500 text-white border-green-400'
+                    : 'bg-white text-green-500 border-green-400 hover:bg-green-50'
+                    }`}
+                    disabled={loadingStates[doc.id]}>Final
+                  </button>
+                </div>}
+                  </div>
+                  
                 </div>
               </div>
             ))}

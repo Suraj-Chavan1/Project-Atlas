@@ -5,7 +5,7 @@ import NewProjectModal from './NewProjectModal';
 import { useUser } from '../contexts/UserContext';
 import axios from 'axios';
 import { CircularProgress, Alert } from '@mui/material';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Area, AreaChart } from 'recharts';
 import CalendarHeatmap from 'react-calendar-heatmap';
 import 'react-calendar-heatmap/dist/styles.css';
 
@@ -24,6 +24,30 @@ const activityData = [
   { name: 'Requirements Extracted', value: 12 },
   { name: 'Test Cases Pushed', value: 8 },
   { name: 'Documents Written', value: 2 },
+];
+
+const data = [
+  { name: 'Mon', value: 200 },
+  { name: 'Tue', value: 300 },
+  { name: 'Wed', value: 250 },
+  { name: 'Thu', value: 400 },
+  { name: 'Fri', value: 350 },
+];
+
+const data2 = [
+  { name: 'Mon', value: 450 },
+  { name: 'Tue', value: 300 },
+  { name: 'Wed', value: 230 },
+  { name: 'Thu', value: 400 },
+  { name: 'Fri', value: 100 },
+];
+
+const data3 = [
+  { name: 'Mon', value: 700 },
+  { name: 'Tue', value: 300 },
+  { name: 'Wed', value: 300 },
+  { name: 'Thu', value: 400 },
+  { name: 'Fri', value: 120 },
 ];
 
 const COLORS = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b'];
@@ -96,34 +120,40 @@ const ProjectsMain = () => {
     <div className="flex flex-col bg-[#fceeea]">
       <NavbarDB title="Your Projects" byline="Manage all your projects with ease on a single page" />
       <div className='grid grid-cols-3 w-full'>
-        <div className='my-1 mx-2 border border-[#989898] p-3 bg-white rounded-md flex flex-col'>
-          <div>Today's Insights</div>
-          <div className='flex justify-between items-start rounded-md bg-[#fceeea] my-1 text p-2'>
+
+        {/*Today's Insights*/}
+        <div className="my-1 mx-2 border border-[#989898] p-3 bg-white rounded-md flex flex-col justify-between">
+        <div>Today's Insights</div>
+          <div className='flex justify-between items-start rounded-md bg-[#F3DFBF] my-1 text p-2'>
             <div className='font-bold text-sm'>Stories Pushed</div>
               <div className='text-green-600 text-sm font-bold'>7</div>
           </div>
 
-          <div className='flex justify-between items-start rounded-md bg-[#fceeea] my-1 text p-2'>
+          <div className='flex justify-between items-start rounded-md bg-[#F3DFBF] my-1 text p-2'>
             <div className='font-bold text-sm'>Requirements Extracted</div>
               <div className='text-red-600 text-sm font-bold'>12</div>
           </div>
 
-          <div className='flex justify-between items-start rounded-md bg-[#fceeea] my-1 text p-2'>
+          <div className='flex justify-between items-start rounded-md bg-[#F3DFBF] my-1 text p-2'>
             <div className='font-bold text-sm'>Test Cases Pushed</div>
               <div className='text-green-600 text-sm font-bold'>8</div>
           </div>
+         
 
-          <div className='flex justify-between items-start rounded-md bg-[#fceeea] my-1 text p-2'>
+          <div className='flex justify-between items-start rounded-md bg-[#F3DFBF] my-1 text p-2'>
             <div className='font-bold text-sm'>Standard Documents Written</div>
               <div className='text-green-600 text-sm font-bold'>2</div>
           </div>
 
+
           
-        </div>
+    </div>
+         {/*Today's Insights Ends*/}
+ 
        
-        <div className='col-span-2 my-1 mx-2 border border-[#989898] p-3 bg-white rounded-md flex flex-col'>
+        <div className=' col-span-2 my-1 mx-2 border border-[#989898] p-3 bg-white rounded-md flex flex-col'>
           <div className='mb-2'> Documents Generated</div>
-          <div className='h-39'>
+          <div className='h-40'>
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={documentsData}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -187,27 +217,30 @@ const ProjectsMain = () => {
       </div>
 
       <div className='bg-white border border-[#989898] rounded-md m-1 p-3 h-full'>
-  <h2 className="text-lg font-semibold mb-2">Activity Overview</h2>
+      <div>Today's Insights</div>
+          <div className='flex justify-between items-start rounded-md bg-[#fceeea] my-1 text p-2'>
+            <div className='font-bold text-sm'>Stories Pushed</div>
+              <div className='text-green-600 text-sm font-bold'>7</div>
+          </div>
 
-  <ResponsiveContainer width="100%" height={250}>
-    <PieChart>
-      <Pie
-        dataKey="value"
-        data={activityData}
-        cx="50%"
-        cy="50%"
-        outerRadius={80}
-        innerRadius={40}
-        label
-      >
-        {activityData.map((entry, index) => (
-          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-        ))}
-      </Pie>
-      <Tooltip />
-    </PieChart>
-  </ResponsiveContainer>
-</div>
+          <div className='flex justify-between items-start rounded-md bg-[#fceeea] my-1 text p-2'>
+            <div className='font-bold text-sm'>Requirements Extracted</div>
+              <div className='text-red-600 text-sm font-bold'>12</div>
+          </div>
+
+          <div className='flex justify-between items-start rounded-md bg-[#fceeea] my-1 text p-2'>
+            <div className='font-bold text-sm'>Test Cases Pushed</div>
+              <div className='text-green-600 text-sm font-bold'>8</div>
+          </div>
+         
+
+          <div className='flex justify-between items-start rounded-md bg-[#fceeea] my-1 text p-2'>
+            <div className='font-bold text-sm'>Standard Documents Written</div>
+              <div className='text-green-600 text-sm font-bold'>2</div>
+          </div>
+
+          
+      </div>
 
 
         
