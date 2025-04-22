@@ -66,6 +66,7 @@ const SingleProjectDocs = () => {
   
       if (response.data.success) {
         await fetchDocuments();
+        console.log(response.data);
         setSelectedDoc(response.data.document);
       }
     } catch (err) {
@@ -204,7 +205,7 @@ const SingleProjectDocs = () => {
       );
 
       if (existingFinalDoc) {
-        toast.error(`There is already a final ${docToFinalize.template_type.toUpperCase()} document. Please unset it first.`);
+        console.error(`There is already a final ${docToFinalize.template_type.toUpperCase()} document. Please unset it first.`);
         return;
       }
 
@@ -226,9 +227,9 @@ const SingleProjectDocs = () => {
             ? { ...doc, is_final: true, finalized_by: author, finalized_at: data.document.finalized_at }
             : doc
         ));
-        toast.success('Document marked as final successfully!');
+        console.success('Document marked as final successfully!');
       } else {
-        toast.error(data.error || 'Failed to mark document as final');
+        console.error(data.error || 'Failed to mark document as final');
       }
     } catch (err) {
       toast.error('Error marking document as final');
@@ -259,12 +260,12 @@ const SingleProjectDocs = () => {
             ? { ...doc, is_final: false, finalized_by: null, finalized_at: null }
             : doc
         ));
-        toast.success('Document unset as final successfully!');
+        console.log('Document unset as final successfully!');
       } else {
-        toast.error(data.error || 'Failed to unset document as final');
+        console.error(data.error || 'Failed to unset document as final');
       }
     } catch (err) {
-      toast.error('Error unsetting document as final');
+      console.error('Error unsetting document as final');
       console.error('Error:', err);
     } finally {
       setLoadingStates(prev => ({ ...prev, [documentId]: false }));
@@ -357,6 +358,7 @@ const SingleProjectDocs = () => {
                     onClick={(e) => {
                       e.stopPropagation();
                       handleSetFinal(doc.id);
+                      console.log("setting final: ", doc.id);
                     }}
                     className={`text-sm py-1 px-4 w-28 rounded-r-md border ${
                       doc.is_final
@@ -419,7 +421,7 @@ const SingleProjectDocs = () => {
                       <strong>Last Modified:</strong> {new Date(selectedDoc.last_modified).toLocaleString()}
                     </p>
                     <p className="mb-2">
-                      <strong>Document URL:</strong> <a href={selectedDoc.blob_url} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">View PDF (Version {selectedDoc.version})</a>
+                      <strong>Document URL:</strong> <a href={selectedDoc.url} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">View PDF (Version {selectedDoc.version})</a>
                     </p>
                   </div>
 
@@ -471,7 +473,7 @@ const SingleProjectDocs = () => {
                         <div className="p-4 bg-gray-50 rounded-md whitespace-pre-wrap">
                           {selectedDoc.context}
                         </div>
-                      </div>
+                      </div>  
                     )}
                   </div>
                 </div>

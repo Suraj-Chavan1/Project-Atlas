@@ -53,6 +53,9 @@ const SingleProjectReqs = ({ projectId }) => {
   const [selectedTextContent, setSelectedTextContent] = useState(null);
   const [showTextModal, setShowTextModal] = useState(false);
   const [isGeneratingTemplate, setIsGeneratingTemplate] = useState(false);
+  const [showTemplate, setShowTemplate] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+
 
   useEffect(() => {
     if (projectId) {
@@ -373,6 +376,10 @@ const SingleProjectReqs = ({ projectId }) => {
 
         <div className='col-span-1 border border-gray-400 bg-white p-3 flex flex-col rounded-md'>
           <div>Recent Activity here</div>
+          <button className='my-1 p-2 bg-[#f3dfbf] rounded-md text-sm' onClick={()=>setShowTemplate(true)}>View SDE Template</button>
+          <button className='my-1 p-2 bg-[#f3dfbf] rounded-md text-sm' onClick={()=>setShowTemplate(true)}>View BA Template</button>
+          <button className='my-1 p-2 bg-[#f3dfbf] rounded-md text-sm' onClick={()=>setShowTemplate(true)}>View Client Template</button>
+          <button className='my-1 p-2 bg-[#f3dfbf] rounded-md text-sm' onClick={()=>setShowTemplate(true)}>View DevOps Template</button>
         </div>
       </div>
 
@@ -395,7 +402,7 @@ const SingleProjectReqs = ({ projectId }) => {
             }}
           >
             X
-          </IconButton>
+         </IconButton>
         </DialogTitle>
         <DialogContent dividers>
           <Typography
@@ -425,6 +432,7 @@ const SingleProjectReqs = ({ projectId }) => {
       </Dialog>
 
       {/* Modal */}
+
       {showModal && (
         <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
           <div className="bg-white p-6 rounded-lg w-[90%] max-w-lg">
@@ -534,6 +542,59 @@ const SingleProjectReqs = ({ projectId }) => {
           </div>
         </div>
       )}
+
+{showTemplate && (
+  <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
+    <div className="bg-white p-6 rounded-lg w-[95%] max-w-4xl h-[90vh] overflow-y-auto">
+      <h2 className="text-2xl font-semibold mb-4">Generated Document</h2>
+
+      {/* ACTION BUTTONS */}
+      <div className="flex justify-end gap-3 mb-4">
+        {!isEditing ? (
+          <Button variant="outlined" onClick={() => setIsEditing(true)}>
+            Edit
+          </Button>
+        ) : (
+          <>
+            <Button variant="contained" color="primary" >
+              Save
+            </Button>
+            <Button variant="outlined" onClick={() => setIsEditing(false)}>
+              Cancel
+            </Button>
+          </>
+        )}
+        <Button
+          onClick={() => {
+            setShowTemplate(false);
+            setIsEditing(false);
+            setTextContent('');
+          }}
+          variant="text"
+        >
+          Close
+        </Button>
+      </div>
+
+      {/* DOCUMENT PREVIEW / EDIT */}
+      <div className="border p-4 rounded bg-gray-50 max-h-[70vh] overflow-y-auto">
+        {!isEditing ? (
+          <pre className="whitespace-pre-wrap text-sm text-gray-800">{textContent}</pre>
+        ) : (
+          <TextField
+            fullWidth
+            multiline
+            rows={20}
+            variant="outlined"
+            value={textContent}
+            onChange={(e) => setTextContent(e.target.value)}
+          />
+        )}
+      </div>
+    </div>
+  </div>
+)}
+
     </div>
   );
 };
