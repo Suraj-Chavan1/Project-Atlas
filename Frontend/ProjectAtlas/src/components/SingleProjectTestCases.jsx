@@ -16,6 +16,8 @@ const SingleProjectTestCases = () => {
     const [showPreviewMap, setShowPreviewMap] = useState({});
     const [editingMap, setEditingMap] = useState({});
     const [editContentMap, setEditContentMap] = useState({});
+    const [regenerationContextMap, setRegenerationContextMap] = useState({});
+    const [showRegenerationInputMap, setShowRegenerationInputMap] = useState({});
 
     // Extract project ID from URL if not available in params
     const getProjectId = () => {
@@ -253,6 +255,113 @@ const SingleProjectTestCases = () => {
         window.location.href = installUrl;
     };
 
+    const handleRegenerateTests = async (storyKey) => {
+        console.log(`Starting test regeneration for story ${storyKey}`);
+        try {
+            setLoadingMap(prev => ({ ...prev, [storyKey]: true }));
+            
+            const currentProjectId = getProjectId();
+            console.log('Current project ID:', currentProjectId);
+            
+            if (!currentProjectId) {
+                console.error('Project ID not found');
+                alert('Error: Project ID not found. Please make sure you are on a valid project page.');
+                return;
+            }
+
+            // Get the current test files
+            let testFiles = [];
+            if (editingMap[storyKey]) {
+                console.log('Getting test files from edit mode');
+                testFiles = Object.entries(editContentMap[storyKey]).map(([name, content]) => ({
+                    name,
+                    content
+                }));
+            } else if (previewMap[storyKey]) {
+                console.log('Getting test files from preview mode');
+                testFiles = previewMap[storyKey].testFiles;
+            }
+            
+            console.log('Current test files:', testFiles);
+            console.log('Regeneration context:', regenerationContextMap[storyKey]);
+
+            // Call the regenerate endpoint with the context
+            console.log('Making API call to regenerate tests...');
+            const response = await axios.post('http://localhost:5000/testcode/regenerate-tests', {
+                story_key: storyKey,
+                project_id: currentProjectId,
+                test_files: testFiles,
+                context: regenerationContextMap[storyKey] || '',
+                language: 'python',
+                framework: 'pytest'
+            });
+
+            console.log('Regeneration API response:', response.data);
+
+            if (response.data.success) {
+                console.log('Successfully regenerated tests');
+                // Update the preview with the regenerated tests
+                setPreviewMap(prev => ({
+                    ...prev,
+                    [storyKey]: {
+                        testFiles: response.data.test_files,
+                        timestamp: new Date().toISOString()
+                    }
+                }));
+
+                // Hide the regeneration input
+                setShowRegenerationInputMap(prev => ({
+                    ...prev,
+                    [storyKey]: false
+                }));
+
+                // Clear the context
+                setRegenerationContextMap(prev => ({
+                    ...prev,
+                    [storyKey]: ''
+                }));
+
+                alert('Test cases regenerated successfully with your context. Review and click "Save & Upload" to finalize.');
+            } else {
+                console.error('Regeneration failed:', response.data.error);
+            }
+        } catch (error) {
+            console.error('Error regenerating tests:', error);
+            console.error('Error details:', {
+                message: error.message,
+                response: error.response?.data,
+                status: error.response?.status
+            });
+            alert('Failed to regenerate test cases');
+        } finally {
+            setLoadingMap(prev => ({ ...prev, [storyKey]: false }));
+        }
+    };
+
+    const handleRegenerationContextChange = (storyKey, context) => {
+        console.log(`Updating context for story ${storyKey}`);
+        console.log('New context:', context);
+        setRegenerationContextMap(prev => ({
+            ...prev,
+            [storyKey]: context
+        }));
+    };
+
+    const toggleRegenerationInput = (storyKey) => {
+        console.log(`Toggling regeneration input for story ${storyKey}`);
+        console.log('Current showRegenerationInputMap:', showRegenerationInputMap);
+        
+        // Use functional update to ensure we're working with the latest state
+        setShowRegenerationInputMap(prev => {
+            const newValue = !prev[storyKey];
+            console.log(`Setting ${storyKey} to ${newValue}`);
+            return {
+                ...prev,
+                [storyKey]: newValue
+            };
+        });
+    };
+
     return (
         <div className="flex flex-col mx-3 my-0 h-screen">
             <div className="mb-4">
@@ -340,6 +449,12 @@ const SingleProjectTestCases = () => {
                                                     Edit
                                                 </button>
                                                 <button
+                                                    onClick={() => toggleRegenerationInput(story.key)}
+                                                    className="px-3 py-1 bg-purple-500 text-white rounded hover:bg-purple-600 text-sm"
+                                                >
+                                                    Regenerate with Context
+                                                </button>
+                                                <button
                                                     onClick={() => handleSaveAndUpload(story.key)}
                                                     className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 text-sm"
                                                     disabled={loadingMap[story.key]}
@@ -362,6 +477,26 @@ const SingleProjectTestCases = () => {
                                                 </div>
                                             ))}
                                         </div>
+                                        
+                                        {/* Regeneration Context Input */}
+                                        {showRegenerationInputMap[story.key] && (
+                                            <div className="mt-4 p-3 bg-white rounded border border-gray-200">
+                                                <h4 className="font-semibold mb-2">Enter Context for Regeneration</h4>
+                                                <textarea
+                                                    value={regenerationContextMap[story.key] || ''}
+                                                    onChange={(e) => handleRegenerationContextChange(story.key, e.target.value)}
+                                                    placeholder="Enter additional context for regenerating test cases..."
+                                                    className="w-full h-32 p-2 border rounded mb-2"
+                                                />
+                                                <button
+                                                    onClick={() => handleRegenerateTests(story.key)}
+                                                    className="px-3 py-1 bg-purple-600 text-white rounded hover:bg-purple-700 text-sm"
+                                                    disabled={loadingMap[story.key]}
+                                                >
+                                                    {loadingMap[story.key] ? 'Regenerating...' : 'Regenerate'}
+                                                </button>
+                                            </div>
+                                        )}
                                     </div>
                                 )}
                                 

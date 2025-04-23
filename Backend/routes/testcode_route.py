@@ -266,7 +266,7 @@ def delete_test_cases_from_db(story_key: str) -> bool:
         print(f"Error deleting test cases from database: {str(e)}")
         return False
 
-def generate_test_cases(story: dict, language: str = "javascript", framework: str = "jest") -> dict:
+def generate_test_cases(story: dict, language: str = "javascript", framework: str = "jest", context: str = "") -> dict:
     """
     Generate test cases for a user story in the specified language and framework.
     
@@ -274,6 +274,7 @@ def generate_test_cases(story: dict, language: str = "javascript", framework: st
         story: The user story dictionary from Jira
         language: The programming language for test cases (javascript or python)
         framework: The testing framework to use (jest, mocha, pytest, etc.)
+        context: Additional context provided by the user for regeneration
         
     Returns:
         Dictionary containing test case files with their content
@@ -299,7 +300,8 @@ def generate_test_cases(story: dict, language: str = "javascript", framework: st
         else:
             test_file = f"{issue_key}_test{file_ext}"
     
-    prompt = f"""Generate comprehensive test cases for the following user story.
+    # Build the prompt with context if provided
+    base_prompt = f"""Generate comprehensive test cases for the following user story.
 Output a valid JSON object with the following structure:
 {{
     "{test_file}": "Complete test code for the user story"
@@ -320,13 +322,19 @@ Technical Requirements:
 - Follow the naming conventions for {framework} tests
 - Include proper error handling and assertions
 """
+
+    # Add context to prompt if provided
+    if context:
+        prompt = f"{base_prompt}\n\nAdditional Context:\n{context}\n\nIMPORTANT: Consider the additional context when generating test cases."
+    else:
+        prompt = base_prompt + "\n\nIMPORTANT: Respond with ONLY the JSON object, no additional text or notes."
     
     try:
         response = client.chat.completions.create(
             model=DEPLOYMENT_NAME,
             messages=[
                 {"role": "system", "content": f"You are a QA engineer that creates comprehensive {language} test cases using {framework}. Always respond with valid JSON only."},
-                {"role": "user", "content": prompt + "\n IMPORTANT: Respond with ONLY the JSON object, no additional text or notes."}
+                {"role": "user", "content": prompt}
             ],
             max_tokens=4000,
             temperature=0.3,
@@ -728,6 +736,63 @@ def generate_tests():
         
     except Exception as e:
         print(f"Error generating and uploading tests: {str(e)}")
+        traceback.print_exc()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@testcode_bp.route('/regenerate-tests', methods=['POST'])
+def regenerate_tests():
+    """
+    Regenerate test cases with additional context from the user.
+    """
+    try:
+        data = request.get_json()
+        story_key = data.get('story_key')
+        project_id = data.get('project_id')
+        test_files = data.get('test_files', [])
+        user_context = data.get('context', '')  # Additional context provided by user
+        language = data.get('language', 'python')
+        framework = data.get('framework', 'pytest')
+
+        print(f"Received request to regenerate tests for story {story_key} with project ID {project_id}")
+        print(f"User context: {user_context}")
+
+        if not story_key or not test_files or not project_id:
+            return jsonify({'success': False, 'error': 'Missing required parameters'}), 400
+
+        # Get story details from Jira
+        jql = f'key = {story_key}'
+        issues = get_jira_issues(jql, 1)
+        
+        if not issues:
+            return jsonify({'success': False, 'error': f'Story {story_key} not found'}), 404
+
+        story = issues[0]
+        
+        # Generate new test cases with the provided context
+        test_cases = generate_test_cases(
+            story=story,
+            language=language,
+            framework=framework,
+            context=user_context
+        )
+        
+        if not test_cases:
+            return jsonify({'success': False, 'error': 'Failed to generate test cases'}), 500
+
+        # Convert the test cases to the expected format
+        test_files = [{
+            'name': name,
+            'content': content
+        } for name, content in test_cases.items()]
+
+        return jsonify({
+            'success': True,
+            'test_files': test_files,
+            'timestamp': datetime.now().isoformat()
+        })
+        
+    except Exception as e:
+        print(f"Error regenerating tests: {str(e)}")
         traceback.print_exc()
         return jsonify({'success': False, 'error': str(e)}), 500
 
