@@ -38,7 +38,8 @@ const sampleUsers = [
 ];
 
 const SingleProjectReqs = ({ projectId }) => {
-  const { user } = useUser();
+  const { user, setUser } = useUser();
+ 
   const [showModal, setShowModal] = useState(false);
   const [resourceName, setResourceName] = useState('');
   const [selectedFile, setSelectedFile] = useState(null);
@@ -65,24 +66,53 @@ const SingleProjectReqs = ({ projectId }) => {
     client: false,
     devops: false
   });
+  const [currentDocument, setCurrentDocument] = useState(null);
+  const [additionalContext, setAdditionalContext] = useState('');
+  const [blobUrl, setBlobUrl] = useState('');
+  const [success, setSuccess] = useState('');
 
   useEffect(() => {
     if (projectId) {
+      console.log('Current logged-in user:', {
+        name: user?.name || 'Not available',
+        role: user?.roles[0] || 'Not available',
+        id: user?.id || 'Not available'
+      });
       fetchProjectUsers();
       fetchResources();
       fetchDocuments();
     }
-  }, [projectId]);
+  }, [projectId, user]);
 
   const fetchProjectUsers = async () => {
     try {
+      console.log('Fetching project users...');
       const response = await axios.get(`http://localhost:5000/projects/${projectId}`, {
         headers: {
           'X-User-ID': user?.id || localStorage.getItem('userId')
         }
       });
+      console.log('Project users response:', response.data);
+      
       if (response.data.success) {
         setProjectUsers(response.data.project.stakeholders);
+        // Find the current user in stakeholders
+        const currentStakeholder = response.data.project.stakeholders.find(
+          s => s.id === (user?.id || localStorage.getItem('userId'))
+        );
+        console.log('Current stakeholder:', currentStakeholder);
+        
+        if (currentStakeholder) {
+          console.log('Setting user role to:', currentStakeholder.role);
+          // Update the user context with the role
+          if (setUser) {
+            setUser(prevUser => ({
+              ...prevUser,
+              role: currentStakeholder.role
+            }));
+            console.log('Updated user context with role:', currentStakeholder.role);
+          }
+        }
       }
     } catch (err) {
       console.error('Error fetching project users:', err);
@@ -233,7 +263,8 @@ const SingleProjectReqs = ({ projectId }) => {
   const handleViewDocument = (doc, type) => {
     console.log('Attempting to view document:', { type, doc });
     if (doc) {
-      console.log('Setting document content for viewing:', doc.combined_text?.substring(0, 100) + '...');
+      // Use combined_text directly
+      console.log('Setting document content for viewing:', doc.combined_text);
       setTextContent(doc.combined_text);
       setShowTemplate(true);
     } else {
@@ -312,6 +343,7 @@ const SingleProjectReqs = ({ projectId }) => {
     const projectUser = projectUsers.find(u => u.id === userId);
     return projectUser ? projectUser.role : 'Unknown Role';
   };
+ 
 
   const handleTextClick = (content) => {
     setSelectedTextContent(content);
@@ -465,6 +497,87 @@ const SingleProjectReqs = ({ projectId }) => {
     }
   };
 
+  const handleSaveTemplate = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    try {
+        setLoading(true);
+        setError(null);
+        setSuccess(null);
+
+        const response = await axios.put(
+            `http://localhost:5000/sde/update-document/${projectId}`,
+            {
+                combined_text: textContent
+            },
+            {
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                withCredentials: false
+            }
+        );
+
+        if (response.data.success) {
+            setSuccess('Document updated successfully');
+            setTextContent(response.data.document.combined_text);
+            setBlobUrl(response.data.blob_url);
+            setIsEditing(false);
+            
+            // Update the document state based on user role
+            if (user?.roles[0] === 'SDE') {
+                setSdeDoc(response.data.document);
+            } else if (user?.roles[0] === 'BA') {
+                setBaDoc(response.data.document);
+            } else if (user?.roles[0] === 'Client') {
+                setClientDoc(response.data.document);
+            } else if (user?.roles[0] === 'DevOps') {
+                setDevopsDoc(response.data.document);
+            }
+        } else {
+            setError(response.data.message || 'Failed to update document');
+        }
+    } catch (error) {
+        console.error('Error saving template:', error);
+        setError(error.response?.data?.message || 'Failed to save template');
+    } finally {
+        setLoading(false);
+    }
+  };
+
+  const handleAIAssist = async (e) => {
+    e.preventDefault(); // Prevent form submission
+    e.stopPropagation(); // Stop event bubbling
+    
+    if (!textContent) {
+      setError('No content to edit');
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await axios.post(`http://localhost:5000/sde/edit-with-ai/${projectId}`, {
+        current_text: textContent,
+        context: additionalContext
+      });
+
+      if (response.data.success) {
+        setTextContent(response.data.edited_text);
+        setSuccess('Document edited successfully with AI assistance');
+      } else {
+        setError(response.data.message || 'Failed to edit document with AI');
+      }
+    } catch (err) {
+      console.error('AI edit error:', err);
+      setError(err.response?.data?.message || 'Error editing document with AI');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="flex flex-col mx-3 my-0">
       <div className='grid grid-cols-3 grid-cols-2 gap-4 mt-2'>
@@ -581,10 +694,12 @@ const SingleProjectReqs = ({ projectId }) => {
           {user?.role && (
             <button 
               className='p-2 bg-black text-white rounded-md text-sm mb-4 hover:bg-gray-800'
-              onClick={() => {
-                const currentDoc = user.role === 'sde' ? sdeDoc : 
-                                 user.role === 'ba' ? baDoc : 
-                                 user.role === 'client' ? clientDoc : 
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const currentDoc = user.roles[0] === 'SDE' ? sdeDoc : 
+                                 user.roles[0] === 'BA' ? baDoc : 
+                                 user.roles[0] === 'client' ? clientDoc : 
                                  devopsDoc;
                 console.log('Edit button clicked for', user.role, 'template');
                 console.log('Current document:', currentDoc);
@@ -595,31 +710,35 @@ const SingleProjectReqs = ({ projectId }) => {
               }}
               disabled={!sdeDoc?.blob_url && !baDoc?.blob_url && !clientDoc?.blob_url && !devopsDoc?.blob_url}
             >
-              Edit {user.role.toUpperCase()} Template
+              Edit {user.roles[0].toUpperCase()} Template
             </button>
           )}
 
           {/* Current Role Template Button */}
-          {user?.role && (
+          {user?.roles[0] && (
             <div className="mb-4">
-              <div className="text-sm font-semibold mb-2">Your Template ({user.role.toUpperCase()})</div>
+              <div className="text-sm font-semibold mb-2">Your Template ({user.roles[0].toUpperCase()})</div>
               <div className="flex flex-col gap-2">
                 <button 
                   className='p-2 bg-[#f3dfbf] rounded-md text-sm' 
-                  onClick={() => handleViewDocument(
-                    user.role === 'sde' ? sdeDoc : 
-                    user.role === 'ba' ? baDoc : 
-                    user.role === 'client' ? clientDoc : 
-                    devopsDoc, 
-                    user.role
-                  )}
-                  disabled={docLoading[user.role]}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleViewDocument(
+                      user.roles[0] === 'SDE' ? sdeDoc : 
+                      user.roles[0] === 'BA' ? baDoc : 
+                      user.roles[0] === 'Client' ? clientDoc : 
+                      devopsDoc, 
+                      user.roles[0]
+                    );
+                  }}
+                  disabled={docLoading[user.roles[0]]}
                 >
-                  {docLoading[user.role] ? 'Loading...' : 
-                   (user.role === 'sde' ? sdeDoc : 
-                    user.role === 'ba' ? baDoc : 
-                    user.role === 'client' ? clientDoc : 
-                    devopsDoc) ? `View ${user.role.toUpperCase()} Template` : `Generate ${user.role.toUpperCase()} Template`}
+                  {docLoading[user.roles[0]] ? 'Loading...' : 
+                   (user.roles[0] === 'SDE' ? sdeDoc : 
+                    user.roles[0] === 'BA' ? baDoc : 
+                    user.roles[0] === 'Client' ? clientDoc : 
+                    devopsDoc) ? `View ${user.roles[0].toUpperCase()} Template` : `Generate ${user.roles[0].toUpperCase()} Template`}
                 </button>
               </div>
             </div>
@@ -642,14 +761,16 @@ const SingleProjectReqs = ({ projectId }) => {
                       View Document
                     </a>
                   </div>
-                  {user?.role === 'sde' && (
+                  {user?.roles[0] === 'SDE' && (
                     <button 
                       className='p-1 bg-blue-100 rounded-md text-sm text-blue-600 hover:bg-blue-200 ml-8'
-                      onClick={() => {
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
                         console.log('Edit button clicked for SDE template');
-                        console.log('Current user role:', user?.role);
+                        console.log('Current user role:', user?.roles[0]);
                         console.log('SDE document:', sdeDoc);
-                        handleViewDocument(sdeDoc, 'sde');
+                        handleViewDocument(sdeDoc, 'SDE');
                         setIsEditing(true);
                       }}
                     >
@@ -671,12 +792,14 @@ const SingleProjectReqs = ({ projectId }) => {
                       View Document
                     </a>
                   </div>
-                  {user?.role === 'ba' && (
+                  {user?.roles[0] === 'BA' && (
                     <button 
                       className='p-1 bg-blue-100 rounded-md text-sm text-blue-600 hover:bg-blue-200 ml-8'
-                      onClick={() => {
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
                         console.log('Edit button clicked for BA template');
-                        console.log('Current user role:', user?.role);
+                        console.log('Current user role:', user?.roles[0]);
                         console.log('BA document:', baDoc);
                         handleViewDocument(baDoc, 'ba');
                         setIsEditing(true);
@@ -700,14 +823,16 @@ const SingleProjectReqs = ({ projectId }) => {
                       View Document
                     </a>
                   </div>
-                  {user?.role === 'client' && (
+                  {user?.roles[0] === 'Client' && (
                     <button 
                       className='p-1 bg-blue-100 rounded-md text-sm text-blue-600 hover:bg-blue-200 ml-8'
-                      onClick={() => {
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
                         console.log('Edit button clicked for Client template');
-                        console.log('Current user role:', user?.role);
+                        console.log('Current user role:', user?.roles[0]);
                         console.log('Client document:', clientDoc);
-                        handleViewDocument(clientDoc, 'client');
+                        handleViewDocument(clientDoc, 'Client');
                         setIsEditing(true);
                       }}
                     >
@@ -729,14 +854,16 @@ const SingleProjectReqs = ({ projectId }) => {
                       View Document
                     </a>
                   </div>
-                  {user?.role === 'devops' && (
+                  {user?.roles[0] === 'DevOps' && (
                     <button 
                       className='p-1 bg-blue-100 rounded-md text-sm text-blue-600 hover:bg-blue-200 ml-8'
-                      onClick={() => {
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
                         console.log('Edit button clicked for DevOps template');
-                        console.log('Current user role:', user?.role);
+                        console.log('Current user role:', user?.roles[0]);
                         console.log('DevOps document:', devopsDoc);
-                        handleViewDocument(devopsDoc, 'devops');
+                        handleViewDocument(devopsDoc, 'DevOps');
                         setIsEditing(true);
                       }}
                     >
@@ -913,58 +1040,128 @@ const SingleProjectReqs = ({ projectId }) => {
         </div>
       )}
 
-{showTemplate && (
-  <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
-    <div className="bg-white p-6 rounded-lg w-[95%] max-w-4xl h-[90vh] overflow-y-auto">
-      <h2 className="text-2xl font-semibold mb-4">Generated Document</h2>
+      {showTemplate && (
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-lg w-[95%] max-w-4xl h-[90vh] overflow-y-auto">
+            <h2 className="text-2xl font-semibold mb-4">Generated Document</h2>
 
-      {/* ACTION BUTTONS */}
-      <div className="flex justify-end gap-3 mb-4">
-        {!isEditing ? (
-          <Button variant="outlined" onClick={() => setIsEditing(true)}>
-            Edit
-          </Button>
-        ) : (
-          <>
-            <Button variant="contained" color="primary" >
-              Save
-            </Button>
-            <Button variant="outlined" onClick={() => setIsEditing(false)}>
-              Cancel
-            </Button>
-          </>
-        )}
-        <Button
-          onClick={() => {
-            setShowTemplate(false);
-            setIsEditing(false);
-            setTextContent('');
-          }}
-          variant="text"
-        >
-          Close
-        </Button>
-      </div>
+            {/* ACTION BUTTONS */}
+            <div className="flex justify-end gap-3 mb-4">
+              {!isEditing ? (
+                <Button variant="outlined" onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setIsEditing(true);
+                }}>
+                  Edit
+                </Button>
+              ) : (
+                <>
+                  <Button 
+                    variant="contained" 
+                    color="primary" 
+                    onClick={handleSaveTemplate}
+                    disabled={loading}
+                    type="button"
+                  >
+                    {loading ? <CircularProgress size={24} /> : 'Save'}
+                  </Button>
+                  <Button 
+                    variant="outlined" 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setIsEditing(false);
+                    }}
+                    disabled={loading}
+                    type="button"
+                  >
+                    Cancel
+                  </Button>
+                </>
+              )}
+              <Button
+                onClick={() => {
+                  setShowTemplate(false);
+                  setIsEditing(false);
+                  setTextContent('');
+                }}
+                variant="text"
+                disabled={loading}
+              >
+                Close
+              </Button>
+            </div>
 
-      {/* DOCUMENT PREVIEW / EDIT */}
-      <div className="border p-4 rounded bg-gray-50 max-h-[70vh] overflow-y-auto">
-        {!isEditing ? (
-          <pre className="whitespace-pre-wrap text-sm text-gray-800">{textContent}</pre>
-        ) : (
-          <TextField
-            fullWidth
-            multiline
-            rows={20}
-            variant="outlined"
-            value={textContent}
-            onChange={(e) => setTextContent(e.target.value)}
-          />
-        )}
-      </div>
-    </div>
-  </div>
-)}
+            {error && (
+              <Alert severity="error" className="mb-4">
+                {error}
+              </Alert>
+            )}
 
+            {/* DOCUMENT PREVIEW / EDIT */}
+            <div className="flex flex-col gap-4">
+              {isEditing ? (
+                <>
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Additional Context for AI
+                    </label>
+                    <textarea
+                      value={additionalContext}
+                      onChange={(e) => setAdditionalContext(e.target.value)}
+                      className="w-full h-20 p-2 border rounded-md"
+                      placeholder="Enter any additional context or instructions for the AI..."
+                    />
+                  </div>
+                  <textarea
+                    value={textContent}
+                    onChange={(e) => setTextContent(e.target.value)}
+                    className="w-full h-96 p-2 border rounded-md"
+                    placeholder="Edit document content..."
+                  />
+                  <div className="flex justify-end gap-2">
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={handleAIAssist}
+                      disabled={loading}
+                      type="button"
+                    >
+                      {loading ? <CircularProgress size={24} /> : 'AI Assist'}
+                    </Button>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={handleSaveTemplate}
+                      disabled={loading}
+                      type="button"
+                    >
+                      {loading ? <CircularProgress size={24} /> : 'Save'}
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setIsEditing(false);
+                      }}
+                      disabled={loading}
+                      type="button"
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </>
+              ) : (
+                <div className="p-4 bg-gray-50 rounded-md whitespace-pre-wrap">
+                  {textContent}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

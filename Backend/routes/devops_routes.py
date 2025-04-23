@@ -18,6 +18,9 @@ import httpx
 from flask import Blueprint, request, jsonify
 import ssl
 import traceback
+from flask_cors import CORS
+from io import BytesIO
+import re
 
 # Azure OpenAI Configuration
 AZURE_ENDPOINT = "https://suraj-m9lgdbv9-eastus2.cognitiveservices.azure.com/"
@@ -274,6 +277,252 @@ async def generate_devops_content(requirements_text, openai_client, deployment_n
     
     return content
 
+def generate_pdf(data, output_buffer):
+    """Generate a professional PDF document from the requirements data in memory."""
+    try:
+        # Set up the document with proper margins
+        doc = SimpleDocTemplate(
+            output_buffer,
+            pagesize=A4,
+            rightMargin=50,
+            leftMargin=50,
+            topMargin=50,
+            bottomMargin=50
+        )
+        
+        # Define enhanced styles
+        styles = getSampleStyleSheet()
+        
+        # Professional title style - smaller font
+        title_style = ParagraphStyle(
+            'Title',
+            parent=styles['Heading1'],
+            fontSize=22,
+            alignment=1,  # Center alignment
+            spaceAfter=12,
+            textColor=colors.HexColor('#1B365D')  # Dark blue
+        )
+        
+        # Modern subtitle style - smaller font
+        subtitle_style = ParagraphStyle(
+            'Subtitle',
+            parent=styles['Heading2'],
+            fontSize=16,
+            textColor=colors.HexColor('#2E5C8A'),  # Medium blue
+            spaceBefore=10,
+            spaceAfter=6,
+            alignment=0,  # Left alignment
+            borderWidth=0
+        )
+        
+        # Section header style - smaller font
+        section_style = ParagraphStyle(
+            'Section',
+            parent=styles['Heading3'],
+            fontSize=13,
+            textColor=colors.HexColor('#4A4A4A'),  # Dark gray
+            spaceBefore=10,
+            spaceAfter=4,
+            leftIndent=0
+        )
+        
+        # Clean normal text style - smaller font
+        normal_style = ParagraphStyle(
+            'Normal',
+            parent=styles['Normal'],
+            fontSize=10,
+            leading=12,
+            textColor=colors.HexColor('#333333')  # Soft black
+        )
+        
+        # Build document content
+        content = []
+        
+        # Header section - more compact
+        timestamp = datetime.now().strftime("%B %d, %Y at %I:%M %p")
+        
+        content.append(Paragraph("DevOps Requirements Document", title_style))
+        content.append(Spacer(1, 8))
+        content.append(Paragraph(f"Generated on: {timestamp}", ParagraphStyle(
+            'Timestamp', 
+            parent=normal_style,
+            textColor=colors.HexColor('#666666'),  # Medium gray
+            alignment=1  # Center aligned
+        )))
+        content.append(Spacer(1, 15))
+        
+        # Process each section
+        for section, section_content in data.items():
+            # Skip the combined_text field if it exists
+            if section == "combined_text":
+                continue
+                
+            # Add section header
+            content.append(Paragraph(section, subtitle_style))
+            
+            # Add horizontal rule
+            hr_table = Table([['']],colWidths=[doc.width-20],rowHeights=[1])
+            hr_table.setStyle(TableStyle([
+                ('LINEABOVE', (0,0), (-1,0), 1, colors.HexColor('#DDDDDD')),  # Light gray line
+            ]))
+            content.append(hr_table)
+            content.append(Spacer(1, 8))
+            
+            # Format and add section content
+            formatted_content = str(section_content).replace('•', '⚫')  # Replace bullet points with circles
+            
+            # Split content into paragraphs to avoid large tables
+            paragraphs = formatted_content.split('\n')
+            
+            # Process each paragraph
+            for para in paragraphs:
+                if para.strip():
+                    # Create a small table for each paragraph
+                    data_table = [[Paragraph(para, normal_style)]]
+                    section_table = Table(data_table, colWidths=[doc.width - 40])
+                    section_table.setStyle(TableStyle([
+                        ('BACKGROUND', (0, 0), (-1, -1), colors.HexColor('#F8F8F8')),  # Very light gray
+                        ('TEXTCOLOR', (0, 0), (-1, -1), colors.HexColor('#333333')),
+                        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+                        ('BOX', (0, 0), (-1, -1), 1, colors.HexColor('#DDDDDD')),
+                        ('LEFTPADDING', (0, 0), (-1, -1), 10),
+                        ('RIGHTPADDING', (0, 0), (-1, -1), 10),
+                        ('TOPPADDING', (0, 0), (-1, -1), 6),
+                        ('BOTTOMPADDING', (0, 0), (-1, -1), 6)
+                    ]))
+                    content.append(section_table)
+                    content.append(Spacer(1, 6))
+            
+            content.append(Spacer(1, 10))
+        
+        # Add footer with page numbers
+        def add_page_number(canvas, doc):
+            page_num = canvas.getPageNumber()
+            canvas.saveState()
+            canvas.setFont("Helvetica", 8)
+            canvas.setFillColor(colors.HexColor('#666666'))
+            
+            # Add header line
+            canvas.setStrokeColor(colors.HexColor('#DDDDDD'))
+            canvas.line(doc.leftMargin, doc.pagesize[1] - 35, doc.width + doc.rightMargin, doc.pagesize[1] - 35)
+            
+            # Add footer line
+            canvas.line(doc.leftMargin, 45, doc.width + doc.rightMargin, 45)
+            
+            # Add page number
+            canvas.drawRightString(doc.width + doc.rightMargin, 25, f"Page {page_num}")
+            
+            # Add document title in footer
+            canvas.drawString(doc.leftMargin, 25, "DevOps Requirements Document")
+            canvas.restoreState()
+        
+        # Build the PDF with page numbers and headers/footers
+        doc.build(content, onFirstPage=add_page_number, onLaterPages=add_page_number)
+        
+        # Return the buffer
+        return output_buffer
+        
+    except Exception as e:
+        print(f"Error in PDF generation: {str(e)}")
+        print("Attempting fallback PDF generation...")
+        try:
+            # Fallback to simple PDF generation
+            from reportlab.pdfgen import canvas
+            from reportlab.lib.pagesizes import A4
+            
+            c = canvas.Canvas(output_buffer, pagesize=A4)
+            y = 800  # Start near top of page
+            
+            # Add title
+            c.setFont("Helvetica-Bold", 16)
+            c.drawString(50, y, "DevOps Requirements Document")
+            y -= 30
+            
+            # Add timestamp
+            c.setFont("Helvetica", 10)
+            c.drawString(50, y, f"Generated on: {datetime.now().strftime('%B %d, %Y at %I:%M %p')}")
+            y -= 30
+            
+            # Add content
+            c.setFont("Helvetica", 10)
+            for section, section_content in data.items():
+                if section == "combined_text":
+                    continue
+                    
+                # Add section header
+                c.setFont("Helvetica-Bold", 12)
+                c.drawString(50, y, section)
+                y -= 20
+                
+                # Add section content
+                c.setFont("Helvetica", 10)
+                for line in str(section_content).split('\n'):
+                    if y < 50:  # Start new page if near bottom
+                        c.showPage()
+                        y = 800
+                        c.setFont("Helvetica", 10)
+                    
+                    try:
+                        c.drawString(50, y, line)
+                    except:
+                        c.drawString(50, y, line.encode('ascii', 'replace').decode())
+                    y -= 12
+                
+                y -= 10  # Add space between sections
+            
+            c.save()
+            print("Created fallback PDF successfully")
+            return output_buffer
+            
+        except Exception as e2:
+            print(f"Fallback PDF generation failed: {str(e2)}")
+            raise
+
+def upload_to_blob_storage_from_memory(pdf_buffer, doc_type: str, doc_id: str) -> str:
+    """
+    Upload a PDF from memory to Azure Blob Storage and return a viewable URL.
+    
+    Args:
+        pdf_buffer: BytesIO buffer containing the PDF
+        doc_type: Type of document (devops)
+        doc_id: Document ID
+        
+    Returns:
+        Viewable Blob URL
+    """
+    try:
+        # Get blob container
+        container_client = get_blob_container()
+        
+        # Create a unique blob name
+        safe_doc_type = re.sub(r'[^a-zA-Z0-9-]', '-', doc_type.lower())
+        safe_doc_id = re.sub(r'[^a-zA-Z0-9-]', '-', doc_id)
+        blob_name = f"requirements/{safe_doc_type}/{safe_doc_id}.pdf"
+        
+        # Create blob client
+        blob_client = container_client.get_blob_client(blob_name)
+        
+        # Set content type
+        content_settings = ContentSettings(content_type='application/pdf')
+        
+        # Upload the PDF from memory
+        pdf_buffer.seek(0)  # Reset buffer position
+        blob_client.upload_blob(
+            pdf_buffer,
+            overwrite=True,
+            content_settings=content_settings
+        )
+        
+        # Return the URL
+        return blob_client.url
+        
+    except Exception as e:
+        print(f"Error uploading to blob storage: {str(e)}")
+        print(f"Error type: {type(e).__name__}")
+        print(f"Traceback: {traceback.format_exc()}")
+        raise
+
 async def process_devops_template(project_id, requirements_text):
     """Process and generate DevOps template content."""
     try:
@@ -294,26 +543,13 @@ async def process_devops_template(project_id, requirements_text):
         for section, section_content in content.items():
             combined_text += f"{section_content}\n\n"
         
-        # Generate PDF
-        timestamp = datetime.utcnow().strftime('%Y%m%d_%H%M%S')
-        pdf_filename = f"devops_requirements_{project_id}_{timestamp}.pdf"
-        pdf_path = os.path.join(os.path.dirname(__file__), pdf_filename)
+        # Generate PDF in memory
+        pdf_buffer = BytesIO()
+        generate_pdf(content, pdf_buffer)
+        pdf_buffer.seek(0)
         
-        # Generate the PDF
-        generate_pdf(content, pdf_path)
-        print(f"Generated PDF at: {pdf_path}")
-        
-        # Upload to blob storage
-        blob_name = f"requirements/{pdf_filename}"
-        blob_url = upload_to_blob_storage(pdf_path, blob_name)
-        print(f"Uploaded PDF to blob storage: {blob_url}")
-        
-        # Clean up local PDF file
-        try:
-            os.remove(pdf_path)
-            print(f"Cleaned up local PDF file: {pdf_path}")
-        except Exception as e:
-            print(f"Error cleaning up local PDF file: {str(e)}")
+        # Upload to blob storage directly from memory
+        blob_url = upload_to_blob_storage_from_memory(pdf_buffer, 'devops', str(uuid.uuid4()))
         
         # If document exists, update it
         if items:
@@ -322,14 +558,14 @@ async def process_devops_template(project_id, requirements_text):
             doc["combined_text"] = combined_text.strip()
             doc["timestamp"] = datetime.utcnow().isoformat()
             doc["blob_url"] = blob_url
-            doc["pdf_filename"] = pdf_filename
+            doc["version"] = doc.get("version", 1) + 1
             
             await container.upsert_item(doc)
             print(f"Updated existing document with ID: {doc['id']}")
             return doc['id'], doc
         else:
             # Create new document
-            doc_id = f"devops_requirements_{project_id}_{timestamp}"
+            doc_id = f"devops_requirements_{project_id}_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}"
             requirements_data = {
                 "id": doc_id,
                 "template_type": "devops",
@@ -338,7 +574,7 @@ async def process_devops_template(project_id, requirements_text):
                 "project_id": project_id,
                 "timestamp": datetime.utcnow().isoformat(),
                 "blob_url": blob_url,
-                "pdf_filename": pdf_filename
+                "version": 1
             }
             
             await container.create_item(body=requirements_data)
@@ -347,166 +583,9 @@ async def process_devops_template(project_id, requirements_text):
         
     except Exception as e:
         print(f"Error processing DevOps template: {str(e)}")
+        print(f"Error type: {type(e).__name__}")
+        print(f"Traceback: {traceback.format_exc()}")
         raise
-
-def generate_pdf(data, output_path):
-    """Generate a professional PDF document from the requirements data."""
-    # Set up the document with proper margins
-    doc = SimpleDocTemplate(
-        output_path,
-        pagesize=A4,
-        rightMargin=50,
-        leftMargin=50,
-        topMargin=50,
-        bottomMargin=50
-    )
-    
-    # Define enhanced styles
-    styles = getSampleStyleSheet()
-    
-    # Professional title style - smaller font
-    title_style = ParagraphStyle(
-        'Title',
-        parent=styles['Heading1'],
-        fontSize=22,
-        alignment=1,  # Center alignment
-        spaceAfter=12,
-        textColor=colors.HexColor('#1B365D')  # Dark blue
-    )
-    
-    # Modern subtitle style - smaller font
-    subtitle_style = ParagraphStyle(
-        'Subtitle',
-        parent=styles['Heading2'],
-        fontSize=16,
-        textColor=colors.HexColor('#2E5C8A'),  # Medium blue
-        spaceBefore=10,
-        spaceAfter=6,
-        alignment=0,  # Left alignment
-        borderWidth=0
-    )
-    
-    # Section header style - smaller font
-    section_style = ParagraphStyle(
-        'Section',
-        parent=styles['Heading3'],
-        fontSize=13,
-        textColor=colors.HexColor('#4A4A4A'),  # Dark gray
-        spaceBefore=10,
-        spaceAfter=4,
-        leftIndent=0
-    )
-    
-    # Clean normal text style - smaller font
-    normal_style = ParagraphStyle(
-        'Normal',
-        parent=styles['Normal'],
-        fontSize=10,
-        leading=12,
-        textColor=colors.HexColor('#333333')  # Soft black
-    )
-    
-    # Build document content
-    content = []
-    
-    # Header section - more compact
-    timestamp = datetime.now().strftime("%B %d, %Y at %I:%M %p")
-    
-    content.append(Paragraph("DevOps Requirements Specification", title_style))
-    content.append(Spacer(1, 8))
-    content.append(Paragraph(f"Generated on: {timestamp}", ParagraphStyle(
-        'Timestamp', 
-        parent=normal_style,
-        textColor=colors.HexColor('#666666'),  # Medium gray
-        alignment=1  # Center aligned
-    )))
-    content.append(Spacer(1, 15))
-    
-    # Process each section
-    for section, section_content in data.items():
-        # Skip the combined_text field if it exists
-        if section == "combined_text":
-            continue
-            
-        # Add section header
-        content.append(Paragraph(section, subtitle_style))
-        
-        # Add horizontal rule
-        hr_table = Table([['']],colWidths=[doc.width-20],rowHeights=[1])
-        hr_table.setStyle(TableStyle([
-            ('LINEABOVE', (0,0), (-1,0), 1, colors.HexColor('#DDDDDD')),  # Light gray line
-        ]))
-        content.append(hr_table)
-        content.append(Spacer(1, 8))
-        
-        # Format and add section content
-        formatted_content = str(section_content).replace('•', '⚫')  # Replace bullet points with circles
-        
-        # Split content into paragraphs to avoid large tables
-        paragraphs = formatted_content.split('\n')
-        
-        # Process each paragraph
-        for para in paragraphs:
-            if para.strip():
-                # Create a small table for each paragraph
-                data_table = [[Paragraph(para, normal_style)]]
-                section_table = Table(data_table, colWidths=[doc.width - 40])
-                section_table.setStyle(TableStyle([
-                    ('BACKGROUND', (0, 0), (-1, -1), colors.HexColor('#F8F8F8')),  # Very light gray
-                    ('TEXTCOLOR', (0, 0), (-1, -1), colors.HexColor('#333333')),
-                    ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-                    ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-                    ('BOX', (0, 0), (-1, -1), 1, colors.HexColor('#DDDDDD')),
-                    ('LEFTPADDING', (0, 0), (-1, -1), 10),
-                    ('RIGHTPADDING', (0, 0), (-1, -1), 10),
-                    ('TOPPADDING', (0, 0), (-1, -1), 6),
-                    ('BOTTOMPADDING', (0, 0), (-1, -1), 6)
-                ]))
-                content.append(section_table)
-                content.append(Spacer(1, 6))
-        
-        content.append(Spacer(1, 10))
-    
-    # Add footer with page numbers
-    def add_page_number(canvas, doc):
-        page_num = canvas.getPageNumber()
-        canvas.saveState()
-        canvas.setFont("Helvetica", 8)
-        canvas.setFillColor(colors.HexColor('#666666'))
-        
-        # Add header line
-        canvas.setStrokeColor(colors.HexColor('#DDDDDD'))
-        canvas.line(doc.leftMargin, doc.pagesize[1] - 35, doc.width + doc.rightMargin, doc.pagesize[1] - 35)
-        
-        # Add footer line
-        canvas.line(doc.leftMargin, 45, doc.width + doc.rightMargin, 45)
-        
-        # Add page number
-        canvas.drawRightString(doc.width + doc.rightMargin, 25, f"Page {page_num}")
-        
-        # Add document title in footer
-        canvas.drawString(doc.leftMargin, 25, "DevOps Requirements Specification")
-        canvas.restoreState()
-    
-    # Build the PDF with page numbers and headers/footers
-    doc.build(content, onFirstPage=add_page_number, onLaterPages=add_page_number)
-    
-    print(f"Generated PDF at: {output_path}")
-    return output_path
-
-def upload_to_blob_storage(file_path, blob_name):
-    """Upload a file to Azure Blob Storage and return the URL."""
-    container_client = get_blob_container()
-    blob_client = container_client.get_blob_client(blob_name)
-    
-    # Set content type based on file extension
-    content_type = 'application/pdf' if file_path.endswith('.pdf') else 'text/plain'
-    content_settings = ContentSettings(content_type=content_type)
-    
-    with open(file_path, "rb") as data:
-        blob_client.upload_blob(data, overwrite=True, content_settings=content_settings)
-    
-    return blob_client.url
 
 async def update_document_url(doc_id, blob_url):
     """Update the document URL in Cosmos DB."""
@@ -533,6 +612,7 @@ async def close_cosmos_client():
 
 # Create Blueprint
 devops = Blueprint('devops', __name__, url_prefix='/devops')
+CORS(devops)  # Enable CORS for all routes in this blueprint
 
 @devops.route('/generate-document', methods=['POST'])
 async def generate_devops_document():
@@ -705,4 +785,403 @@ async def get_devops_document(project_id):
             'success': False,
             'error': str(e)
         }), 500
+
+@devops.route('/edit-with-ai/<project_id>', methods=['POST'])
+async def edit_with_ai(project_id):
+    try:
+        print("\n=== Starting AI-powered document editing ===")
+        print("Request headers:", dict(request.headers))
+        print("Request data:", request.json)
+        print(f"Project ID: {project_id}")
+
+        data = request.json
+        if not data or 'context' not in data or 'current_text' not in data:
+            print("Error: Missing required fields in request")
+            return jsonify({
+                'success': False,
+                'message': 'context and current_text are required'
+            }), 400
+
+        context = data.get('context', '')
+        current_text = data.get('current_text', '')
+
+        # Create event loop if needed
+        try:
+            loop = asyncio.get_event_loop()
+            print("Using existing event loop")
+        except RuntimeError:
+            print("Creating new event loop")
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+
+        # Initialize Azure OpenAI client
+        print("Initializing Azure OpenAI client...")
+        openai_client = AzureOpenAI(
+            api_version=AZURE_API_VERSION,
+            api_key=AZURE_API_KEY,
+            azure_endpoint=AZURE_ENDPOINT
+        )
+        print("Azure OpenAI client initialized")
+
+        # Prepare the prompt for AI editing
+        prompt = f"""
+        You are a DevOps documentation expert. Please help edit the following text based on the provided context.
+        
+        Context: {context}
+        
+        Current Text:
+        {current_text}
+        
+        Please provide an improved version of the text that:
+        1. Incorporates the context appropriately
+        2. Maintains the original structure and formatting
+        3. Improves technical accuracy and clarity
+        4. Preserves any important technical details
+        
+        Return only the edited text, without any additional explanations or notes.
+        """
+
+        try:
+            # Get AI response
+            print("Sending request to Azure OpenAI...")
+            response = openai_client.chat.completions.create(
+                model=DEPLOYMENT_NAME,
+                messages=[
+                    {"role": "system", "content": "You are a DevOps documentation expert helping to improve technical documents."},
+                    {"role": "user", "content": prompt}
+                ],
+                temperature=0.7,
+                max_tokens=2000
+            )
+            
+            edited_text = response.choices[0].message.content.strip()
+            print("Received response from Azure OpenAI")
+
+            return jsonify({
+                'success': True,
+                'message': 'Document edited successfully with AI',
+                'edited_text': edited_text
+            }), 200
+
+        except Exception as ai_error:
+            print(f"Error in AI processing: {str(ai_error)}")
+            print(f"Error type: {type(ai_error).__name__}")
+            print(f"Traceback: {traceback.format_exc()}")
+            return jsonify({
+                'success': False,
+                'message': f'Error in AI processing: {str(ai_error)}',
+                'error_type': type(ai_error).__name__
+            }), 500
+
+    except Exception as e:
+        print(f"\nError in edit_with_ai:")
+        print(f"Error type: {type(e).__name__}")
+        print(f"Error message: {str(e)}")
+        print(f"Traceback: {traceback.format_exc()}")
+        return jsonify({
+            'success': False,
+            'message': f'Error editing document with AI: {str(e)}',
+            'error_type': type(e).__name__,
+            'traceback': traceback.format_exc()
+        }), 500
+
+@devops.route('/update-document/<project_id>', methods=['PUT', 'OPTIONS'])
+async def update_devops_document(project_id):
+    if request.method == 'OPTIONS':
+        # Handle preflight request
+        response = jsonify({'success': True})
+        response.headers.add('Access-Control-Allow-Origin', 'http://localhost:5173')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
+        response.headers.add('Access-Control-Allow-Methods', 'PUT')
+        return response
+
+    try:
+        print("\n=== Starting document update process ===")
+        print("Request headers:", dict(request.headers))
+        print("Request data:", request.json)
+        print(f"Project ID: {project_id}")
+
+        data = request.json
+        if not data or 'combined_text' not in data:
+            print("Error: Missing combined_text in request")
+            return jsonify({
+                'success': False,
+                'message': 'combined_text is required'
+            }), 400
+
+        # Format combined text
+        combined_text = data.get('combined_text', '')
+        if combined_text:
+            # Remove extra newlines and spaces, but preserve paragraph structure
+            combined_text = '\n\n'.join(
+                ' '.join(line.split())
+                for line in combined_text.split('\n\n')
+                if line.strip()
+            )
+
+        # Create event loop if needed
+        try:
+            loop = asyncio.get_event_loop()
+            print("Using existing event loop")
+        except RuntimeError:
+            print("Creating new event loop")
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+
+        # Initialize Cosmos client
+        print("Initializing Cosmos client...")
+        cosmos_client = CosmosClient(
+            url=COSMOS_URL,
+            credential=COSMOS_KEY,
+            connection_verify=False,
+            consistency_level='Session'
+        )
+        print("Cosmos client initialized")
+
+        # Get database and container clients
+        print("Getting database and container clients...")
+        database = cosmos_client.get_database_client(DATABASE_NAME)
+        container = database.get_container_client(CONTAINER_NAME)
+        print("Database and container clients obtained")
+
+        # Find the existing document
+        print("Querying for existing document...")
+        query = f"SELECT * FROM c WHERE c.project_id = '{project_id}' AND c.template_type = 'devops'"
+        print(f"Query: {query}")
+        
+        items = []
+        try:
+            async for item in container.query_items(
+                query=query,
+                partition_key=project_id
+            ):
+                items.append(item)
+                print(f"Found document: {item.get('id')}")
+        except Exception as query_error:
+            print(f"Error during query: {str(query_error)}")
+            print(f"Error type: {type(query_error).__name__}")
+            print(f"Traceback: {traceback.format_exc()}")
+            raise
+
+        if not items:
+            print("No existing document found")
+            return jsonify({
+                'success': False,
+                'message': 'Document not found'
+            }), 404
+
+        # Update the document
+        print("Updating document...")
+        document = items[0]
+        print(f"Current document combined_text: {document.get('combined_text')}")
+        print(f"New combined_text to update: {combined_text}")
+        
+        # Generate PDF in memory with enhanced formatting
+        try:
+            # Create a BytesIO object to store the PDF
+            pdf_buffer = BytesIO()
+            
+            # Create document with professional margins
+            doc = SimpleDocTemplate(
+                pdf_buffer,
+                pagesize=A4,
+                rightMargin=50,
+                leftMargin=50,
+                topMargin=50,
+                bottomMargin=50
+            )
+            
+            # Define enhanced styles
+            styles = getSampleStyleSheet()
+            
+            # Professional title style
+            title_style = ParagraphStyle(
+                'Title',
+                parent=styles['Heading1'],
+                fontSize=22,
+                alignment=1,  # Center alignment
+                spaceAfter=12,
+                textColor=colors.HexColor('#1B365D')  # Dark blue
+            )
+            
+            # Modern subtitle style
+            subtitle_style = ParagraphStyle(
+                'Subtitle',
+                parent=styles['Heading2'],
+                fontSize=16,
+                textColor=colors.HexColor('#2E5C8A'),  # Medium blue
+                spaceBefore=10,
+                spaceAfter=6,
+                alignment=0,  # Left alignment
+                borderWidth=0
+            )
+            
+            # Section header style
+            section_style = ParagraphStyle(
+                'Section',
+                parent=styles['Heading3'],
+                fontSize=13,
+                textColor=colors.HexColor('#4A4A4A'),  # Dark gray
+                spaceBefore=10,
+                spaceAfter=4,
+                leftIndent=0
+            )
+            
+            # Clean normal text style
+            normal_style = ParagraphStyle(
+                'Normal',
+                parent=styles['Normal'],
+                fontSize=10,
+                leading=12,
+                textColor=colors.HexColor('#333333')  # Soft black
+            )
+            
+            # Build document content
+            content = []
+            
+            # Header section
+            timestamp = datetime.now().strftime("%B %d, %Y at %I:%M %p")
+            
+            content.append(Paragraph("DevOps Requirements Document", title_style))
+            content.append(Spacer(1, 8))
+            content.append(Paragraph(f"Generated on: {timestamp}", ParagraphStyle(
+                'Timestamp', 
+                parent=normal_style,
+                textColor=colors.HexColor('#666666'),  # Medium gray
+                alignment=1  # Center aligned
+            )))
+            content.append(Spacer(1, 15))
+            
+            # Process content
+            lines = combined_text.split('\n')
+            current_section = None
+            
+            for line in lines:
+                if not line.strip():
+                    content.append(Spacer(1, 12))
+                    continue
+                    
+                # Handle special characters
+                line = line.replace('"', '"').replace('"', '"')
+                line = line.replace(''', "'").replace(''', "'")
+                
+                if line.startswith('#') or line.startswith('##'):
+                    # Handle headers
+                    header_text = line.replace('#', '').strip()
+                    if line.startswith('##'):
+                        content.append(Paragraph(header_text, section_style))
+                    else:
+                        content.append(Paragraph(header_text, subtitle_style))
+                    
+                    # Add horizontal rule
+                    hr_table = Table([['']], colWidths=[doc.width-20], rowHeights=[1])
+                    hr_table.setStyle(TableStyle([
+                        ('LINEABOVE', (0,0), (-1,0), 1, colors.HexColor('#DDDDDD')),  # Light gray line
+                    ]))
+                    content.append(hr_table)
+                    content.append(Spacer(1, 8))
+                else:
+                    # Create a small table for each paragraph
+                    data_table = [[Paragraph(line, normal_style)]]
+                    section_table = Table(data_table, colWidths=[doc.width - 40])
+                    section_table.setStyle(TableStyle([
+                        ('BACKGROUND', (0, 0), (-1, -1), colors.HexColor('#F8F8F8')),  # Very light gray
+                        ('TEXTCOLOR', (0, 0), (-1, -1), colors.HexColor('#333333')),
+                        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+                        ('BOX', (0, 0), (-1, -1), 1, colors.HexColor('#DDDDDD')),
+                        ('LEFTPADDING', (0, 0), (-1, -1), 10),
+                        ('RIGHTPADDING', (0, 0), (-1, -1), 10),
+                        ('TOPPADDING', (0, 0), (-1, -1), 6),
+                        ('BOTTOMPADDING', (0, 0), (-1, -1), 6)
+                    ]))
+                    content.append(section_table)
+                    content.append(Spacer(1, 6))
+            
+            # Add footer with page numbers
+            def add_page_number(canvas, doc):
+                page_num = canvas.getPageNumber()
+                canvas.saveState()
+                canvas.setFont("Helvetica", 8)
+                canvas.setFillColor(colors.HexColor('#666666'))
+                
+                # Add header line
+                canvas.setStrokeColor(colors.HexColor('#DDDDDD'))
+                canvas.line(doc.leftMargin, doc.pagesize[1] - 35, doc.width + doc.rightMargin, doc.pagesize[1] - 35)
+                
+                # Add footer line
+                canvas.line(doc.leftMargin, 45, doc.width + doc.rightMargin, 45)
+                
+                # Add page number
+                canvas.drawRightString(doc.width + doc.rightMargin, 25, f"Page {page_num}")
+                
+                # Add document title in footer
+                canvas.drawString(doc.leftMargin, 25, "DevOps Requirements Document")
+                canvas.restoreState()
+            
+            # Build the PDF with page numbers and headers/footers
+            doc.build(content, onFirstPage=add_page_number, onLaterPages=add_page_number)
+            pdf_buffer.seek(0)
+            print("Successfully generated PDF in memory")
+            
+            # Upload to blob storage directly from memory
+            try:
+                blob_url = upload_to_blob_storage_from_memory(pdf_buffer, 'devops', str(uuid.uuid4()))
+                print(f"Successfully uploaded PDF to blob storage: {blob_url}")
+            except Exception as e:
+                print(f"Error uploading to blob storage: {str(e)}")
+                return jsonify({
+                    'success': False,
+                    'message': f'Error uploading document to storage: {str(e)}'
+                }), 500
+        except Exception as e:
+            print(f"Error creating PDF: {str(e)}")
+            return jsonify({
+                'success': False,
+                'message': f'Error creating PDF: {str(e)}'
+            }), 500
+
+        # Update document fields
+        document['combined_text'] = combined_text
+        document['timestamp'] = datetime.utcnow().isoformat()
+        document['blob_url'] = blob_url
+
+        # Update the document in Cosmos DB
+        try:
+            updated_doc = await container.replace_item(document['id'], document)
+            print("Document updated successfully")
+            print(f"Updated document: {updated_doc}")
+        except Exception as update_error:
+            print(f"Error updating document: {str(update_error)}")
+            print(f"Error type: {type(update_error).__name__}")
+            print(f"Traceback: {traceback.format_exc()}")
+            raise
+
+        # Close the Cosmos client
+        print("Closing Cosmos client...")
+        await cosmos_client.close()
+        print("Cosmos client closed")
+
+        response = jsonify({
+            'success': True,
+            'message': 'Document updated successfully',
+            'document': updated_doc,
+            'blob_url': blob_url
+        })
+        response.headers.add('Access-Control-Allow-Origin', 'http://localhost:5173')
+        return response, 200
+
+    except Exception as e:
+        print(f"\nError in update_devops_document:")
+        print(f"Error type: {type(e).__name__}")
+        print(f"Error message: {str(e)}")
+        print(f"Traceback: {traceback.format_exc()}")
+        response = jsonify({
+            'success': False,
+            'message': f'Error updating document: {str(e)}',
+            'error_type': type(e).__name__,
+            'traceback': traceback.format_exc()
+        })
+        response.headers.add('Access-Control-Allow-Origin', 'http://localhost:5173')
+        return response, 500
 
