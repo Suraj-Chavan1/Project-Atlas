@@ -14,6 +14,7 @@ import AIRequirementsPage from './pages/AIRequirementsPage'
 import SingleProjectPage from './pages/SingleProjectPage'
 import RequirementsPage from './pages/RequirementsPage'
 import HomePage2 from './pages/HomePage2'
+import Test from './components/Test'
 
 function App() {
 
@@ -81,7 +82,14 @@ function App() {
               <AIRequirementsPage />
             </ProtectedRoute>
           } />
-        </Routes>
+
+          <Route path="/test" element={
+            <Test />
+          } />  
+          </Routes>
+
+        
+        
       </BrowserRouter>
     </UserProvider>
   )
