@@ -55,12 +55,22 @@ const SingleProjectReqs = ({ projectId }) => {
   const [isGeneratingTemplate, setIsGeneratingTemplate] = useState(false);
   const [showTemplate, setShowTemplate] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-
+  const [sdeDoc, setSdeDoc] = useState(null);
+  const [baDoc, setBaDoc] = useState(null);
+  const [clientDoc, setClientDoc] = useState(null);
+  const [devopsDoc, setDevopsDoc] = useState(null);
+  const [docLoading, setDocLoading] = useState({
+    sde: false,
+    ba: false,
+    client: false,
+    devops: false
+  });
 
   useEffect(() => {
     if (projectId) {
       fetchProjectUsers();
       fetchResources();
+      fetchDocuments();
     }
   }, [projectId]);
 
@@ -89,6 +99,145 @@ const SingleProjectReqs = ({ projectId }) => {
       console.error('Error fetching resources:', err);
     }finally {
       setTableLoading(false);
+    }
+  };
+
+  const fetchDocuments = async () => {
+    console.log('Starting to fetch documents for project:', projectId);
+    
+    const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+    
+    try {
+      // Fetch SDE document
+      console.log('Fetching SDE document...');
+      setDocLoading(prev => ({ ...prev, sde: true }));
+      try {
+        const sdeResponse = await axios.get(`http://localhost:5000/sde/get-document/${projectId}`);
+        console.log('SDE document response:', sdeResponse.data);
+        if (sdeResponse.data.success && sdeResponse.data.exists) {
+          console.log('Setting SDE document:', sdeResponse.data.document);
+          setSdeDoc(sdeResponse.data.document);
+        } else {
+          console.log('No SDE document found or error in response');
+          setSdeDoc(null);
+        }
+      } catch (sdeError) {
+        console.error('Error fetching SDE document:', {
+          message: sdeError.message,
+          response: sdeError.response?.data,
+          status: sdeError.response?.status
+        });
+        setSdeDoc(null);
+      } finally {
+        setDocLoading(prev => ({ ...prev, sde: false }));
+      }
+
+      // Add delay between requests
+      await delay(500);
+
+      // Fetch BA document
+      console.log('Fetching BA document...');
+      setDocLoading(prev => ({ ...prev, ba: true }));
+      try {
+        const baResponse = await axios.get(`http://localhost:5000/ba/get-document/${projectId}`);
+        console.log('BA document response:', baResponse.data);
+        if (baResponse.data.success && baResponse.data.exists) {
+          console.log('Setting BA document:', baResponse.data.document);
+          setBaDoc(baResponse.data.document);
+        } else {
+          console.log('No BA document found or error in response');
+          setBaDoc(null);
+        }
+      } catch (baError) {
+        console.error('Error fetching BA document:', {
+          message: baError.message,
+          response: baError.response?.data,
+          status: baError.response?.status
+        });
+        setBaDoc(null);
+      } finally {
+        setDocLoading(prev => ({ ...prev, ba: false }));
+      }
+
+      // Add delay between requests
+      await delay(500);
+
+      // Fetch Client document
+      console.log('Fetching Client document...');
+      setDocLoading(prev => ({ ...prev, client: true }));
+      try {
+        const clientResponse = await axios.get(`http://localhost:5000/client/get-document/${projectId}`);
+        console.log('Client document response:', clientResponse.data);
+        if (clientResponse.data.success && clientResponse.data.exists) {
+          console.log('Setting Client document:', clientResponse.data.document);
+          setClientDoc(clientResponse.data.document);
+        } else {
+          console.log('No Client document found or error in response');
+          setClientDoc(null);
+        }
+      } catch (clientError) {
+        console.error('Error fetching Client document:', {
+          message: clientError.message,
+          response: clientError.response?.data,
+          status: clientError.response?.status
+        });
+        setClientDoc(null);
+      } finally {
+        setDocLoading(prev => ({ ...prev, client: false }));
+      }
+
+      // Add delay between requests
+      await delay(500);
+
+      // Fetch DevOps document
+      console.log('Fetching DevOps document...');
+      setDocLoading(prev => ({ ...prev, devops: true }));
+      try {
+        const devopsResponse = await axios.get(`http://localhost:5000/devops/get-document/${projectId}`);
+        console.log('DevOps document response:', devopsResponse.data);
+        if (devopsResponse.data.success && devopsResponse.data.exists) {
+          console.log('Setting DevOps document:', devopsResponse.data.document);
+          setDevopsDoc(devopsResponse.data.document);
+        } else {
+          console.log('No DevOps document found or error in response');
+          setDevopsDoc(null);
+        }
+      } catch (devopsError) {
+        console.error('Error fetching DevOps document:', {
+          message: devopsError.message,
+          response: devopsError.response?.data,
+          status: devopsError.response?.status
+        });
+        setDevopsDoc(null);
+      } finally {
+        setDocLoading(prev => ({ ...prev, devops: false }));
+      }
+
+    } catch (error) {
+      console.error('Error in fetchDocuments:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      });
+    } finally {
+      console.log('Finished fetching all documents');
+      setDocLoading({
+        sde: false,
+        ba: false,
+        client: false,
+        devops: false
+      });
+    }
+  };
+
+  const handleViewDocument = (doc, type) => {
+    console.log('Attempting to view document:', { type, doc });
+    if (doc) {
+      console.log('Setting document content for viewing:', doc.combined_text?.substring(0, 100) + '...');
+      setTextContent(doc.combined_text);
+      setShowTemplate(true);
+    } else {
+      console.log('No document available for type:', type);
     }
   };
 
@@ -170,6 +319,7 @@ const SingleProjectReqs = ({ projectId }) => {
   };
 
   const handleGenerateTemplate = async () => {
+    console.log('Starting template generation...');
     setIsGeneratingTemplate(true);
     try {
       console.log('Current user ID:', user?.id);
@@ -183,7 +333,6 @@ const SingleProjectReqs = ({ projectId }) => {
         throw new Error('User not found in project stakeholders');
       }
 
-      // Use the role field instead of position
       const role = stakeholder.role?.toLowerCase();
       console.log('Detected user role:', role);
       
@@ -192,13 +341,11 @@ const SingleProjectReqs = ({ projectId }) => {
         throw new Error('No role found for user');
       }
 
-      // Check if there are any resources
       if (!resources || resources.length === 0) {
         console.error('No resources found for template generation');
         throw new Error('Please add resources before generating a template');
       }
 
-      // Check if any resources have content
       const resourcesWithContent = resources.filter(r => r.context && r.context.trim());
       console.log('Resources with content:', resourcesWithContent);
       
@@ -208,37 +355,62 @@ const SingleProjectReqs = ({ projectId }) => {
       }
       
       let endpoint = '';
+      let docState = null;
       
-      // Determine the endpoint based on user role
       switch(role) {
         case 'sde':
           endpoint = '/sde/generate-document';
+          docState = 'sde';
           break;
         case 'ba':
           endpoint = '/ba/generate-document';
+          docState = 'ba';
           break;
         case 'devops':
           endpoint = '/devops/generate-document';
+          docState = 'devops';
           break;
         case 'client':
           endpoint = '/client/generate-document';
+          docState = 'client';
           break;
         default:
           console.error('Invalid role detected:', role);
           throw new Error(`Invalid user role for template generation: ${role}`);
       }
 
-      // Combine all resource content
       const requirements_text = resourcesWithContent
         .map(r => r.context.trim())
         .join('\n\n');
 
-      console.log('Selected endpoint:', endpoint);
-      console.log('Making request with data:', {
+      console.log('Making API request to:', endpoint);
+      console.log('Request data:', {
         project_id: projectId,
-        requirements_text,
+        requirements_text_length: requirements_text.length,
         userId: user?.id
       });
+
+      // Reset only the specific document state
+      if (docState) {
+        switch(docState) {
+          case 'sde':
+            setSdeDoc(null);
+            setDocLoading(prev => ({ ...prev, sde: true }));
+            break;
+          case 'ba':
+            setBaDoc(null);
+            setDocLoading(prev => ({ ...prev, ba: true }));
+            break;
+          case 'client':
+            setClientDoc(null);
+            setDocLoading(prev => ({ ...prev, client: true }));
+            break;
+          case 'devops':
+            setDevopsDoc(null);
+            setDocLoading(prev => ({ ...prev, devops: true }));
+            break;
+        }
+      }
 
       const response = await axios.post(`http://localhost:5000${endpoint}`, {
         project_id: projectId,
@@ -246,9 +418,35 @@ const SingleProjectReqs = ({ projectId }) => {
         userId: user?.id
       });
       
+      console.log('Template generation response:', response.data);
+      
       if (response.data.success) {
-        console.log('Template generation successful:', response.data);
-        fetchResources();
+        console.log('Template generation successful');
+        // Fetch only the specific document that was generated
+        if (docState) {
+          try {
+            const docResponse = await axios.get(`http://localhost:5000/${docState}/get-document/${projectId}`);
+            console.log(`${docState.toUpperCase()} document response:`, docResponse.data);
+            if (docResponse.data.success && docResponse.data.exists) {
+              switch(docState) {
+                case 'sde':
+                  setSdeDoc(docResponse.data.document);
+                  break;
+                case 'ba':
+                  setBaDoc(docResponse.data.document);
+                  break;
+                case 'client':
+                  setClientDoc(docResponse.data.document);
+                  break;
+                case 'devops':
+                  setDevopsDoc(docResponse.data.document);
+                  break;
+              }
+            }
+          } catch (fetchError) {
+            console.error(`Error fetching ${docState} document:`, fetchError);
+          }
+        }
       } else {
         console.error('Template generation failed:', response.data.message);
         throw new Error(response.data.message || 'Failed to generate template');
@@ -257,10 +455,12 @@ const SingleProjectReqs = ({ projectId }) => {
       console.error('Template generation error:', {
         message: error.message,
         response: error.response?.data,
+        status: error.response?.status,
         stack: error.stack
       });
       setError(error.message);
     } finally {
+      console.log('Finished template generation process');
       setIsGeneratingTemplate(false);
     }
   };
@@ -375,11 +575,181 @@ const SingleProjectReqs = ({ projectId }) => {
         </div>
 
         <div className='col-span-1 border border-gray-400 bg-white p-3 flex flex-col rounded-md'>
-          <div>Recent Activity here</div>
-          <button className='my-1 p-2 bg-[#f3dfbf] rounded-md text-sm' onClick={()=>setShowTemplate(true)}>View SDE Template</button>
-          <button className='my-1 p-2 bg-[#f3dfbf] rounded-md text-sm' onClick={()=>setShowTemplate(true)}>View BA Template</button>
-          <button className='my-1 p-2 bg-[#f3dfbf] rounded-md text-sm' onClick={()=>setShowTemplate(true)}>View Client Template</button>
-          <button className='my-1 p-2 bg-[#f3dfbf] rounded-md text-sm' onClick={()=>setShowTemplate(true)}>View DevOps Template</button>
+          <div className="text-lg font-bold mb-2">Recent Activity</div>
+          
+          {/* Edit Button for Current Role Template */}
+          {user?.role && (
+            <button 
+              className='p-2 bg-black text-white rounded-md text-sm mb-4 hover:bg-gray-800'
+              onClick={() => {
+                const currentDoc = user.role === 'sde' ? sdeDoc : 
+                                 user.role === 'ba' ? baDoc : 
+                                 user.role === 'client' ? clientDoc : 
+                                 devopsDoc;
+                console.log('Edit button clicked for', user.role, 'template');
+                console.log('Current document:', currentDoc);
+                if (currentDoc) {
+                  handleViewDocument(currentDoc, user.role);
+                  setIsEditing(true);
+                }
+              }}
+              disabled={!sdeDoc?.blob_url && !baDoc?.blob_url && !clientDoc?.blob_url && !devopsDoc?.blob_url}
+            >
+              Edit {user.role.toUpperCase()} Template
+            </button>
+          )}
+
+          {/* Current Role Template Button */}
+          {user?.role && (
+            <div className="mb-4">
+              <div className="text-sm font-semibold mb-2">Your Template ({user.role.toUpperCase()})</div>
+              <div className="flex flex-col gap-2">
+                <button 
+                  className='p-2 bg-[#f3dfbf] rounded-md text-sm' 
+                  onClick={() => handleViewDocument(
+                    user.role === 'sde' ? sdeDoc : 
+                    user.role === 'ba' ? baDoc : 
+                    user.role === 'client' ? clientDoc : 
+                    devopsDoc, 
+                    user.role
+                  )}
+                  disabled={docLoading[user.role]}
+                >
+                  {docLoading[user.role] ? 'Loading...' : 
+                   (user.role === 'sde' ? sdeDoc : 
+                    user.role === 'ba' ? baDoc : 
+                    user.role === 'client' ? clientDoc : 
+                    devopsDoc) ? `View ${user.role.toUpperCase()} Template` : `Generate ${user.role.toUpperCase()} Template`}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Generated Templates List */}
+          <div className="mt-4">
+            <div className="text-sm font-semibold mb-2">Generated Templates</div>
+            <div className="space-y-2">
+              {sdeDoc?.blob_url && (
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm">SDE:</span>
+                    <a 
+                      href={sdeDoc.blob_url} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:underline"
+                    >
+                      View Document
+                    </a>
+                  </div>
+                  {user?.role === 'sde' && (
+                    <button 
+                      className='p-1 bg-blue-100 rounded-md text-sm text-blue-600 hover:bg-blue-200 ml-8'
+                      onClick={() => {
+                        console.log('Edit button clicked for SDE template');
+                        console.log('Current user role:', user?.role);
+                        console.log('SDE document:', sdeDoc);
+                        handleViewDocument(sdeDoc, 'sde');
+                        setIsEditing(true);
+                      }}
+                    >
+                      Edit Template
+                    </button>
+                  )}
+                </div>
+              )}
+              {baDoc?.blob_url && (
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm">BA:</span>
+                    <a 
+                      href={baDoc.blob_url} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:underline"
+                    >
+                      View Document
+                    </a>
+                  </div>
+                  {user?.role === 'ba' && (
+                    <button 
+                      className='p-1 bg-blue-100 rounded-md text-sm text-blue-600 hover:bg-blue-200 ml-8'
+                      onClick={() => {
+                        console.log('Edit button clicked for BA template');
+                        console.log('Current user role:', user?.role);
+                        console.log('BA document:', baDoc);
+                        handleViewDocument(baDoc, 'ba');
+                        setIsEditing(true);
+                      }}
+                    >
+                      Edit Template
+                    </button>
+                  )}
+                </div>
+              )}
+              {clientDoc?.blob_url && (
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm">Client:</span>
+                    <a 
+                      href={clientDoc.blob_url} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:underline"
+                    >
+                      View Document
+                    </a>
+                  </div>
+                  {user?.role === 'client' && (
+                    <button 
+                      className='p-1 bg-blue-100 rounded-md text-sm text-blue-600 hover:bg-blue-200 ml-8'
+                      onClick={() => {
+                        console.log('Edit button clicked for Client template');
+                        console.log('Current user role:', user?.role);
+                        console.log('Client document:', clientDoc);
+                        handleViewDocument(clientDoc, 'client');
+                        setIsEditing(true);
+                      }}
+                    >
+                      Edit Template
+                    </button>
+                  )}
+                </div>
+              )}
+              {devopsDoc?.blob_url && (
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm">DevOps:</span>
+                    <a 
+                      href={devopsDoc.blob_url} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:underline"
+                    >
+                      View Document
+                    </a>
+                  </div>
+                  {user?.role === 'devops' && (
+                    <button 
+                      className='p-1 bg-blue-100 rounded-md text-sm text-blue-600 hover:bg-blue-200 ml-8'
+                      onClick={() => {
+                        console.log('Edit button clicked for DevOps template');
+                        console.log('Current user role:', user?.role);
+                        console.log('DevOps document:', devopsDoc);
+                        handleViewDocument(devopsDoc, 'devops');
+                        setIsEditing(true);
+                      }}
+                    >
+                      Edit Template
+                    </button>
+                  )}
+                </div>
+              )}
+              {!sdeDoc?.blob_url && !baDoc?.blob_url && !clientDoc?.blob_url && !devopsDoc?.blob_url && (
+                <div className="text-sm text-gray-500">No templates generated yet</div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 

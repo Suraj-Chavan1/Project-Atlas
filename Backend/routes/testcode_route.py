@@ -700,7 +700,7 @@ def generate_tests():
             # Upload the zip file
             with open(zip_path, 'rb') as data:
                 blob_client.upload_blob(data, overwrite=True)
-
+        
             # Generate SAS token for the blob
             sas_token = generate_blob_sas(
                 account_name=account_name,

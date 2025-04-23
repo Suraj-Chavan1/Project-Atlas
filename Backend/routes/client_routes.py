@@ -17,6 +17,7 @@ from azure.core.credentials import AzureKeyCredential
 import httpx
 from flask import Blueprint, request, jsonify
 import ssl
+import traceback
 
 # Azure OpenAI Configuration
 AZURE_ENDPOINT = "https://suraj-m9lgdbv9-eastus2.cognitiveservices.azure.com/"
@@ -72,6 +73,17 @@ CLIENT_SECTIONS = [
 
 # Global Cosmos DB client
 cosmos_client = None
+
+# Global event loop
+event_loop = None
+
+async def get_event_loop():
+    """Get or create the global event loop."""
+    global event_loop
+    if event_loop is None:
+        event_loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(event_loop)
+    return event_loop
 
 class FormRecognizerExtractor:
     def __init__(self, endpoint, api_key):
@@ -599,14 +611,15 @@ client = Blueprint('client', __name__, url_prefix='/client')
 @client.route('/generate-document', methods=['POST'])
 async def generate_client_document():
     try:
-        print("Received request for Client document generation")
+        print("\n=== Starting Client document generation ===")
+        print("Request headers:", request.headers)
         data = request.json
         print("Request data:", data)
         
         # Accept either project_id or projectId
         project_id = data.get('project_id') or data.get('projectId')
         if not project_id:
-            print("Missing project_id in request")
+            print("Error: Missing project_id in request")
             return jsonify({
                 'success': False,
                 'message': 'Project ID is required'
@@ -620,7 +633,7 @@ async def generate_client_document():
         print(f"Requirements text length: {len(requirements_text)}")
 
         if not requirements_text:
-            print("Empty requirements text provided")
+            print("Error: Empty requirements text provided")
             return jsonify({
                 'success': False,
                 'message': 'Requirements text cannot be empty'
@@ -628,55 +641,143 @@ async def generate_client_document():
 
         # Process the Client template
         try:
-            # Create a new event loop for this request
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
+            print("Getting event loop...")
+            loop = await get_event_loop()
+            print("Event loop retrieved")
             
-            # Configure SSL context
+            print("Configuring SSL context...")
             ssl_context = ssl.create_default_context()
             ssl_context.check_hostname = False
             ssl_context.verify_mode = ssl.CERT_NONE
+            print("SSL context configured")
             
-            # Set up the Cosmos client with SSL context
+            print("Setting up Cosmos client...")
             global cosmos_client
             if cosmos_client is None:
+                print("Initializing new Cosmos client")
                 cosmos_client = CosmosClient(
                     COSMOS_URL, 
                     credential=COSMOS_KEY,
                     connection_verify=False
                 )
+                print("Cosmos client initialized")
+            else:
+                print("Using existing Cosmos client")
             
+            print("Starting template processing...")
             result = await process_client_template(project_id, requirements_text)
-            print("Template processing successful:", result)
+            print("Template processing completed successfully")
+            print("Result:", result)
             
-            # Clean up
+            print("Cleaning up resources...")
             await close_cosmos_client()
-            loop.close()
+            print("Cosmos client closed")
             
         except Exception as template_error:
-            print("Error in template processing:", str(template_error))
+            print("\nError in template processing:")
+            print("Error type:", type(template_error))
+            print("Error message:", str(template_error))
+            print("Error traceback:", traceback.format_exc())
+            
             # Ensure cleanup even on error
             try:
+                print("Attempting cleanup on error...")
                 await close_cosmos_client()
-                loop.close()
-            except:
-                pass
+                print("Cosmos client closed")
+            except Exception as cleanup_error:
+                print("Error during cleanup:", str(cleanup_error))
             raise template_error
 
+        print("\nSending success response")
         return jsonify({
             'success': True,
             'message': 'Document generated successfully',
             'document_id': result[0],
             'data': result[1],
-            'download_url': result[1].get('blob_url')
+            'download_url': result[1].get('blob_url'),
+            'blob_url': result[1].get('blob_url')  # Explicitly include blob URL
         }), 200
 
     except Exception as e:
-        print("Error in generate_client_document:", str(e))
-        print("Error traceback:", e.__traceback__)
+        print("\nError in generate_client_document:")
+        print("Error type:", type(e))
+        print("Error message:", str(e))
+        print("Error traceback:", traceback.format_exc())
         return jsonify({
             'success': False,
             'message': f'Error generating document: {str(e)}'
+        }), 500
+
+@client.route('/get-document/<project_id>', methods=['GET'])
+async def get_client_document(project_id):
+    print(f"Fetching Client document for project {project_id}")
+    try:
+        # Get the event loop
+        loop = asyncio.get_event_loop()
+        if loop.is_closed():
+            print("Creating new event loop")
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+
+        # Create SSL context
+        ssl_context = ssl.create_default_context()
+        ssl_context.check_hostname = False
+        ssl_context.verify_mode = ssl.CERT_NONE
+
+        # Initialize Cosmos client
+        print("Initializing Cosmos client")
+        cosmos_client = CosmosClient(
+            COSMOS_URL,
+            credential=COSMOS_KEY,
+            connection_verify=False,
+            consistency_level="Session"
+        )
+
+        # Get database and container
+        print("Getting database and container")
+        database = cosmos_client.get_database_client(DATABASE_NAME)
+        container = database.get_container_client(CONTAINER_NAME)
+
+        # Query for the document
+        print("Querying for document")
+        query = f"SELECT * FROM c WHERE c.project_id = '{project_id}' AND c.template_type = 'client'"
+        items = []
+        async for item in container.query_items(query=query):
+            items.append(item)
+
+        # Close the Cosmos client
+        await cosmos_client.close()
+
+        if items:
+            print("Document found")
+            # Get the most recent document
+            document = max(items, key=lambda x: x.get('timestamp', ''))
+            return jsonify({
+                'success': True,
+                'exists': True,
+                'document': {
+                    'id': document.get('id'),
+                    'content': document.get('content'),
+                    'combined_text': document.get('combined_text'),
+                    'timestamp': document.get('timestamp'),
+                    'blob_url': document.get('blob_url')
+                }
+            })
+        else:
+            print("No document found")
+            return jsonify({
+                'success': True,
+                'exists': False,
+                'message': 'No Client document found for this project'
+            })
+
+    except Exception as e:
+        print(f"Error fetching Client document: {str(e)}")
+        print(f"Error type: {type(e)}")
+        print(f"Error traceback: {traceback.format_exc()}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
         }), 500
 
 if __name__ == "__main__":
