@@ -7,6 +7,7 @@ import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import SectionEvaluations from './SectionEvaluations';
 import { FaUser, FaClock  } from "react-icons/fa";
+import ReactMarkdown from "react-markdown";
 
 
 const SingleProjectDocs = () => {
@@ -470,9 +471,9 @@ const SingleProjectDocs = () => {
                       </div>
                     ) : (
                       <div className="mt-2">
-                        <div className="p-4 bg-gray-50 rounded-md whitespace-pre-wrap">
+                        <ReactMarkdown  >
                           {selectedDoc.context}
-                        </div>
+                        </ReactMarkdown >
                       </div>  
                     )}
                   </div>

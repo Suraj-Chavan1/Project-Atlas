@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { useParams, useLocation } from 'react-router-dom';
+import ReactMarkdown from "react-markdown";
 
 const SingleProjectTestCases = () => {
     const { projectId } = useParams(); // Extract project ID from URL
@@ -468,8 +469,8 @@ const SingleProjectTestCases = () => {
                         {stories.map((story) => (
                             <div
                                 key={story.key}
-                                className={`p-4 border rounded-lg ${
-                                    selectedStory?.key === story.key ? 'border-blue-500' : 'border-gray-200'
+                                className={`p-4 border rounded-lg bg-white  ${
+                                    selectedStory?.key === story.key ? 'border-blue-500' : 'border-gray-500'
                                 }`}
                             >
                                 <div className="flex justify-between items-start">
@@ -478,19 +479,12 @@ const SingleProjectTestCases = () => {
                                         onClick={() => setSelectedStory(story)}
                                     >
                                         <h3 className="font-bold">{story.key}: {story.summary}</h3>
-                                        <p className="text-sm text-gray-600 mt-1">{story.description}</p>
+                                        <ReactMarkdown  >{story.description}</ReactMarkdown >
                                         <div className="flex justify-between mt-2">
                                             <span className="text-sm">Status: {story.status}</span>
                                             <span className="text-sm">Priority: {story.priority}</span>
                                         </div>
                                     </div>
-                                    <button
-                                        onClick={() => handleDeleteStory(story.key)}
-                                        className="ml-2 px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-sm"
-                                        disabled={loadingMap[story.key]}
-                                    >
-                                        Delete
-                                    </button>
                                 </div>
                                 
                                 <div className="mt-3 flex justify-between items-center">
