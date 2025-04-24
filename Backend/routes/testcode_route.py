@@ -796,5 +796,52 @@ def regenerate_tests():
         traceback.print_exc()
         return jsonify({'success': False, 'error': str(e)}), 500
 
+@testcode_bp.route('/push-to-github', methods=['POST'])
+def push_to_github():
+    try:
+        data = request.json
+        owner = data.get('owner')
+        repo = data.get('repo')
+        file_url = data.get('fileUrl')
+        path = data.get('path')
+
+        if not all([owner, repo, file_url, path]):
+            return jsonify({
+                'success': False,
+                'error': 'Missing required parameters'
+            }), 400
+
+        # Make request to GitHub bot
+        github_bot_url = "https://git-hub-bot-git-main-anujs-projects-b5a04637.vercel.app/push_test_using_url"
+        payload = {
+            "owner": owner,
+            "repo": repo,
+            "fileUrl": file_url,
+            "path": path
+        }
+        headers = {
+            "Content-Type": "application/json"
+        }
+
+        response = requests.post(github_bot_url, json=payload, headers=headers)
+
+        if response.ok:
+            return jsonify({
+                'success': True,
+                'message': 'Successfully pushed to GitHub',
+                'data': response.json()
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'error': f'GitHub bot error: {response.text}'
+            }), response.status_code
+
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
 if __name__ == "__main__":
     main() 

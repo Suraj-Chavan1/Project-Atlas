@@ -18,6 +18,10 @@ const SingleProjectTestCases = () => {
     const [editContentMap, setEditContentMap] = useState({});
     const [regenerationContextMap, setRegenerationContextMap] = useState({});
     const [showRegenerationInputMap, setShowRegenerationInputMap] = useState({});
+    const [githubConfig, setGithubConfig] = useState({
+        owner: 'ANUJT65',
+        repo: 'Jira_Testcases'
+    });
 
     // Extract project ID from URL if not available in params
     const getProjectId = () => {
@@ -362,6 +366,80 @@ const SingleProjectTestCases = () => {
         });
     };
 
+    const handlePushToGitHub = async (storyKey) => {
+        try {
+            setLoadingMap(prev => ({ ...prev, [storyKey]: true }));
+            
+            // Get the test files from the preview or edited content
+            let testFiles = [];
+            
+            if (editingMap[storyKey]) {
+                // If we're editing, use the edited content
+                testFiles = Object.entries(editContentMap[storyKey]).map(([name, content]) => ({
+                    name,
+                    content
+                }));
+            } else if (previewMap[storyKey]) {
+                // Otherwise use the preview content
+                testFiles = previewMap[storyKey].testFiles;
+            } else if (testCasesMap[storyKey]) {
+                // If we have saved test cases, use those
+                testFiles = testCasesMap[storyKey].testFiles.map(file => {
+                    const [name, ...contentParts] = file.split('\n');
+                    return {
+                        name: name.replace(':', ''),
+                        content: contentParts.join('\n')
+                    };
+                });
+            }
+            
+            if (testFiles.length === 0) {
+                alert('No test cases found to push to GitHub');
+                return;
+            }
+            
+            const currentProjectId = getProjectId();
+            console.log("Pushing test cases with project ID:", currentProjectId);
+            
+            if (!currentProjectId) {
+                alert('Error: Project ID not found. Please make sure you are on a valid project page.');
+                return;
+            }
+            
+            // First save and upload to get the blob URL
+            const saveResponse = await axios.post('http://localhost:5000/testcode/generate-tests', {
+                story_key: storyKey,
+                project_id: currentProjectId,
+                test_files: testFiles
+            });
+            
+            if (saveResponse.data.success) {
+                const blobUrl = saveResponse.data.blob_url;
+                
+                // Now push to GitHub using the blob URL
+                const response = await axios.post('http://localhost:5000/testcode/push-to-github', {
+                    owner: githubConfig.owner,
+                    repo: githubConfig.repo,
+                    fileUrl: blobUrl,
+                    path: `tests/${storyKey}_tests.py`
+                });
+
+                if (response.data.success) {
+                    alert('Successfully pushed test cases to GitHub');
+                } else {
+                    alert(`Failed to push to GitHub: ${response.data.error}`);
+                }
+            } else {
+                alert('Failed to save test cases before pushing to GitHub');
+            }
+        } catch (error) {
+            console.error('Error pushing to GitHub:', error);
+            alert('Failed to push test cases to GitHub');
+        } finally {
+            setLoadingMap(prev => ({ ...prev, [storyKey]: false }));
+        }
+    };
+
     return (
         <div className="flex flex-col mx-3 my-0 h-screen">
             <div className="mb-4">
@@ -423,12 +501,28 @@ const SingleProjectTestCases = () => {
                                         {loadingMap[story.key] ? 'Generating...' : 'Generate Tests'}
                                     </button>
                                     
-                                    {testCasesMap[story.key] && (
-                                        <span className="text-xs text-gray-500">
-                                            Generated: {new Date(testCasesMap[story.key].timestamp).toLocaleString()}
-                                        </span>
-                                    )}
+                                    <div className="space-x-2">
+                                        <button
+                                            onClick={() => handlePushToGitHub(story.key)}
+                                            disabled={loadingMap[story.key]}
+                                            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 disabled:opacity-50"
+                                        >
+                                            {loadingMap[story.key] ? 'Pushing...' : 'Push to GitHub'}
+                                        </button>
+                                        <button
+                                            onClick={() => handleDeleteStory(story.key)}
+                                            className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                                        >
+                                            Delete Story
+                                        </button>
+                                    </div>
                                 </div>
+                                
+                                {testCasesMap[story.key] && (
+                                    <span className="text-xs text-gray-500">
+                                        Generated: {new Date(testCasesMap[story.key].timestamp).toLocaleString()}
+                                    </span>
+                                )}
                                 
                                 {/* Preview Section */}
                                 {showPreviewMap[story.key] && previewMap[story.key] && previewMap[story.key].testFiles && previewMap[story.key].testFiles.length > 0 && !editingMap[story.key] && (
