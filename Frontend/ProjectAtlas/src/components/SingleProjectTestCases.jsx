@@ -12,6 +12,7 @@ const SingleProjectTestCases = () => {
     const [selectedStory, setSelectedStory] = useState(null);
     const [testCasesMap, setTestCasesMap] = useState({});
     const [loadingMap, setLoadingMap] = useState({});
+    const [githubPushingMap, setGithubPushingMap] = useState({});
     const [previewMap, setPreviewMap] = useState({});
     const [showPreviewMap, setShowPreviewMap] = useState({});
     const [editingMap, setEditingMap] = useState({});
@@ -368,7 +369,7 @@ const SingleProjectTestCases = () => {
 
     const handlePushToGitHub = async (storyKey) => {
         try {
-            setLoadingMap(prev => ({ ...prev, [storyKey]: true }));
+            setGithubPushingMap(prev => ({ ...prev, [storyKey]: true }));
             
             // Get the test files from the preview or edited content
             let testFiles = [];
@@ -504,10 +505,10 @@ const SingleProjectTestCases = () => {
                                     <div className="space-x-2">
                                         <button
                                             onClick={() => handlePushToGitHub(story.key)}
-                                            disabled={loadingMap[story.key]}
+                                            disabled={githubPushingMap[story.key]}
                                             className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 disabled:opacity-50"
                                         >
-                                            {loadingMap[story.key] ? 'Pushing...' : 'Push to GitHub'}
+                                            {githubPushingMap[story.key] ? 'Pushing...' : 'Push to GitHub'}
                                         </button>
                                         <button
                                             onClick={() => handleDeleteStory(story.key)}
@@ -557,22 +558,6 @@ const SingleProjectTestCases = () => {
                                                 </button>
                                             </div>
                                         </div>
-                                        <div className="space-y-2">
-                                            {previewMap[story.key].testFiles.map((file, index) => (
-                                                <div key={index} className="p-2 bg-white rounded border border-gray-200">
-                                                    <div className="text-xs text-gray-500 mb-1">{file.name}</div>
-                                                    <SyntaxHighlighter
-                                                        language="python"
-                                                        style={vscDarkPlus}
-                                                        customStyle={{ margin: 0, maxHeight: '300px' }}
-                                                    >
-                                                        {file.content}
-                                                    </SyntaxHighlighter>
-                                                </div>
-                                            ))}
-                                        </div>
-                                        
-                                        {/* Regeneration Context Input */}
                                         {showRegenerationInputMap[story.key] && (
                                             <div className="mt-4 p-3 bg-white rounded border border-gray-200">
                                                 <h4 className="font-semibold mb-2">Enter Context for Regeneration</h4>
@@ -591,6 +576,23 @@ const SingleProjectTestCases = () => {
                                                 </button>
                                             </div>
                                         )}
+                                        <div className="space-y-2">
+                                            {previewMap[story.key].testFiles.map((file, index) => (
+                                                <div key={index} className="p-2 bg-white rounded border border-gray-200">
+                                                    <div className="text-xs text-gray-500 mb-1">{file.name}</div>
+                                                    <SyntaxHighlighter
+                                                        language="python"
+                                                        style={vscDarkPlus}
+                                                        customStyle={{ margin: 0, maxHeight: '300px' }}
+                                                    >
+                                                        {file.content}
+                                                    </SyntaxHighlighter>
+                                                </div>
+                                            ))}
+                                        </div>
+                                        
+                                        {/* Regeneration Context Input */}
+                                        
                                     </div>
                                 )}
                                 
