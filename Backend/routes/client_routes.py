@@ -970,7 +970,7 @@ async def update_client_document(project_id):
         return response
 
     try:
-        print("\n=== Starting document update process ===")
+        print("\n=== Starting Client document update process ===")
         print("Request headers:", dict(request.headers))
         print("Request data:", request.json)
         print(f"Project ID: {project_id}")
@@ -1111,20 +1111,20 @@ async def update_client_document(project_id):
             )
             
             # Build document content
-            content = []
+            doc_content = []
             
             # Header section
             timestamp = datetime.now().strftime("%B %d, %Y at %I:%M %p")
             
-            content.append(Paragraph("Client Requirements Document", title_style))
-            content.append(Spacer(1, 8))
-            content.append(Paragraph(f"Generated on: {timestamp}", ParagraphStyle(
+            doc_content.append(Paragraph("Client Requirements Document", title_style))
+            doc_content.append(Spacer(1, 8))
+            doc_content.append(Paragraph(f"Generated on: {timestamp}", ParagraphStyle(
                 'Timestamp', 
                 parent=normal_style,
                 textColor=colors.HexColor('#666666'),  # Medium gray
                 alignment=1  # Center aligned
             )))
-            content.append(Spacer(1, 15))
+            doc_content.append(Spacer(1, 15))
             
             # Process content
             lines = combined_text.split('\n')
@@ -1132,7 +1132,7 @@ async def update_client_document(project_id):
             
             for line in lines:
                 if not line.strip():
-                    content.append(Spacer(1, 12))
+                    doc_content.append(Spacer(1, 12))
                     continue
                     
                 # Handle special characters
@@ -1143,20 +1143,36 @@ async def update_client_document(project_id):
                     # Handle headers
                     header_text = line.replace('#', '').strip()
                     if line.startswith('##'):
-                        content.append(Paragraph(header_text, section_style))
+                        doc_content.append(Paragraph(header_text, section_style))
                     else:
-                        content.append(Paragraph(header_text, subtitle_style))
+                        doc_content.append(Paragraph(header_text, subtitle_style))
                     
                     # Add horizontal rule
                     hr_table = Table([['']], colWidths=[doc.width-20], rowHeights=[1])
                     hr_table.setStyle(TableStyle([
                         ('LINEABOVE', (0,0), (-1,0), 1, colors.HexColor('#DDDDDD')),  # Light gray line
                     ]))
-                    content.append(hr_table)
-                    content.append(Spacer(1, 8))
+                    doc_content.append(hr_table)
+                    doc_content.append(Spacer(1, 8))
                 else:
-                    # Create a small table for each paragraph
-                    data_table = [[Paragraph(line, normal_style)]]
+                    # Handle bullet points and regular text
+                    if line.strip().startswith('-'):
+                        # For bullet points, create a table with proper indentation
+                        bullet_text = line.strip()[1:].strip()  # Remove the bullet and trim
+                        bullet_style = ParagraphStyle(
+                            'Bullet',
+                            parent=normal_style,
+                            leftIndent=20,
+                            bulletIndent=0,
+                            bulletFontSize=10,
+                            bulletOffsetY=2
+                        )
+                        data_table = [[Paragraph(f"• {bullet_text}", bullet_style)]]
+                    else:
+                        # For regular text, use normal style
+                        data_table = [[Paragraph(line, normal_style)]]
+                    
+                    # Create table for the content
                     section_table = Table(data_table, colWidths=[doc.width - 40])
                     section_table.setStyle(TableStyle([
                         ('BACKGROUND', (0, 0), (-1, -1), colors.HexColor('#F8F8F8')),  # Very light gray
@@ -1169,8 +1185,8 @@ async def update_client_document(project_id):
                         ('TOPPADDING', (0, 0), (-1, -1), 6),
                         ('BOTTOMPADDING', (0, 0), (-1, -1), 6)
                     ]))
-                    content.append(section_table)
-                    content.append(Spacer(1, 6))
+                    doc_content.append(section_table)
+                    doc_content.append(Spacer(1, 6))
             
             # Add footer with page numbers
             def add_page_number(canvas, doc):
@@ -1194,7 +1210,7 @@ async def update_client_document(project_id):
                 canvas.restoreState()
             
             # Build the PDF with page numbers and headers/footers
-            doc.build(content, onFirstPage=add_page_number, onLaterPages=add_page_number)
+            doc.build(doc_content, onFirstPage=add_page_number, onLaterPages=add_page_number)
             pdf_buffer.seek(0)
             print("Successfully generated PDF in memory")
             
@@ -1204,16 +1220,10 @@ async def update_client_document(project_id):
                 print(f"Successfully uploaded PDF to blob storage: {blob_url}")
             except Exception as e:
                 print(f"Error uploading to blob storage: {str(e)}")
-                return jsonify({
-                    'success': False,
-                    'message': f'Error uploading document to storage: {str(e)}'
-                }), 500
+                raise
         except Exception as e:
             print(f"Error creating PDF: {str(e)}")
-            return jsonify({
-                'success': False,
-                'message': f'Error creating PDF: {str(e)}'
-            }), 500
+            raise
 
         # Update document fields
         document['combined_text'] = combined_text

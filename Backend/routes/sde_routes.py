@@ -544,13 +544,181 @@ async def process_sde_template(project_id, requirements_text):
         for section, section_content in content.items():
             combined_text += f"{section_content}\n\n"
         
-        # Generate PDF in memory
-        pdf_buffer = BytesIO()
-        generate_pdf(content, pdf_buffer)
-        pdf_buffer.seek(0)
-        
-        # Upload to blob storage directly from memory
-        blob_url = upload_to_blob_storage_from_memory(pdf_buffer, 'sde', str(uuid.uuid4()))
+        # Generate PDF in memory with enhanced formatting
+        try:
+            # Create a BytesIO object to store the PDF
+            pdf_buffer = BytesIO()
+            
+            # Create document with professional margins
+            doc = SimpleDocTemplate(
+                pdf_buffer,
+                pagesize=A4,
+                rightMargin=50,
+                leftMargin=50,
+                topMargin=50,
+                bottomMargin=50
+            )
+            
+            # Define enhanced styles
+            styles = getSampleStyleSheet()
+            
+            # Professional title style
+            title_style = ParagraphStyle(
+                'Title',
+                parent=styles['Heading1'],
+                fontSize=22,
+                alignment=1,  # Center alignment
+                spaceAfter=12,
+                textColor=colors.HexColor('#1B365D')  # Dark blue
+            )
+            
+            # Modern subtitle style
+            subtitle_style = ParagraphStyle(
+                'Subtitle',
+                parent=styles['Heading2'],
+                fontSize=16,
+                textColor=colors.HexColor('#2E5C8A'),  # Medium blue
+                spaceBefore=10,
+                spaceAfter=6,
+                alignment=0,  # Left alignment
+                borderWidth=0
+            )
+            
+            # Section header style
+            section_style = ParagraphStyle(
+                'Section',
+                parent=styles['Heading3'],
+                fontSize=13,
+                textColor=colors.HexColor('#4A4A4A'),  # Dark gray
+                spaceBefore=10,
+                spaceAfter=4,
+                leftIndent=0
+            )
+            
+            # Clean normal text style
+            normal_style = ParagraphStyle(
+                'Normal',
+                parent=styles['Normal'],
+                fontSize=10,
+                leading=12,
+                textColor=colors.HexColor('#333333')  # Soft black
+            )
+            
+            # Build document content
+            doc_content = []
+            
+            # Header section
+            timestamp = datetime.now().strftime("%B %d, %Y at %I:%M %p")
+            
+            doc_content.append(Paragraph("Technical Documentation", title_style))
+            doc_content.append(Spacer(1, 8))
+            doc_content.append(Paragraph(f"Generated on: {timestamp}", ParagraphStyle(
+                'Timestamp', 
+                parent=normal_style,
+                textColor=colors.HexColor('#666666'),  # Medium gray
+                alignment=1  # Center aligned
+            )))
+            doc_content.append(Spacer(1, 15))
+            
+            # Process content
+            lines = combined_text.split('\n')
+            current_section = None
+            
+            for line in lines:
+                if not line.strip():
+                    doc_content.append(Spacer(1, 12))
+                    continue
+                    
+                # Handle special characters
+                line = line.replace('"', '"').replace('"', '"')
+                line = line.replace(''', "'").replace(''', "'")
+                
+                if line.startswith('#') or line.startswith('##'):
+                    # Handle headers
+                    header_text = line.replace('#', '').strip()
+                    if line.startswith('##'):
+                        doc_content.append(Paragraph(header_text, section_style))
+                    else:
+                        doc_content.append(Paragraph(header_text, subtitle_style))
+                    
+                    # Add horizontal rule
+                    hr_table = Table([['']], colWidths=[doc.width-20], rowHeights=[1])
+                    hr_table.setStyle(TableStyle([
+                        ('LINEABOVE', (0,0), (-1,0), 1, colors.HexColor('#DDDDDD')),  # Light gray line
+                    ]))
+                    doc_content.append(hr_table)
+                    doc_content.append(Spacer(1, 8))
+                else:
+                    # Handle bullet points and regular text
+                    if line.strip().startswith('-'):
+                        # For bullet points, create a table with proper indentation
+                        bullet_text = line.strip()[1:].strip()  # Remove the bullet and trim
+                        bullet_style = ParagraphStyle(
+                            'Bullet',
+                            parent=normal_style,
+                            leftIndent=20,
+                            bulletIndent=0,
+                            bulletFontSize=10,
+                            bulletOffsetY=2
+                        )
+                        data_table = [[Paragraph(f"• {bullet_text}", bullet_style)]]
+                    else:
+                        # For regular text, use normal style
+                        data_table = [[Paragraph(line, normal_style)]]
+                    
+                    # Create table for the content
+                    section_table = Table(data_table, colWidths=[doc.width - 40])
+                    section_table.setStyle(TableStyle([
+                        ('BACKGROUND', (0, 0), (-1, -1), colors.HexColor('#F8F8F8')),  # Very light gray
+                        ('TEXTCOLOR', (0, 0), (-1, -1), colors.HexColor('#333333')),
+                        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+                        ('BOX', (0, 0), (-1, -1), 1, colors.HexColor('#DDDDDD')),
+                        ('LEFTPADDING', (0, 0), (-1, -1), 10),
+                        ('RIGHTPADDING', (0, 0), (-1, -1), 10),
+                        ('TOPPADDING', (0, 0), (-1, -1), 6),
+                        ('BOTTOMPADDING', (0, 0), (-1, -1), 6)
+                    ]))
+                    doc_content.append(section_table)
+                    doc_content.append(Spacer(1, 6))
+            
+            # Add footer with page numbers
+            def add_page_number(canvas, doc):
+                page_num = canvas.getPageNumber()
+                canvas.saveState()
+                canvas.setFont("Helvetica", 8)
+                canvas.setFillColor(colors.HexColor('#666666'))
+                
+                # Add header line
+                canvas.setStrokeColor(colors.HexColor('#DDDDDD'))
+                canvas.line(doc.leftMargin, doc.pagesize[1] - 35, doc.width + doc.rightMargin, doc.pagesize[1] - 35)
+                
+                # Add footer line
+                canvas.line(doc.leftMargin, 45, doc.width + doc.rightMargin, 45)
+                
+                # Add page number
+                canvas.drawRightString(doc.width + doc.rightMargin, 25, f"Page {page_num}")
+                
+                # Add document title in footer
+                canvas.drawString(doc.leftMargin, 25, "Technical Documentation")
+                canvas.restoreState()
+            
+            # Build the PDF with page numbers and headers/footers
+            doc.build(doc_content, onFirstPage=add_page_number, onLaterPages=add_page_number)
+            pdf_buffer.seek(0)
+            print("Successfully generated PDF in memory")
+            
+            # Upload to blob storage directly from memory
+            try:
+                blob_url = upload_to_blob_storage_from_memory(pdf_buffer, 'sde', str(uuid.uuid4()))
+                print(f"Successfully uploaded PDF to blob storage: {blob_url}")
+            except Exception as e:
+                print(f"Error uploading to blob storage: {str(e)}")
+                raise
+                
+        except Exception as e:
+            print(f"Error creating PDF: {str(e)}")
+            raise
         
         # If document exists, update it
         if items:
@@ -947,10 +1115,11 @@ async def edit_with_ai(project_id):
         {current_text}
         
         Please provide an improved version of the text that:
-        1. Incorporates the context appropriately
-        2. Maintains the original structure and formatting
-        3. Improves clarity and technical accuracy
-        4. Preserves any important technical details
+        1. Maintains the original section structure (Technical Feasibility Notes, Functional Requirements, etc.)
+        2. Preserves any bullet points or numbered lists
+        3. Keeps the same level of detail and technical accuracy
+        4. Improves clarity and organization
+        5. Uses consistent formatting for headers (use # for main sections, ## for subsections)
         
         Return only the edited text, without any additional explanations or notes.
         """
@@ -961,7 +1130,7 @@ async def edit_with_ai(project_id):
             response = openai_client.chat.completions.create(
                 model=DEPLOYMENT_NAME,
                 messages=[
-                    {"role": "system", "content": "You are a technical documentation expert helping to improve technical documents."},
+                    {"role": "system", "content": "You are a technical documentation expert helping to improve technical documents while maintaining their structure."},
                     {"role": "user", "content": prompt}
                 ],
                 temperature=0.7,
@@ -971,10 +1140,29 @@ async def edit_with_ai(project_id):
             edited_text = response.choices[0].message.content.strip()
             print("Received response from Azure OpenAI")
 
+            # Format the edited text to match the template structure
+            formatted_text = ""
+            sections = edited_text.split('\n\n')
+            
+            for section in sections:
+                if section.strip():
+                    # Check if this is a main section
+                    if any(section.strip().startswith(header) for header in SDE_SECTIONS):
+                        formatted_text += f"# {section.strip()}\n\n"
+                    else:
+                        # Check if this is a subsection
+                        lines = section.split('\n')
+                        for line in lines:
+                            if line.strip().startswith('-'):
+                                formatted_text += f"{line.strip()}\n"
+                            else:
+                                formatted_text += f"## {line.strip()}\n"
+                        formatted_text += "\n"
+
             return jsonify({
                 'success': True,
                 'message': 'Document edited successfully with AI',
-                'edited_text': edited_text
+                'edited_text': formatted_text.strip()
             }), 200
 
         except Exception as ai_error:
@@ -1151,20 +1339,20 @@ async def update_sde_document(project_id):
             )
             
             # Build document content
-            content = []
+            doc_content = []
             
             # Header section
             timestamp = datetime.now().strftime("%B %d, %Y at %I:%M %p")
             
-            content.append(Paragraph("Technical Documentation", title_style))
-            content.append(Spacer(1, 8))
-            content.append(Paragraph(f"Generated on: {timestamp}", ParagraphStyle(
+            doc_content.append(Paragraph("Technical Documentation", title_style))
+            doc_content.append(Spacer(1, 8))
+            doc_content.append(Paragraph(f"Generated on: {timestamp}", ParagraphStyle(
                 'Timestamp', 
                 parent=normal_style,
                 textColor=colors.HexColor('#666666'),  # Medium gray
                 alignment=1  # Center aligned
             )))
-            content.append(Spacer(1, 15))
+            doc_content.append(Spacer(1, 15))
             
             # Process content
             lines = combined_text.split('\n')
@@ -1172,7 +1360,7 @@ async def update_sde_document(project_id):
             
             for line in lines:
                 if not line.strip():
-                    content.append(Spacer(1, 12))
+                    doc_content.append(Spacer(1, 12))
                     continue
                     
                 # Handle special characters
@@ -1183,20 +1371,36 @@ async def update_sde_document(project_id):
                     # Handle headers
                     header_text = line.replace('#', '').strip()
                     if line.startswith('##'):
-                        content.append(Paragraph(header_text, section_style))
+                        doc_content.append(Paragraph(header_text, section_style))
                     else:
-                        content.append(Paragraph(header_text, subtitle_style))
+                        doc_content.append(Paragraph(header_text, subtitle_style))
                     
                     # Add horizontal rule
                     hr_table = Table([['']], colWidths=[doc.width-20], rowHeights=[1])
                     hr_table.setStyle(TableStyle([
                         ('LINEABOVE', (0,0), (-1,0), 1, colors.HexColor('#DDDDDD')),  # Light gray line
                     ]))
-                    content.append(hr_table)
-                    content.append(Spacer(1, 8))
+                    doc_content.append(hr_table)
+                    doc_content.append(Spacer(1, 8))
                 else:
-                    # Create a small table for each paragraph
-                    data_table = [[Paragraph(line, normal_style)]]
+                    # Handle bullet points and regular text
+                    if line.strip().startswith('-'):
+                        # For bullet points, create a table with proper indentation
+                        bullet_text = line.strip()[1:].strip()  # Remove the bullet and trim
+                        bullet_style = ParagraphStyle(
+                            'Bullet',
+                            parent=normal_style,
+                            leftIndent=20,
+                            bulletIndent=0,
+                            bulletFontSize=10,
+                            bulletOffsetY=2
+                        )
+                        data_table = [[Paragraph(f"• {bullet_text}", bullet_style)]]
+                    else:
+                        # For regular text, use normal style
+                        data_table = [[Paragraph(line, normal_style)]]
+                    
+                    # Create table for the content
                     section_table = Table(data_table, colWidths=[doc.width - 40])
                     section_table.setStyle(TableStyle([
                         ('BACKGROUND', (0, 0), (-1, -1), colors.HexColor('#F8F8F8')),  # Very light gray
@@ -1209,8 +1413,8 @@ async def update_sde_document(project_id):
                         ('TOPPADDING', (0, 0), (-1, -1), 6),
                         ('BOTTOMPADDING', (0, 0), (-1, -1), 6)
                     ]))
-                    content.append(section_table)
-                    content.append(Spacer(1, 6))
+                    doc_content.append(section_table)
+                    doc_content.append(Spacer(1, 6))
             
             # Add footer with page numbers
             def add_page_number(canvas, doc):
@@ -1234,7 +1438,7 @@ async def update_sde_document(project_id):
                 canvas.restoreState()
             
             # Build the PDF with page numbers and headers/footers
-            doc.build(content, onFirstPage=add_page_number, onLaterPages=add_page_number)
+            doc.build(doc_content, onFirstPage=add_page_number, onLaterPages=add_page_number)
             pdf_buffer.seek(0)
             print("Successfully generated PDF in memory")
             
@@ -1244,16 +1448,10 @@ async def update_sde_document(project_id):
                 print(f"Successfully uploaded PDF to blob storage: {blob_url}")
             except Exception as e:
                 print(f"Error uploading to blob storage: {str(e)}")
-                return jsonify({
-                    'success': False,
-                    'message': f'Error uploading document to storage: {str(e)}'
-                }), 500
+                raise
         except Exception as e:
             print(f"Error creating PDF: {str(e)}")
-            return jsonify({
-                'success': False,
-                'message': f'Error creating PDF: {str(e)}'
-            }), 500
+            raise
 
         # Update document fields
         document['combined_text'] = combined_text

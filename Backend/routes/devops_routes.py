@@ -11,6 +11,7 @@ from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+from reportlab.lib.pagesizes import A4
 import uuid
 from azure.ai.formrecognizer import DocumentAnalysisClient
 from azure.core.credentials import AzureKeyCredential
@@ -293,37 +294,40 @@ def generate_pdf(data, output_buffer):
         # Define enhanced styles
         styles = getSampleStyleSheet()
         
-        # Professional title style - smaller font
+        # Professional title style - larger font
         title_style = ParagraphStyle(
             'Title',
             parent=styles['Heading1'],
-            fontSize=22,
+            fontSize=24,
             alignment=1,  # Center alignment
             spaceAfter=12,
-            textColor=colors.HexColor('#1B365D')  # Dark blue
+            textColor=colors.HexColor('#1B365D'),  # Dark blue
+            fontName='Helvetica-Bold'
         )
         
-        # Modern subtitle style - smaller font
+        # Modern subtitle style - larger font
         subtitle_style = ParagraphStyle(
             'Subtitle',
             parent=styles['Heading2'],
-            fontSize=16,
+            fontSize=18,
             textColor=colors.HexColor('#2E5C8A'),  # Medium blue
-            spaceBefore=10,
-            spaceAfter=6,
+            spaceBefore=20,
+            spaceAfter=10,
             alignment=0,  # Left alignment
-            borderWidth=0
+            borderWidth=0,
+            fontName='Helvetica-Bold'
         )
         
-        # Section header style - smaller font
+        # Section header style - larger font
         section_style = ParagraphStyle(
             'Section',
             parent=styles['Heading3'],
-            fontSize=13,
+            fontSize=14,
             textColor=colors.HexColor('#4A4A4A'),  # Dark gray
-            spaceBefore=10,
-            spaceAfter=4,
-            leftIndent=0
+            spaceBefore=15,
+            spaceAfter=8,
+            leftIndent=0,
+            fontName='Helvetica-Bold'
         )
         
         # Clean normal text style - smaller font
@@ -332,7 +336,10 @@ def generate_pdf(data, output_buffer):
             parent=styles['Normal'],
             fontSize=10,
             leading=12,
-            textColor=colors.HexColor('#333333')  # Soft black
+            textColor=colors.HexColor('#333333'),  # Soft black
+            fontName='Helvetica',
+            spaceBefore=6,
+            spaceAfter=6
         )
         
         # Build document content
@@ -341,7 +348,7 @@ def generate_pdf(data, output_buffer):
         # Header section - more compact
         timestamp = datetime.now().strftime("%B %d, %Y at %I:%M %p")
         
-        content.append(Paragraph("DevOps Requirements Document", title_style))
+        content.append(Paragraph("DevOps Requirements", title_style))
         content.append(Spacer(1, 8))
         content.append(Paragraph(f"Generated on: {timestamp}", ParagraphStyle(
             'Timestamp', 
@@ -349,7 +356,7 @@ def generate_pdf(data, output_buffer):
             textColor=colors.HexColor('#666666'),  # Medium gray
             alignment=1  # Center aligned
         )))
-        content.append(Spacer(1, 15))
+        content.append(Spacer(1, 20))
         
         # Process each section
         for section, section_content in data.items():
@@ -357,7 +364,7 @@ def generate_pdf(data, output_buffer):
             if section == "combined_text":
                 continue
                 
-            # Add section header
+            # Add section header with extra spacing
             content.append(Paragraph(section, subtitle_style))
             
             # Add horizontal rule
@@ -366,17 +373,29 @@ def generate_pdf(data, output_buffer):
                 ('LINEABOVE', (0,0), (-1,0), 1, colors.HexColor('#DDDDDD')),  # Light gray line
             ]))
             content.append(hr_table)
-            content.append(Spacer(1, 8))
+            content.append(Spacer(1, 12))
             
             # Format and add section content
             formatted_content = str(section_content).replace('•', '⚫')  # Replace bullet points with circles
             
             # Split content into paragraphs to avoid large tables
             paragraphs = formatted_content.split('\n')
+            last_was_header = False
             
             # Process each paragraph
             for para in paragraphs:
-                if para.strip():
+                if not para.strip():
+                    continue
+                    
+                # Check if this is a subsection header
+                if para.strip().startswith('##'):
+                    header_text = para.strip()[2:].strip()
+                    # Skip if this is a duplicate of the main section
+                    if header_text.lower() != section.lower():
+                        content.append(Paragraph(header_text, section_style))
+                        content.append(Spacer(1, 8))
+                        last_was_header = True
+                else:
                     # Create a small table for each paragraph
                     data_table = [[Paragraph(para, normal_style)]]
                     section_table = Table(data_table, colWidths=[doc.width - 40])
@@ -393,8 +412,9 @@ def generate_pdf(data, output_buffer):
                     ]))
                     content.append(section_table)
                     content.append(Spacer(1, 6))
+                    last_was_header = False
             
-            content.append(Spacer(1, 10))
+            content.append(Spacer(1, 15))  # Extra space between sections
         
         # Add footer with page numbers
         def add_page_number(canvas, doc):
@@ -414,7 +434,7 @@ def generate_pdf(data, output_buffer):
             canvas.drawRightString(doc.width + doc.rightMargin, 25, f"Page {page_num}")
             
             # Add document title in footer
-            canvas.drawString(doc.leftMargin, 25, "DevOps Requirements Document")
+            canvas.drawString(doc.leftMargin, 25, "DevOps Requirements")
             canvas.restoreState()
         
         # Build the PDF with page numbers and headers/footers
@@ -427,16 +447,13 @@ def generate_pdf(data, output_buffer):
         print(f"Error in PDF generation: {str(e)}")
         print("Attempting fallback PDF generation...")
         try:
-            # Fallback to simple PDF generation
-            from reportlab.pdfgen import canvas
-            from reportlab.lib.pagesizes import A4
-            
+            # Fallback to simple PDF generation in memory
             c = canvas.Canvas(output_buffer, pagesize=A4)
             y = 800  # Start near top of page
             
             # Add title
             c.setFont("Helvetica-Bold", 16)
-            c.drawString(50, y, "DevOps Requirements Document")
+            c.drawString(50, y, "DevOps Requirements")
             y -= 30
             
             # Add timestamp
@@ -896,7 +913,7 @@ async def update_devops_document(project_id):
         return response
 
     try:
-        print("\n=== Starting document update process ===")
+        print("\n=== Starting DevOps document update process ===")
         print("Request headers:", dict(request.headers))
         print("Request data:", request.json)
         print(f"Project ID: {project_id}")
@@ -1001,7 +1018,8 @@ async def update_devops_document(project_id):
                 fontSize=22,
                 alignment=1,  # Center alignment
                 spaceAfter=12,
-                textColor=colors.HexColor('#1B365D')  # Dark blue
+                textColor=colors.HexColor('#1B365D'),  # Dark blue
+                fontName='Helvetica-Bold'
             )
             
             # Modern subtitle style
@@ -1010,10 +1028,11 @@ async def update_devops_document(project_id):
                 parent=styles['Heading2'],
                 fontSize=16,
                 textColor=colors.HexColor('#2E5C8A'),  # Medium blue
-                spaceBefore=10,
-                spaceAfter=6,
+                spaceBefore=20,
+                spaceAfter=10,
                 alignment=0,  # Left alignment
-                borderWidth=0
+                borderWidth=0,
+                fontName='Helvetica-Bold'
             )
             
             # Section header style
@@ -1022,9 +1041,10 @@ async def update_devops_document(project_id):
                 parent=styles['Heading3'],
                 fontSize=13,
                 textColor=colors.HexColor('#4A4A4A'),  # Dark gray
-                spaceBefore=10,
-                spaceAfter=4,
-                leftIndent=0
+                spaceBefore=15,
+                spaceAfter=8,
+                leftIndent=0,
+                fontName='Helvetica-Bold'
             )
             
             # Clean normal text style
@@ -1033,24 +1053,27 @@ async def update_devops_document(project_id):
                 parent=styles['Normal'],
                 fontSize=10,
                 leading=12,
-                textColor=colors.HexColor('#333333')  # Soft black
+                textColor=colors.HexColor('#333333'),  # Soft black
+                fontName='Helvetica',
+                spaceBefore=6,
+                spaceAfter=6
             )
             
             # Build document content
-            content = []
+            doc_content = []
             
             # Header section
             timestamp = datetime.now().strftime("%B %d, %Y at %I:%M %p")
             
-            content.append(Paragraph("DevOps Requirements Document", title_style))
-            content.append(Spacer(1, 8))
-            content.append(Paragraph(f"Generated on: {timestamp}", ParagraphStyle(
+            doc_content.append(Paragraph("DevOps Requirements Document", title_style))
+            doc_content.append(Spacer(1, 8))
+            doc_content.append(Paragraph(f"Generated on: {timestamp}", ParagraphStyle(
                 'Timestamp', 
                 parent=normal_style,
                 textColor=colors.HexColor('#666666'),  # Medium gray
                 alignment=1  # Center aligned
             )))
-            content.append(Spacer(1, 15))
+            doc_content.append(Spacer(1, 20))
             
             # Process content
             lines = combined_text.split('\n')
@@ -1058,7 +1081,7 @@ async def update_devops_document(project_id):
             
             for line in lines:
                 if not line.strip():
-                    content.append(Spacer(1, 12))
+                    doc_content.append(Spacer(1, 12))
                     continue
                     
                 # Handle special characters
@@ -1069,20 +1092,36 @@ async def update_devops_document(project_id):
                     # Handle headers
                     header_text = line.replace('#', '').strip()
                     if line.startswith('##'):
-                        content.append(Paragraph(header_text, section_style))
+                        doc_content.append(Paragraph(header_text, section_style))
                     else:
-                        content.append(Paragraph(header_text, subtitle_style))
+                        doc_content.append(Paragraph(header_text, subtitle_style))
                     
                     # Add horizontal rule
                     hr_table = Table([['']], colWidths=[doc.width-20], rowHeights=[1])
                     hr_table.setStyle(TableStyle([
                         ('LINEABOVE', (0,0), (-1,0), 1, colors.HexColor('#DDDDDD')),  # Light gray line
                     ]))
-                    content.append(hr_table)
-                    content.append(Spacer(1, 8))
+                    doc_content.append(hr_table)
+                    doc_content.append(Spacer(1, 12))
                 else:
-                    # Create a small table for each paragraph
-                    data_table = [[Paragraph(line, normal_style)]]
+                    # Handle bullet points and regular text
+                    if line.strip().startswith('-'):
+                        # For bullet points, create a table with proper indentation
+                        bullet_text = line.strip()[1:].strip()  # Remove the bullet and trim
+                        bullet_style = ParagraphStyle(
+                            'Bullet',
+                            parent=normal_style,
+                            leftIndent=20,
+                            bulletIndent=0,
+                            bulletFontSize=10,
+                            bulletOffsetY=2
+                        )
+                        data_table = [[Paragraph(f"• {bullet_text}", bullet_style)]]
+                    else:
+                        # For regular text, use normal style
+                        data_table = [[Paragraph(line, normal_style)]]
+                    
+                    # Create table for the content
                     section_table = Table(data_table, colWidths=[doc.width - 40])
                     section_table.setStyle(TableStyle([
                         ('BACKGROUND', (0, 0), (-1, -1), colors.HexColor('#F8F8F8')),  # Very light gray
@@ -1095,8 +1134,8 @@ async def update_devops_document(project_id):
                         ('TOPPADDING', (0, 0), (-1, -1), 6),
                         ('BOTTOMPADDING', (0, 0), (-1, -1), 6)
                     ]))
-                    content.append(section_table)
-                    content.append(Spacer(1, 6))
+                    doc_content.append(section_table)
+                    doc_content.append(Spacer(1, 6))
             
             # Add footer with page numbers
             def add_page_number(canvas, doc):
@@ -1120,7 +1159,7 @@ async def update_devops_document(project_id):
                 canvas.restoreState()
             
             # Build the PDF with page numbers and headers/footers
-            doc.build(content, onFirstPage=add_page_number, onLaterPages=add_page_number)
+            doc.build(doc_content, onFirstPage=add_page_number, onLaterPages=add_page_number)
             pdf_buffer.seek(0)
             print("Successfully generated PDF in memory")
             
@@ -1130,16 +1169,10 @@ async def update_devops_document(project_id):
                 print(f"Successfully uploaded PDF to blob storage: {blob_url}")
             except Exception as e:
                 print(f"Error uploading to blob storage: {str(e)}")
-                return jsonify({
-                    'success': False,
-                    'message': f'Error uploading document to storage: {str(e)}'
-                }), 500
+                raise
         except Exception as e:
             print(f"Error creating PDF: {str(e)}")
-            return jsonify({
-                'success': False,
-                'message': f'Error creating PDF: {str(e)}'
-            }), 500
+            raise
 
         # Update document fields
         document['combined_text'] = combined_text
