@@ -267,4 +267,35 @@ def get_project(project_id):
         return jsonify({
             'success': False,
             'message': f'Error fetching project: {str(e)}'
-        }), 500 
+        }), 500
+
+@projects.route('/stakeholders/<project_id>', methods=['GET'])
+def get_project_stakeholders(project_id):
+    try:
+        # Get the database and container
+        database = client.get_database_client("RequirementsDB")
+        container = database.get_container_client("Projects")
+        
+        # Query for the specific project
+        query = f"SELECT * FROM c WHERE c.id = '{project_id}'"
+        items = list(container.query_items(
+            query=query,
+            enable_cross_partition_query=True
+        ))
+        
+        if not items:
+            return jsonify({"error": "Project not found"}), 404
+            
+        project = items[0]
+        
+        # Extract stakeholders and role counts
+        response_data = {
+            "stakeholders": project.get("stakeholders", []),
+            "role_counts": project.get("role_counts", {})
+        }
+        
+        return jsonify(response_data), 200
+        
+    except Exception as e:
+        print(f"Error fetching stakeholders: {str(e)}")
+        return jsonify({"error": str(e)}), 500 
