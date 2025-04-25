@@ -33,7 +33,7 @@ import { RiPencilFill } from "react-icons/ri";
 
 
 
-import { AttachFile, TextFields } from '@mui/icons-material';
+import { AttachFile, TextFields, CloudDownload } from '@mui/icons-material';
 
 const sampleUsers = [
   { id: 'u1', name: 'Suraj' },
@@ -89,6 +89,14 @@ const SingleProjectReqs = ({ projectId }) => {
   const [transcript, setTranscript] = useState(null);
   const [audioSummary, setAudioSummary] = useState(null);
   const [transcriptionStatus, setTranscriptionStatus] = useState('idle'); // idle, loading, success, error
+
+  // Add new states for Confluence
+  const [showConfluenceModal, setShowConfluenceModal] = useState(false);
+  const [confluenceSpaces, setConfluenceSpaces] = useState([]);
+  const [confluencePages, setConfluencePages] = useState([]);
+  const [selectedSpace, setSelectedSpace] = useState(null);
+  const [selectedPage, setSelectedPage] = useState(null);
+  const [confluenceLoading, setConfluenceLoading] = useState(false);
 
   useEffect(() => {
     if (projectId) {
@@ -783,6 +791,158 @@ const SingleProjectReqs = ({ projectId }) => {
     }
   };
 
+  const fetchConfluenceSpaces = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/resources/confluence/spaces');
+      if (response.data.success) {
+        setConfluenceSpaces(response.data.spaces);
+      }
+    } catch (err) {
+      console.error('Error fetching Confluence spaces:', err);
+      setError('Failed to fetch Confluence spaces');
+    }
+  };
+
+  const fetchConfluencePages = async (spaceKey) => {
+    try {
+      const response = await axios.get(`http://localhost:5000/resources/confluence/pages/${spaceKey}`);
+      if (response.data.success) {
+        setConfluencePages(response.data.pages);
+      }
+    } catch (err) {
+      console.error('Error fetching Confluence pages:', err);
+      setError('Failed to fetch Confluence pages');
+    }
+  };
+
+  const handleConfluenceImport = async () => {
+    try {
+      setConfluenceLoading(true);
+      setError(null);
+
+      if (!selectedPage) {
+        setError('Please select a page to import');
+        return;
+      }
+
+      const response = await axios.get(`http://localhost:5000/resources/confluence/page/${selectedPage.id}`, {
+        params: { 
+          title: selectedPage.title,
+          projectId: projectId,
+          taggedUsers: taggedUsers
+        },
+        headers: {
+          'X-User-ID': user?.id || localStorage.getItem('userId')
+        }
+      });
+
+      if (response.data.success) {
+        setSuccess('Confluence page imported successfully');
+        setShowConfluenceModal(false);
+        fetchResources(); // Refresh the resources list
+        // Reset form
+        setSelectedSpace(null);
+        setSelectedPage(null);
+        setTaggedUsers([]);
+      } else {
+        setError(response.data.message || 'Failed to import Confluence page');
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || 'Error importing Confluence page');
+    } finally {
+      setConfluenceLoading(false);
+    }
+  };
+
+  const ResourceContent = ({ resource }) => {
+    if (!resource) return null;
+
+    const cleanHtmlContent = (html) => {
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = html;
+      let text = tempDiv.textContent || tempDiv.innerText;
+      text = text.replace(/\s+/g, ' ');
+      text = text.replace(/&nbsp;/g, ' ')
+                 .replace(/&amp;/g, '&')
+                 .replace(/&lt;/g, '<')
+                 .replace(/&gt;/g, '>')
+                 .replace(/&quot;/g, '"')
+                 .replace(/&#39;/g, "'");
+      return text.trim();
+    };
+
+    const renderContent = () => {
+      if (resource.type === 'confluence') {
+        try {
+          console.log('=== Confluence Resource Details ===');
+          console.log('Resource:', resource);
+          
+          const cleanedContent = cleanHtmlContent(resource.context);
+          
+          return (
+            <div style={{ 
+              whiteSpace: 'pre-wrap',
+              wordWrap: 'break-word',
+              maxHeight: '200px',
+              overflowY: 'auto',
+              padding: '8px',
+              backgroundColor: 'white',
+              borderRadius: '4px',
+              border: '1px solid #e0e0e0',
+              fontSize: '12px',
+              lineHeight: '1.3'
+            }}>
+              <div style={{ 
+                fontFamily: 'monospace'
+              }}>
+                {cleanedContent}
+              </div>
+            </div>
+          );
+        } catch (e) {
+          console.error('Error rendering Confluence content:', e);
+          return (
+            <div style={{ 
+              padding: '4px',
+              backgroundColor: '#ffebee',
+              borderRadius: '4px',
+              color: '#c62828',
+              fontSize: '11px'
+            }}>
+              Error displaying content: {e.message}
+            </div>
+          );
+        }
+      }
+      return <div>{resource.context}</div>;
+    };
+
+    return (
+      <div style={{ 
+        padding: '8px',
+        backgroundColor: '#f5f5f5',
+        borderRadius: '4px',
+        marginTop: '8px',
+        fontSize: '11px'
+      }}>
+        <h3 style={{ marginBottom: '4px', fontSize: '12px' }}>{resource.name}</h3>
+        {renderContent()}
+        <div style={{ marginTop: '4px', fontSize: '10px' }}>
+          <p>Created: {new Date(resource.created_at).toLocaleString()}</p>
+          {resource.tagged_users && resource.tagged_users.length > 0 && (
+            <p>Tagged Users: {resource.tagged_users.join(', ')}</p>
+          )}
+          {resource.metadata && (
+            <div style={{ marginTop: '2px' }}>
+              <p>Space: {resource.metadata.space_key}</p>
+              <p>Version: {resource.metadata.version}</p>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="flex flex-col mx-3 my-0">
       <div className='grid grid-cols-3 grid-cols-2 gap-4 mt-2'>
@@ -915,6 +1075,8 @@ const SingleProjectReqs = ({ projectId }) => {
                         </Button>
                       )}
                     </div>
+                  ) : resource.type === 'confluence' ? (
+                    <ResourceContent resource={resource} />
                   ) : (
                     resource.url && (
                       <Link href={resource.url} target="_blank" rel="noopener noreferrer">
@@ -1172,6 +1334,7 @@ const SingleProjectReqs = ({ projectId }) => {
               <Tab icon={<AttachFile />} label="File" value="file" />
               <Tab icon={<i className="fa fa-globe" />} label="Website" value="website" />
               <Tab icon={<i className="fa fa-microphone" />} label="Audio" value="audio" />
+              <Tab icon={<CloudDownload />} label="Confluence" value="confluence" />
             </Tabs>
 
             {inputType === 'text' ? (
@@ -1231,6 +1394,20 @@ const SingleProjectReqs = ({ projectId }) => {
                     Selected: {audioFile.name}
                   </Typography>
                 )}
+              </div>
+            ) : inputType === 'confluence' ? (
+              <div className="mb-4">
+                <Button
+                  variant="outlined"
+                  startIcon={<CloudDownload />}
+                  onClick={() => {
+                    setShowModal(false);
+                    setShowConfluenceModal(true);
+                    fetchConfluenceSpaces();
+                  }}
+                >
+                  Import from Confluence
+                </Button>
               </div>
             ) : (
               <TextField
@@ -1638,6 +1815,129 @@ const SingleProjectReqs = ({ projectId }) => {
           </DialogActions>
         </Dialog>
       )}
+
+      <Button
+        variant="contained"
+        color="primary"
+        startIcon={<CloudDownload />}
+        onClick={() => {
+          setShowConfluenceModal(true);
+          fetchConfluenceSpaces();
+        }}
+        style={{ margin: '10px' }}
+      >
+        Import from Confluence
+      </Button>
+
+      {/* Confluence Import Modal */}
+      <Dialog 
+        open={showConfluenceModal} 
+        onClose={() => setShowConfluenceModal(false)}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle>Import from Confluence</DialogTitle>
+        <DialogContent>
+          <Typography variant="subtitle1" gutterBottom>
+            Select Space
+          </Typography>
+          <TableContainer component={Paper}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Space Name</TableCell>
+                  <TableCell>Space Key</TableCell>
+                  <TableCell>Action</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {confluenceSpaces.map((space) => (
+                  <TableRow key={space.key}>
+                    <TableCell>{space.name}</TableCell>
+                    <TableCell>{space.key}</TableCell>
+                    <TableCell>
+                      <Button
+                        variant="outlined"
+                        onClick={() => {
+                          setSelectedSpace(space);
+                          fetchConfluencePages(space.key);
+                        }}
+                      >
+                        Select
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+
+          {selectedSpace && (
+            <>
+              <Typography variant="subtitle1" gutterBottom style={{ marginTop: '20px' }}>
+                Pages in {selectedSpace.name}
+              </Typography>
+              <TableContainer component={Paper}>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Page Title</TableCell>
+                      <TableCell>Action</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {confluencePages.map((page) => (
+                      <TableRow key={page.id}>
+                        <TableCell>{page.title}</TableCell>
+                        <TableCell>
+                          <Button
+                            variant="outlined"
+                            onClick={() => setSelectedPage(page)}
+                            disabled={selectedPage?.id === page.id}
+                          >
+                            {selectedPage?.id === page.id ? 'Selected' : 'Select'}
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </>
+          )}
+
+          {selectedPage && (
+            <>
+              <Typography variant="subtitle1" gutterBottom style={{ marginTop: '20px' }}>
+                Tag Users
+              </Typography>
+              {projectUsers.map(user => (
+                <FormControlLabel
+                  key={user.id}
+                  control={
+                    <Checkbox
+                      checked={taggedUsers.includes(user.id)}
+                      onChange={() => toggleUserTag(user.id)}
+                    />
+                  }
+                  label={user.name}
+                />
+              ))}
+            </>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowConfluenceModal(false)}>Cancel</Button>
+          <Button 
+            onClick={handleConfluenceImport}
+            disabled={confluenceLoading || !selectedPage}
+            variant="contained"
+            color="primary"
+          >
+            {confluenceLoading ? <CircularProgress size={24} /> : 'Import Page'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };

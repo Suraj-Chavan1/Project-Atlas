@@ -16,8 +16,20 @@ import httpx
 import time
 from urllib.parse import urlparse
 from openai import AzureOpenAI
+import traceback
+import json
+from flask_cors import CORS
+
 
 resources = Blueprint('resources', __name__, url_prefix='/resources')
+
+# Enable CORS for this blueprint with specific headers
+CORS(resources, 
+     resources={r"/*": {
+         "origins": "http://localhost:5173",
+         "allow_headers": ["Content-Type", "x-user-id"],
+         "methods": ["GET", "POST", "OPTIONS"]
+     }})
 
 # Azure OpenAI Configuration
 OPENAI_ENDPOINT = "https://suraj-m9lgdbv9-eastus2.cognitiveservices.azure.com/"
@@ -63,6 +75,11 @@ openai_client = AzureOpenAI(
     api_version=OPENAI_API_VERSION,
     http_client=httpx.Client()
 )
+
+# Confluence Configuration
+email = "prathamgadkari@gmail.com"
+api_token = "ATATT3xFfGF0LXSWvbAlLm1lVXyxSroefrBXONpTLDg5mzfknXUUxTYAjQ0u59wKKGh3ObCEnducPVGqRwCLoxDu8oc4xx3aBAHj6A9Tzuj2OqiUszHVo3UvYrpmblYC2xHttFxo5ULieeRE2LNIfR3w_l2YNJTvACQ_zmBnkt6Tjvenqyu2pEM=99E9EA51"
+base_url = "https://prathamgadkari.atlassian.net/wiki"
 
 def validate_url(url):
     """Validate if a string is a proper URL"""
@@ -542,3 +559,221 @@ def transcribe_audio_route():
             'success': False,
             'message': f'Error transcribing audio: {str(e)}'
         }), 500
+
+def get_confluence_spaces():
+    """Fetch all available spaces in Confluence."""
+    spaces_url = f"{base_url}/rest/api/space"
+    
+    try:
+        response = requests.get(
+            spaces_url,
+            auth=(email, api_token),
+            headers={"Accept": "application/json"}
+        )
+        
+        if response.status_code == 200:
+            spaces = response.json().get('results', [])
+            return [{"key": space['key'], "name": space['name']} for space in spaces]
+        else:
+            print(f"Failed to fetch spaces: Status {response.status_code}")
+            return []
+    except Exception as e:
+        print(f"Error fetching spaces: {str(e)}")
+        return []
+
+def get_confluence_pages(space_key):
+    """Fetch all pages in a specific space."""
+    api_endpoint = f"{base_url}/rest/api/content"
+    
+    params = {
+        'expand': 'space',
+        'limit': 100,
+        'spaceKey': space_key
+    }
+
+    try:
+        response = requests.get(
+            api_endpoint,
+            auth=(email, api_token),
+            headers={"Accept": "application/json"},
+            params=params
+        )
+
+        if response.status_code == 200:
+            pages = response.json().get('results', [])
+            return [{"id": page['id'], "title": page['title']} for page in pages]
+        else:
+            print(f"Failed to fetch pages: Status {response.status_code}")
+            return []
+    except Exception as e:
+        print(f"Error fetching pages: {str(e)}")
+        return []
+
+def get_confluence_page_content(page_id, title):
+    """Fetch Confluence page content and return as JSON."""
+    content_url = f"{base_url}/rest/api/content/{page_id}"
+    params = {
+        "expand": "body.storage,space"
+    }
+
+    try:
+        print(f"\n=== Fetching Confluence Page ===")
+        print(f"URL: {content_url}")
+        print(f"Params: {params}")
+        
+        response = requests.get(
+            content_url,
+            auth=(email, api_token),
+            headers={"Accept": "application/json"},
+            params=params
+        )
+
+        print(f"\n=== Response Details ===")
+        print(f"Status Code: {response.status_code}")
+        print(f"Response Headers: {response.headers}")
+        print(f"Response Content Preview: {response.text[:500]}")
+
+        if response.status_code == 200:
+            content = response.json()
+            print(f"\n=== Content Structure ===")
+            print(f"Content Keys: {content.keys()}")
+            
+            if 'body' not in content:
+                raise Exception("No 'body' field in response")
+            if 'storage' not in content['body']:
+                raise Exception("No 'storage' field in body")
+            
+            # Get the raw content
+            raw_content = content['body']['storage']['value']
+            print(f"\n=== Raw Content Preview ===")
+            print(f"First 200 chars: {raw_content[:200]}")
+            
+            # Create a structured response
+            result = {
+                "title": title,
+                "content": raw_content,
+                "space_key": content['space']['key'],
+                "version": content.get('version', {}).get('number', 1)
+            }
+            
+            print(f"\n=== Final Result ===")
+            print(f"Result Structure: {result.keys()}")
+            print(f"Content Length: {len(raw_content)}")
+            
+            return result
+        else:
+            raise Exception(f"Failed to get content for '{title}': Status {response.status_code}, Response: {response.text}")
+    except Exception as e:
+        print(f"\n=== Error Details ===")
+        print(f"Error: {str(e)}")
+        print(f"Traceback: {traceback.format_exc()}")
+        raise Exception(f"Error processing '{title}': {str(e)}")
+
+@resources.route('/confluence/spaces', methods=['GET'])
+def get_confluence_spaces_route():
+    try:
+        spaces = get_confluence_spaces()
+        return jsonify({
+            'success': True,
+            'spaces': spaces
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': str(e)
+        }), 500
+
+@resources.route('/confluence/pages/<space_key>', methods=['GET'])
+def get_confluence_pages_route(space_key):
+    try:
+        pages = get_confluence_pages(space_key)
+        return jsonify({
+            'success': True,
+            'pages': pages
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': str(e)
+        }), 500
+
+@resources.route('/confluence/page/<page_id>', methods=['GET', 'OPTIONS'])
+def get_confluence_page_route(page_id):
+    if request.method == 'OPTIONS':
+        # Handle preflight request
+        response = jsonify({'status': 'ok'})
+        response.headers.add('Access-Control-Allow-Origin', 'http://localhost:5173')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type, x-user-id')
+        response.headers.add('Access-Control-Allow-Methods', 'GET, OPTIONS')
+        return response
+
+    try:
+        title = request.args.get('title')
+        project_id = request.args.get('projectId')
+        tagged_users = request.args.getlist('taggedUsers[]')
+        user_id = request.headers.get('x-user-id')
+        
+        print(f"\n=== Processing Confluence Import ===")
+        print(f"Project ID: {project_id}")
+        print(f"Tagged Users: {tagged_users}")
+        print(f"User ID: {user_id}")
+        
+        if not title:
+            return jsonify({"error": "Missing title"}), 400
+            
+        content = get_confluence_page_content(page_id, title)
+        
+        # Construct the proper Confluence URL
+        confluence_url = f"{base_url}/spaces/{content['space_key']}/pages/{page_id}"
+        print(f"\n=== Generated Confluence URL ===")
+        print(f"URL: {confluence_url}")
+        
+        # Create resource in database
+        resource = {
+            "id": f"confluence_{page_id}",
+            "project_id": project_id,
+            "name": f"Confluence: {title}",
+            "tagged_users": tagged_users,
+            "created_at": datetime.utcnow().isoformat(),
+            "created_by": user_id or "system",
+            "type": "confluence",
+            "context": content['content'],
+            "content_type": "application/json",
+            "source_url": confluence_url,  # Use the constructed URL
+            "metadata": {
+                "space_key": content['space_key'],
+                "version": content['version']
+            }
+        }
+        
+        print(f"\n=== Resource to be saved ===")
+        print(f"Resource ID: {resource['id']}")
+        print(f"Source URL: {resource['source_url']}")
+        
+        # Save to Cosmos DB
+        try:
+            container = cosmos_client.get_database_client('RequirementsDB').get_container_client('Resources')
+            container.create_item(body=resource)
+            print(f"Successfully saved Confluence page to database: {title}")
+        except Exception as db_error:
+            print(f"Error saving to database: {str(db_error)}")
+            raise db_error
+        
+        response = jsonify({
+            "success": True,
+            "resource": resource
+        })
+        
+        # Add CORS headers to the response
+        response.headers.add('Access-Control-Allow-Origin', 'http://localhost:5173')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type, x-user-id')
+        return response
+        
+    except Exception as e:
+        print(f"\n=== Error in get_confluence_page_route ===")
+        print(f"Error: {str(e)}")
+        print(f"Traceback: {traceback.format_exc()}")
+        response = jsonify({"error": str(e)})
+        response.headers.add('Access-Control-Allow-Origin', 'http://localhost:5173')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type, x-user-id')
+        return response, 500
