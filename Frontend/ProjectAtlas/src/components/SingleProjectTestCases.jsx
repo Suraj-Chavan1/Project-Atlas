@@ -639,11 +639,17 @@ const SingleProjectTestCases = () => {
                                             </button>
                                         </div>
                                         <div className="space-y-2">
-                                            {testCasesMap[story.key].testFiles.map((file, index) => (
+                                            {/*{testCasesMap[story.key].testFiles.map((file, index) => (
                                                 <div key={index} className="p-2 bg-white rounded border border-gray-200">
+                                                    <SyntaxHighlighter
+                                                    language="python"
+                                                    style={vscDarkPlus}
+                                                    customStyle={{ margin: 0, maxHeight: '300px' }}>
                                                     {file}
+                                                    </SyntaxHighlighter>
                                                 </div>
-                                            ))}
+                                            ))}*/}
+                                            Test Coverage here:
                                         </div>
                                         
                                         {testCasesMap[story.key].blobUrl && (
