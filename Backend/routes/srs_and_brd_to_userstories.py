@@ -481,6 +481,15 @@ def generate_stories_from_docs():
                 if not document_text:
                     print("Document has no context, skipping")
                     continue
+                
+                # Print the document context used for generating stories
+                print("\n=== Document Context Used for Story Generation ===")
+                print(f"Document ID: {doc.get('id')}")
+                print(f"Document Title: {doc.get('title', 'No Title')}")
+                print(f"Document Type: {doc.get('template_type', 'Unknown')}")
+                print("Context Content (first 500 chars):")
+                print(document_text[:500] + "..." if len(document_text) > 500 else document_text)
+                print("=== End of Document Context Sample ===\n")
                     
                 # Generate user stories
                 print("Generating user stories...")

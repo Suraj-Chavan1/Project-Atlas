@@ -465,64 +465,40 @@ def transcribe_audio_route():
                 'message': 'Unsupported audio format'
             }), 400
             
-        # Generate a unique filename and save temporarily
+        # Generate a unique ID for the resource
+        resource_id = str(uuid.uuid4())
         filename = secure_filename(file.filename)
         file_ext = os.path.splitext(filename)[1]
-        resource_id = str(uuid.uuid4())
+        file_bytes = file.read()
         
-        # Use os.path.join for correct path handling and temp_dir for platform independence
-        temp_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "temp")
-        # Create temp directory if it doesn't exist
-        if not os.path.exists(temp_dir):
-            os.makedirs(temp_dir)
-            print(f"Created temp directory: {temp_dir}")
+        # Upload audio directly to Blob Storage without creating a local file
+        blob_name = f"{project_id}/{resource_id}/{filename}"
+        content_type = get_content_type(file_ext) or 'audio/mpeg'
+        print(f"Uploading audio to Azure Blob Storage: {blob_name}")
+        blob_url = upload_to_blob_storage_from_memory(file_bytes, blob_name, content_type)
+        print(f"Blob URL: {blob_url[:50]}...")
         
-        temp_path = os.path.join(temp_dir, f"{resource_id}{file_ext}")
-        print(f"Saving audio file to temp path: {temp_path}")
-        
-        # Save file temporarily
-        file.save(temp_path)
-        print(f"Audio file saved successfully at: {temp_path}")
-        
-        # Check if file was saved successfully
-        if not os.path.exists(temp_path):
-            print(f"ERROR: File was not saved at {temp_path}")
-            return jsonify({
-                'success': False,
-                'message': f'Error saving audio file: File not found at expected path'
-            }), 500
-            
-        file_bytes = open(temp_path, 'rb').read()
-        
-        # Import transcription functions from Models
+        # Import the necessary functions from speech_to_summary module
         sys_path_parent = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         models_path = os.path.join(sys_path_parent, '..', 'Models')
         sys.path.append(models_path)
         print(f"Added Models path to sys.path: {models_path}")
         
-        from speech_to_summary import upload_audio, start_transcription, poll_transcription, summarize_text
+        # Import the summarization function only
+        from speech_to_summary import start_transcription, poll_transcription, summarize_text
         
-        # Process audio file
-        print(f"Processing audio file: {filename} (size: {len(file_bytes)} bytes)")
-        upload_url = upload_audio(temp_path)
-        print(f"Audio uploaded successfully, URL received: {upload_url[:50]}...")
-        
-        transcript_id = start_transcription(upload_url)
+        # Use AssemblyAI to start transcription directly with the blob URL
+        print(f"Starting transcription with blob URL: {blob_url}")
+        transcript_id = start_transcription(blob_url)
         print(f"Transcription started with ID: {transcript_id}")
         
+        # Poll for transcription results
         transcript = poll_transcription(transcript_id)
         print(f"Transcription completed, received {len(transcript)} characters")
         
         # Generate summary
         summary = summarize_text(transcript)
         print(f"Summary generated, received {len(summary)} characters")
-        
-        # Upload audio to Blob Storage
-        blob_name = f"{project_id}/{resource_id}/{filename}"
-        content_type = get_content_type(file_ext) or 'audio/mpeg'
-        print(f"Uploading audio to Azure Blob Storage: {blob_name}")
-        blob_url = upload_to_blob_storage_from_memory(file_bytes, blob_name, content_type)
-        print(f"Blob URL: {blob_url[:50]}...")
         
         # Create resource data
         resource_data = {
@@ -544,13 +520,6 @@ def transcribe_audio_route():
         print(f"Saving audio resource to Cosmos DB with ID: {resource_id}")
         resources_container.create_item(resource_data)
         print("Audio resource saved successfully to Cosmos DB")
-        
-        # Remove temporary file
-        try:
-            os.remove(temp_path)
-            print(f"Temporary audio file removed: {temp_path}")
-        except Exception as e:
-            print(f"Warning: Could not remove temporary file {temp_path}: {str(e)}")
         
         return jsonify({
             'success': True,

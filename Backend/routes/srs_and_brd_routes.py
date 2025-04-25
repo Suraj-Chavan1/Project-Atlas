@@ -574,6 +574,8 @@ def ai_assisted_edit(processor: MultiMediaProcessor, document_content: str, addi
         "Please refine the document with the new context in mind. "
         "Provide an updated version that improves clarity and incorporates the additional details."
     )
+    
+    print(document_content)
     try:
         response = processor.client.chat.completions.create(
             model=DEPLOYMENT_NAME,
@@ -1876,7 +1878,8 @@ def edit_document():
         document_id = data.get('document_id')
         content = data.get('content')
         additional_context = data.get('additional_context', '')
-        author = data.get('author')  # Get author name from request
+        author = data.get('author', 'System User')  # Get author name from request
+        change_summary = data.get('change_summary', 'Document updated')  # Get change summary
 
         if not document_id or not content:
             logger.error("Missing required parameters")
@@ -1909,19 +1912,33 @@ def edit_document():
             new_version = current_version + 1
             logger.info(f"Current version: {current_version}, New version: {new_version}")
 
+            # Create a unique ID for the new document version
+            new_document_id = str(uuid.uuid4())
+            
+            # Check if there are any differences between old and new content
+            if document['context'] == content and not additional_context and not change_summary:
+                logger.info("No changes detected in document content")
+                return jsonify({
+                    'success': False,
+                    'error': 'No changes detected in document content'
+                }), 400
+
             # Create a new document entry with updated content and version
             new_document = {
-                'id': str(uuid.uuid4()),
+                'id': new_document_id,
                 'project_id': document['project_id'],
                 'template_type': document['template_type'],
                 'context': content,
                 'version': new_version,
-                'timestamp': datetime.now().isoformat(),
+                'timestamp': document.get('timestamp'),  # Keep original creation timestamp
                 'last_modified': datetime.now().isoformat(),
                 'additional_context': additional_context,
                 'parent_document_id': document_id,
                 'author': author,  # Add author name
-                'is_final': False  # New versions are not final by default
+                'modified_by': author,  # Add who modified it
+                'change_summary': change_summary,  # Add change summary
+                'is_final': False,  # New versions are not final by default
+                'is_latest_version': True  # Mark as the latest version
             }
             logger.info(f"New document data: {new_document}")
 
@@ -1967,6 +1984,18 @@ def edit_document():
                 story = []
                 lines = content.split('\n')
                 
+                # Add a version information header at the top of the document
+                version_info = [
+                    Paragraph(f"Document Version: {new_version}", styles['CustomHeading']),
+                    Paragraph(f"Modified By: {author}", styles['CustomBody']),
+                    Paragraph(f"Last Modified: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", styles['CustomBody']),
+                ]
+                if change_summary:
+                    version_info.append(Paragraph(f"Change Summary: {change_summary}", styles['CustomBody']))
+                
+                story.extend(version_info)
+                story.append(Spacer(1, 20))  # Add space after the version info
+                
                 for line in lines:
                     if not line.strip():
                         story.append(Spacer(1, 12))
@@ -2000,8 +2029,12 @@ def edit_document():
                 pdf_content = pdf_buffer.getvalue()
                 logger.info(f"PDF content size: {len(pdf_content)} bytes")
                 
-                # Upload to blob storage
-                blob_url = upload_to_blob_storage_from_memory(pdf_content, 'srs', new_document['id'])
+                # Upload to blob storage with version number in the filename
+                blob_url = upload_to_blob_storage_from_memory(
+                    pdf_content, 
+                    f"{document['template_type']}_v{new_version}", 
+                    new_document_id
+                )
                 if not blob_url:
                     raise Exception("Failed to upload PDF to blob storage")
                 
@@ -2048,7 +2081,9 @@ def edit_document():
                     'version': new_version,
                     'blob_url': blob_url,
                     'timestamp': new_document['timestamp'],
-                    'last_modified': new_document['last_modified']
+                    'last_modified': new_document['last_modified'],
+                    'modified_by': author,
+                    'change_summary': change_summary
                 }
             })
 
@@ -2073,12 +2108,17 @@ def edit_document():
 @srs_brd_bp.route('/ai-assist', methods=['POST'])
 def ai_assist():
     try:
+        print("=== AI Assist Request Started ===")
         data = request.get_json()
         document_id = data.get('document_id')
         content = data.get('content')
         additional_context = data.get('additional_context', '')
         
+        print(f"Document ID: {document_id}")
+        print(f"Additional Context Length: {len(additional_context)}")
+        
         if not document_id or not content:
+            print("Error: Missing required parameters")
             return jsonify({
                 'success': False,
                 'message': 'Missing required parameters: document_id and content'
@@ -2137,23 +2177,52 @@ def ai_assist():
                     'message': 'No requirement documents found for this project'
                 }), 404
 
-            # Combine content from all documents
+            # Combine content from all documents using the combined_text field when available
             content_list = []
             for item in items:
-                req_content = item.get('content', '')
-                if isinstance(req_content, dict):
-                    # If content is a dict, try to get the text content
-                    req_content = req_content.get('text', '') or req_content.get('content', '') or str(req_content)
-                elif not isinstance(req_content, str):
-                    # If content is not a string, convert it to string
-                    req_content = str(req_content)
-                content_list.append(req_content)
+                # Check if combined_text field exists and use it preferentially
+                if 'combined_text' in item and item['combined_text']:
+                    print(f"Using combined_text field for document {item.get('id', 'unknown')}")
+                    content_list.append(item['combined_text'])
+                else:
+                    # Fall back to content field if combined_text is not available
+                    req_content = item.get('content', '')
+                    if isinstance(req_content, dict):
+                        # If content is a dict, extract and join all values
+                        dict_values = []
+                        for key, value in req_content.items():
+                            if isinstance(value, str):
+                                dict_values.append(f"**{key}**: {value}")
+                        if dict_values:
+                            content_list.append("\n\n".join(dict_values))
+                        else:
+                            # Fallback to string representation if needed
+                            content_list.append(str(req_content))
+                    elif not isinstance(req_content, str):
+                        # If content is not a string, convert it to string
+                        content_list.append(str(req_content))
+                    else:
+                        # Content is already a string
+                        content_list.append(req_content)
             
             combined_requirements = "\n\n".join(content_list)
             print(f"Successfully combined content from {len(content_list)} documents")
+            print("=== COMBINED REQUIREMENTS START ===")
+            print(combined_requirements[:1000] + "..." if len(combined_requirements) > 1000 else combined_requirements)
+            print("=== COMBINED REQUIREMENTS END ===")
+
+            print("=== CURRENT DOCUMENT CONTENT START ===")
+            print(content[:1000] + "..." if len(content) > 1000 else content)
+            print("=== CURRENT DOCUMENT CONTENT END ===")
+            
+            print("=== ADDITIONAL CONTEXT START ===")
+            print(additional_context)
+            print("=== ADDITIONAL CONTEXT END ===")
 
         except Exception as e:
             print(f"Error reading document or requirements: {str(e)}")
+            import traceback
+            print(traceback.format_exc())
             return jsonify({
                 'success': False,
                 'message': f'Error reading document or requirements: {str(e)}'
@@ -2161,32 +2230,54 @@ def ai_assist():
 
         # Generate AI-assisted content
         try:
-            # Create a comprehensive prompt that includes:
-            # 1. The current document content
-            # 2. The original requirements
-            # 3. The additional context/instructions
-            prompt = f"""Please improve the following document based on the original requirements and additional instructions.
+            # Create an enhanced, more focused prompt
+            prompt = f"""You are an expert document reviewer tasked with revising a {doc_type} document according to specific instructions.
 
-Original Requirements:
+# TASK
+Revise the provided document by STRICTLY following the additional instructions while ensuring alignment with the original requirements.
+
+# ORIGINAL REQUIREMENTS
+```
 {combined_requirements}
+```
 
-Current Document Content:
+# CURRENT DOCUMENT CONTENT
+```
 {content}
+```
 
-Additional Instructions:
+# ADDITIONAL INSTRUCTIONS - FOLLOW THESE PRECISELY
+```
 {additional_context}
+```
 
-Please maintain the document structure and format while incorporating the requirements and following the additional instructions."""
+# IMPORTANT GUIDELINES:
+1. PRIORITIZE the additional instructions - they are critical client needs
+2. Maintain the document's section structure and document type-specific formatting
+3. Ensure all technical content remains accurate
+4. Do not remove important details from the original document
+5. Make sure each section addresses the corresponding requirements
+6. If you add new content, ensure it logically fits within the document
+7. Keep the same overall document organization and flow
 
-            # Use the processor to generate improved content
-            improved_content = processor._generate_document_in_sections(
-                doc_type,
-                prompt,  # Pass the comprehensive prompt
-                f"{doc_type}_{document_id}",
-                [item.get('name', '') for item in items],  # Pass all requirement document names
-                None  # Additional context is already in the prompt
+Your revised document should result in a complete, well-structured {doc_type} that satisfies both the original requirements and the specific change requests in the additional instructions.
+"""
+
+            print("Sending enhanced prompt to AI model")
+            
+            # Use the client directly to get more control over the response
+            response = processor.client.chat.completions.create(
+                model=DEPLOYMENT_NAME,
+                messages=[
+                    {"role": "system", "content": f"You are an expert {doc_type} document editor with extensive experience in technical documentation."},
+                    {"role": "user", "content": prompt}
+                ],
+                temperature=0.3,  # Lower temperature for more focus on instructions
+                max_tokens=4000
             )
-            print("Successfully generated AI-assisted content")
+            
+            improved_content = response.choices[0].message.content
+            print(f"Successfully generated AI-assisted content ({len(improved_content)} characters)")
             
             return jsonify({
                 'success': True,
@@ -2335,3 +2426,60 @@ def set_document_final():
     except Exception as e:
         logger.error(f"Error setting document final status: {str(e)}")
         return jsonify({'success': False, 'error': str(e)}), 500
+
+@srs_brd_bp.route('/document-versions/<project_id>/<template_type>', methods=['GET'])
+def get_document_versions(project_id, template_type):
+    """
+    Retrieve all versions of a specific document type for a project
+    """
+    try:
+        logger.info(f"Fetching versions for {template_type} documents in project {project_id}")
+        
+        # Query for all documents of the specified template type in this project
+        query = f"SELECT * FROM c WHERE c.project_id = '{project_id}' AND c.template_type = '{template_type}'"
+        items = list(cosmos_db.query_items(
+            query=query,
+            enable_cross_partition_query=True
+        ))
+        
+        if not items:
+            logger.info(f"No {template_type} documents found for project {project_id}")
+            return jsonify({
+                'success': False,
+                'error': f'No {template_type} documents found'
+            }), 404
+        
+        # Sort documents by version
+        items.sort(key=lambda x: x.get('version', 1), reverse=True)
+        
+        # Format the response
+        versions = []
+        for item in items:
+            version_data = {
+                'id': item['id'],
+                'version': item.get('version', 1),
+                'timestamp': item.get('timestamp'),
+                'last_modified': item.get('last_modified', item.get('timestamp')),
+                'modified_by': item.get('modified_by'),
+                'is_final': item.get('is_final', False),
+                'finalized_by': item.get('finalized_by'),
+                'finalized_at': item.get('finalized_at'),
+                'blob_url': item.get('blob_url'),
+                'change_summary': item.get('change_summary'),
+                'is_latest_version': item.get('is_latest_version', False)
+            }
+            versions.append(version_data)
+        
+        logger.info(f"Found {len(versions)} versions of {template_type} documents")
+        return jsonify({
+            'success': True,
+            'versions': versions
+        })
+        
+    except Exception as e:
+        logger.error(f"Error retrieving document versions: {str(e)}")
+        logger.error(traceback.format_exc())
+        return jsonify({
+            'success': False,
+            'error': f'Failed to retrieve document versions: {str(e)}'
+        }), 500

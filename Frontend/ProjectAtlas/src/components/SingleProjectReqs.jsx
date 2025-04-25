@@ -70,6 +70,21 @@ const SingleProjectReqs = ({ projectId }) => {
   const [additionalContext, setAdditionalContext] = useState('');
   const [blobUrl, setBlobUrl] = useState('');
   const [success, setSuccess] = useState('');
+  const [currentDocType, setCurrentDocType] = useState(null); // 'sde', 'ba', 'client', or 'devops'
+  
+  // Website scraping states
+  const [showWebScrapeModal, setShowWebScrapeModal] = useState(false);
+  const [websiteUrl, setWebsiteUrl] = useState('');
+  const [scrapedContent, setScrapedContent] = useState(null);
+  const [websiteSummary, setWebsiteSummary] = useState(null);
+  const [scrapingStatus, setScrapingStatus] = useState('idle'); // idle, loading, success, error
+  
+  // Audio transcription states
+  const [showAudioModal, setShowAudioModal] = useState(false);
+  const [audioFile, setAudioFile] = useState(null);
+  const [transcript, setTranscript] = useState(null);
+  const [audioSummary, setAudioSummary] = useState(null);
+  const [transcriptionStatus, setTranscriptionStatus] = useState('idle'); // idle, loading, success, error
 
   useEffect(() => {
     if (projectId) {
@@ -263,10 +278,18 @@ const SingleProjectReqs = ({ projectId }) => {
   const handleViewDocument = (doc, type) => {
     console.log('Attempting to view document:', { type, doc });
     if (doc) {
-      // Use combined_text directly
+      // Always update the textContent when switching documents
+      // This ensures content is updated whether in viewing or editing mode
       console.log('Setting document content for viewing:', doc.combined_text);
       setTextContent(doc.combined_text);
       setShowTemplate(true);
+      // Set the current document type for tracking which document is being edited
+      setCurrentDocType(type.toLowerCase());
+      console.log('Current document type set to:', type.toLowerCase());
+      
+      // If already in editing mode, make sure we keep that state
+      // This ensures we don't exit edit mode when switching documents
+      console.log('Current editing state is:', isEditing ? 'editing' : 'viewing');
     } else {
       console.log('No document available for type:', type);
     }
@@ -277,6 +300,13 @@ const SingleProjectReqs = ({ projectId }) => {
     if (file) {
       setSelectedFile(file);
       setTextContent(''); // Clear text content when file is selected
+    }
+  };
+
+  const handleAudioFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      setAudioFile(file);
     }
   };
 
@@ -293,6 +323,40 @@ const SingleProjectReqs = ({ projectId }) => {
       setLoading(true);
       setError(null);
 
+      // Handle website scraping if in website input mode
+      if (inputType === 'website' && websiteUrl) {
+        const response = await axios.post('http://localhost:5000/resources/scrape-website', {
+          projectId: projectId,
+          resourceName: resourceName,
+          url: websiteUrl,
+          taggedUsers: taggedUsers
+        }, {
+          headers: {
+            'Content-Type': 'application/json',
+            'X-User-ID': user?.id || localStorage.getItem('userId')
+          }
+        });
+
+        if (response.data.success) {
+          // Store the summary for display
+          if (response.data.resource && response.data.resource.summary) {
+            setWebsiteSummary(response.data.resource.summary);
+          }
+          
+          setShowModal(false);
+          fetchResources(); // Refresh resources list
+          // Reset form
+          setResourceName('');
+          setWebsiteUrl('');
+          setTaggedUsers([]);
+          return;
+        } else {
+          setError(response.data.message || 'Failed to scrape website');
+          return;
+        }
+      }
+
+      // Handle regular file/text resource
       const formData = new FormData();
       formData.append('projectId', projectId);
       formData.append('resourceName', resourceName);
@@ -329,6 +393,124 @@ const SingleProjectReqs = ({ projectId }) => {
       }
     } catch (err) {
       setError(err.response?.data?.message || 'Error adding resource');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleScrapeWebsite = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      setScrapingStatus('loading');
+
+      const response = await axios.post('http://localhost:5000/resources/scrape-website', {
+        projectId: projectId,
+        resourceName: resourceName,
+        url: websiteUrl,
+        taggedUsers: taggedUsers
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+          'X-User-ID': user?.id || localStorage.getItem('userId')
+        }
+      });
+
+      if (response.data.success) {
+        setScrapingStatus('success');
+        fetchResources(); // Refresh resources list
+        
+        // Store the summary for display
+        if (response.data.resource && response.data.resource.summary) {
+          setWebsiteSummary(response.data.resource.summary);
+        }
+        
+        // Close the scraping modal after short delay to show success message
+        setTimeout(() => {
+          setShowWebScrapeModal(false);
+          setResourceName('');
+          setWebsiteUrl('');
+          setTaggedUsers([]);
+        }, 1500);
+      } else {
+        setError(response.data.message || 'Failed to scrape website');
+        setScrapingStatus('error');
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || 'Error scraping website');
+      setScrapingStatus('error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleTranscribeAudio = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      setTranscriptionStatus('loading');
+
+      // Log audio file details to help with debugging
+      console.log('Audio file being uploaded:', {
+        name: audioFile?.name,
+        type: audioFile?.type,
+        size: audioFile?.size,
+        lastModified: new Date(audioFile?.lastModified).toISOString()
+      });
+
+      const formData = new FormData();
+      formData.append('file', audioFile);
+      formData.append('projectId', projectId);
+      formData.append('resourceName', resourceName);
+      taggedUsers.forEach(userId => {
+        formData.append('taggedUsers[]', userId);
+      });
+
+      console.log('Sending audio transcription request to server...');
+      const response = await axios.post('http://localhost:5000/resources/transcribe-audio', 
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            'X-User-ID': user?.id || localStorage.getItem('userId')
+          }
+        }
+      );
+
+      console.log('Transcription response received:', response.data);
+
+      if (response.data.success) {
+        setTranscriptionStatus('success');
+        fetchResources(); // Refresh resources list
+        
+        // Store the transcript and summary for display
+        if (response.data.resource) {
+          setTranscript(response.data.resource.transcript);
+          setAudioSummary(response.data.resource.summary);
+          console.log('Transcript and summary received successfully');
+        }
+        
+        // Close the modal after short delay to show success message
+        setTimeout(() => {
+          setShowModal(false);
+          setResourceName('');
+          setAudioFile(null);
+          setTaggedUsers([]);
+        }, 1500);
+      } else {
+        console.error('Audio transcription failed:', response.data.message);
+        setError(response.data.message || 'Failed to transcribe audio');
+        setTranscriptionStatus('error');
+      }
+    } catch (err) {
+      console.error('Error during audio transcription:', err);
+      console.error('Error details:', {
+        message: err.message,
+        response: err.response?.data,
+        status: err.response?.status,
+      });
+      setError(err.response?.data?.message || `Error transcribing audio: ${err.message}`);
+      setTranscriptionStatus('error');
     } finally {
       setLoading(false);
     }
@@ -501,13 +683,31 @@ const SingleProjectReqs = ({ projectId }) => {
     e.preventDefault();
     e.stopPropagation();
     
+    console.log('Saving template for document type:', currentDocType);
+    
     try {
         setLoading(true);
         setError(null);
         setSuccess(null);
 
+        // Choose the correct endpoint based on currentDocType
+        let endpoint = '';
+        if (currentDocType === 'sde') {
+            endpoint = `http://localhost:5000/sde/update-document/${projectId}`;
+        } else if (currentDocType === 'ba') {
+            endpoint = `http://localhost:5000/ba/update-document/${projectId}`;
+        } else if (currentDocType === 'client') {
+            endpoint = `http://localhost:5000/client/update-document/${projectId}`;
+        } else if (currentDocType === 'devops') {
+            endpoint = `http://localhost:5000/devops/update-document/${projectId}`;
+        } else {
+            throw new Error('Invalid document type selected for saving');
+        }
+
+        console.log('Using endpoint:', endpoint);
+
         const response = await axios.put(
-            `http://localhost:5000/sde/update-document/${projectId}`,
+            endpoint,
             {
                 combined_text: textContent
             },
@@ -520,19 +720,20 @@ const SingleProjectReqs = ({ projectId }) => {
         );
 
         if (response.data.success) {
+            console.log('Document updated successfully:', response.data);
             setSuccess('Document updated successfully');
             setTextContent(response.data.document.combined_text);
             setBlobUrl(response.data.blob_url);
             setIsEditing(false);
             
-            // Update the document state based on user role
-            if (user?.roles[0] === 'SDE') {
+            // Update the corresponding document state based on currentDocType
+            if (currentDocType === 'sde') {
                 setSdeDoc(response.data.document);
-            } else if (user?.roles[0] === 'BA') {
+            } else if (currentDocType === 'ba') {
                 setBaDoc(response.data.document);
-            } else if (user?.roles[0] === 'Client') {
+            } else if (currentDocType === 'client') {
                 setClientDoc(response.data.document);
-            } else if (user?.roles[0] === 'DevOps') {
+            } else if (currentDocType === 'devops') {
                 setDevopsDoc(response.data.document);
             }
         } else {
@@ -595,13 +796,14 @@ const SingleProjectReqs = ({ projectId }) => {
 
         <div className='col-span-1 row-span-1 border-gray-400 bg-white flex flex-col rounded-md'>
           <button
-            className='flex flex-col justify-center items-center h-full bg-blue-600 text-white'
+            className='flex flex-col justify-center items-center h-1/2 bg-blue-600 text-white'
             onClick={() => setShowModal(true)}
           >
             + Add a Resource/Requirement
           </button>
+      
           <button 
-            className='flex flex-col justify-center items-center h-full bg from-blue-300 to-blue-600 mt-1 bg-[#00072D] text-white'
+            className='flex flex-col justify-center items-center h-1/2 bg from-blue-300 to-blue-600 mt-1 bg-[#00072D] text-white'
             onClick={handleGenerateTemplate}
             disabled={isGeneratingTemplate}
           >
@@ -664,6 +866,54 @@ const SingleProjectReqs = ({ projectId }) => {
                         >
                           View Text
                         </Button>
+                      ) : resource.type === 'audio' ? (
+                        <div className="flex flex-col gap-1">
+                          <Link
+                            href={resource.url}
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="mb-1 flex items-center"
+                            sx={{ display: 'flex', alignItems: 'center' }}
+                          >
+                            <i className="fa fa-headphones mr-1"></i> Listen Audio
+                          </Link>
+                          {resource.context && (
+                            <Button
+                              onClick={() => {
+                                console.log("Audio resource data:", resource);
+                                setTranscript(resource.context || "No transcript available");
+                                setAudioSummary(resource.summary || "No summary available");
+                              }}
+                              color="primary"
+                              size="small"
+                              variant="outlined"
+                              sx={{ mt: 1 }}
+                            >
+                              View Transcript & Summary
+                            </Button>
+                          )}
+                        </div>
+                      ) : resource.type === 'website' ? (
+                        <div className="flex flex-col gap-1">
+                          <Link
+                            href={resource.url || resource.source_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            Visit Website
+                          </Link>
+                          {resource.summary && (
+                            <Button
+                              onClick={() => setWebsiteSummary(resource.summary)}
+                              color="secondary"
+                              size="small"
+                              variant="outlined"
+                              style={{ marginTop: '4px' }}
+                            >
+                              View Summary
+                            </Button>
+                          )}
+                        </div>
                       ) : (
                         resource.url && (
                           <Link
@@ -950,6 +1200,8 @@ const SingleProjectReqs = ({ projectId }) => {
             >
               <Tab icon={<TextFields />} label="Text" value="text" />
               <Tab icon={<AttachFile />} label="File" value="file" />
+              <Tab icon={<i className="fa fa-globe" />} label="Website" value="website" />
+              <Tab icon={<i className="fa fa-microphone" />} label="Audio" value="audio" />
             </Tabs>
 
             {inputType === 'text' ? (
@@ -962,7 +1214,7 @@ const SingleProjectReqs = ({ projectId }) => {
                 onChange={(e) => setTextContent(e.target.value)}
                 className="mb-4"
               />
-            ) : (
+            ) : inputType === 'file' ? (
               <div className="mb-4">
                 <input
                   type="file"
@@ -986,6 +1238,39 @@ const SingleProjectReqs = ({ projectId }) => {
                   </Typography>
                 )}
               </div>
+            ) : inputType === 'audio' ? (
+              <div className="mb-4">
+                <input
+                  type="file"
+                  accept="audio/*"
+                  onChange={handleAudioFileChange}
+                  className="hidden"
+                  id="audio-input"
+                />
+                <label htmlFor="audio-input">
+                  <Button
+                    variant="outlined"
+                    component="span"
+                    startIcon={<i className="fa fa-microphone" />}
+                  >
+                    Choose Audio File
+                  </Button>
+                </label>
+                {audioFile && (
+                  <Typography variant="body2" className="mt-2">
+                    Selected: {audioFile.name}
+                  </Typography>
+                )}
+              </div>
+            ) : (
+              <TextField
+                fullWidth
+                label="Website URL"
+                placeholder="https://example.com"
+                value={websiteUrl}
+                onChange={(e) => setWebsiteUrl(e.target.value)}
+                className="mb-4"
+              />
             )}
 
             <div className="mb-4">
@@ -1028,10 +1313,10 @@ const SingleProjectReqs = ({ projectId }) => {
                 Cancel
               </Button>
               <Button
-                onClick={handleResourceSubmit}
+                onClick={inputType === 'audio' ? handleTranscribeAudio : handleResourceSubmit}
                 variant="contained"
                 color="primary"
-                disabled={loading || (!textContent && !selectedFile) || !resourceName}
+                disabled={loading || (!textContent && !selectedFile && !websiteUrl && !audioFile) || !resourceName}
               >
                 {loading ? <CircularProgress size={24} /> : 'Upload Resource'}
               </Button>
@@ -1161,6 +1446,233 @@ const SingleProjectReqs = ({ projectId }) => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Website Scraping Modal */}
+      {showWebScrapeModal && (
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-lg w-[90%] max-w-lg">
+            <h2 className="text-xl font-semibold mb-4">Scrape Website Content</h2>
+            
+            <TextField
+              fullWidth
+              label="Resource Name"
+              value={resourceName}
+              onChange={(e) => setResourceName(e.target.value)}
+              className="mb-4"
+            />
+
+            <TextField
+              fullWidth
+              label="Website URL"
+              placeholder="https://example.com"
+              value={websiteUrl}
+              onChange={(e) => setWebsiteUrl(e.target.value)}
+              className="mb-4"
+            />
+
+            <div className="mb-4">
+              <Typography variant="subtitle1" className="mb-2">
+                Tag Users
+              </Typography>
+              <div className="max-h-40 overflow-y-auto border rounded p-2">
+                {projectUsers.map(projectUser => (
+                  <FormControlLabel
+                    key={projectUser.id}
+                    control={
+                      <Checkbox
+                        checked={taggedUsers.includes(projectUser.id)}
+                        onChange={() => toggleUserTag(projectUser.id)}
+                      />
+                    }
+                    label={`${projectUser.name} (${projectUser.role})`}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {error && (
+              <Alert severity="error" className="mb-4">
+                {error}
+              </Alert>
+            )}
+
+            {scrapingStatus === 'success' && (
+              <Alert severity="success" className="mb-4">
+                Website scraped successfully! The content has been added to your resources.
+              </Alert>
+            )}
+
+            <div className="flex justify-end gap-3">
+              <Button
+                onClick={() => {
+                  setShowWebScrapeModal(false);
+                  setResourceName('');
+                  setWebsiteUrl('');
+                  setTaggedUsers([]);
+                  setError(null);
+                  setScrapingStatus('idle');
+                }}
+                disabled={loading}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleScrapeWebsite}
+                variant="contained"
+                color="primary"
+                disabled={loading || !websiteUrl || !resourceName}
+              >
+                {loading ? <CircularProgress size={24} /> : 'Scrape Website'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Website Summary Modal */}
+      {websiteSummary && (
+        <Dialog
+          open={!!websiteSummary}
+          onClose={() => setWebsiteSummary(null)}
+          maxWidth="md"
+          fullWidth
+        >
+          <DialogTitle>
+            Website Analysis Summary
+            <IconButton
+              aria-label="close"
+              onClick={() => setWebsiteSummary(null)}
+              sx={{
+                position: 'absolute',
+                right: 8,
+                top: 8,
+              }}
+            >
+              X
+           </IconButton>
+          </DialogTitle>
+          <DialogContent dividers>
+            <Typography
+              component="div"
+              style={{
+                whiteSpace: 'pre-wrap',
+                wordWrap: 'break-word',
+                fontFamily: 'inherit',
+                padding: '16px',
+              }}
+              dangerouslySetInnerHTML={{ __html: websiteSummary.replace(/\*\*/g, '<strong>').replace(/\n/g, '<br/>') }}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setWebsiteSummary(null)}>Close</Button>
+            <Button
+              onClick={() => {
+                navigator.clipboard.writeText(websiteSummary);
+              }}
+              color="primary"
+            >
+              Copy to Clipboard
+            </Button>
+          </DialogActions>
+        </Dialog>
+      )}
+      
+      {/* Audio Transcription Results Modal */}
+      {transcript && (
+        <Dialog
+          open={!!transcript}
+          onClose={() => setTranscript(null)}
+          maxWidth="md"
+          fullWidth
+        >
+          <DialogTitle>
+            Audio Transcription Results
+            <IconButton
+              aria-label="close"
+              onClick={() => {
+                setTranscript(null);
+                setAudioSummary(null);
+              }}
+              sx={{
+                position: 'absolute',
+                right: 8,
+                top: 8,
+              }}
+            >
+              X
+           </IconButton>
+          </DialogTitle>
+          <DialogContent dividers>
+            <Typography variant="h6" gutterBottom>
+              Transcript:
+            </Typography>
+            <Paper 
+              elevation={0} 
+              variant="outlined"
+              style={{ 
+                padding: '16px', 
+                marginBottom: '24px',
+                maxHeight: '200px',
+                overflowY: 'auto'
+              }}
+            >
+              <Typography
+                style={{
+                  whiteSpace: 'pre-wrap',
+                  wordWrap: 'break-word',
+                  fontFamily: 'inherit',
+                }}
+              >
+                {transcript}
+              </Typography>
+            </Paper>
+            
+            {audioSummary && (
+              <>
+                <Typography variant="h6" gutterBottom>
+                  Summary:
+                </Typography>
+                <Paper 
+                  elevation={0} 
+                  variant="outlined"
+                  style={{ 
+                    padding: '16px',
+                    backgroundColor: '#f8f9fa'
+                  }}
+                >
+                  <Typography
+                    style={{
+                      whiteSpace: 'pre-wrap',
+                      wordWrap: 'break-word',
+                      fontFamily: 'inherit',
+                    }}
+                    dangerouslySetInnerHTML={{ __html: audioSummary.replace(/\*\*/g, '<strong>').replace(/\n/g, '<br/>') }}
+                  />
+                </Paper>
+              </>
+            )}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => {
+              setTranscript(null);
+              setAudioSummary(null);
+            }}>
+              Close
+            </Button>
+            <Button
+              onClick={() => {
+                const content = audioSummary ? 
+                  `Transcript:\n${transcript}\n\nSummary:\n${audioSummary}` : 
+                  transcript;
+                navigator.clipboard.writeText(content);
+              }}
+              color="primary"
+            >
+              Copy to Clipboard
+            </Button>
+          </DialogActions>
+        </Dialog>
       )}
     </div>
   );
