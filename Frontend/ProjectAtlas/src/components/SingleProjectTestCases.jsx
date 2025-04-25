@@ -519,13 +519,7 @@ const SingleProjectTestCases = () => {
                                         <div className="flex justify-between items-center mb-2">
                                             <h4 className="font-semibold">Preview Test Files</h4>
                                             <div className="space-x-2">
-                                            <button
-                                            onClick={() => handlePushToGitHub(story.key)}
-                                            disabled={githubPushingMap[story.key]}
-                                            className="px-4 py-1 text-sm bg-green-500 text-white rounded hover:bg-green-600 disabled:opacity-50"
-                                        >
-                                            {githubPushingMap[story.key] ? 'Pushing...' : 'Push to GitHub'}
-                                        </button>
+                                            
                                                 <button
                                                     onClick={() => handleCancelPreview(story.key)}
                                                     className="px-3 py-1 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 text-sm"
@@ -632,12 +626,21 @@ const SingleProjectTestCases = () => {
                                     <div className="mt-4 p-3 bg-gray-50 rounded-lg">
                                         <div className="flex justify-between items-center mb-2">
                                             <h4 className="font-semibold">Generated Test Files</h4>
+                                            <div>
+                                            <button
+                                            onClick={() => handlePushToGitHub(story.key)}
+                                            disabled={githubPushingMap[story.key]}
+                                            className="px-4 py-1 text-sm bg-green-500 text-white rounded hover:bg-green-600 disabled:opacity-50 mx-2"
+                                        >
+                                            {githubPushingMap[story.key] ? 'Pushing...' : 'Push to GitHub'}
+                                        </button>
                                             <button
                                                 onClick={() => handleEditTest(story.key)}
                                                 className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 text-sm"
                                             >
-                                                Edit
+                                                Edits
                                             </button>
+                                            </div>
                                         </div>
                                         <div className="space-y-2">
                                             {/*{testCasesMap[story.key].testFiles.map((file, index) => (
