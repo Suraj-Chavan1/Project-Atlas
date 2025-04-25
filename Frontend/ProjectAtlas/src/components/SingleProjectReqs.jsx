@@ -815,131 +815,124 @@ const SingleProjectReqs = ({ projectId }) => {
           </button>
         </div>
 
-        <div className='col-span-2 border border-gray-400 bg-white p-3 flex flex-col rounded-md'>
-          <div className='flex justify-between'>
-            <div className='text-lg font-bold mb-2'>Requirements/Resources</div>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => setShowModal(true)}
-            >
-              + Add Resource
-            </Button>
-          </div>
+        <div className='col-span-2 border border-gray-400 bg-white p-3 flex flex-col rounded-md overflow-y-auto h-[calc(100vh-200px)]'>
+  <div className='flex justify-between'>
+    <div className='text-lg font-bold mb-2'>Requirements/Resources</div>
+    <Button
+      variant="contained"
+      color="primary"
+      onClick={() => setShowModal(true)}
+    >
+      + Add Resource
+    </Button>
+  </div>
 
-          {tableLoading ? <div className="flex justify-center items-center h-32">
-    <CircularProgress />
-  </div> : <>          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Name</TableCell>
-                  <TableCell>Type</TableCell>
-                  <TableCell>Uploaded By</TableCell>
-                  <TableCell>Role</TableCell>
-                  <TableCell>Tagged Users</TableCell>
-                  <TableCell>Content/URL</TableCell>
-                  <TableCell>Date</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {resources.map((resource) => (
-                  <TableRow key={resource.id}>
-                    <TableCell>{resource.name}</TableCell>
-                    <TableCell>{resource.type}</TableCell>
-                    <TableCell>{getUserName(resource.created_by)}</TableCell>
-                    <TableCell>{getUserRole(resource.created_by)}</TableCell>
-                    <TableCell>
-                      <div className="flex flex-wrap gap-1">
-                        {resource.tagged_users.map(userId => (
-                          <Chip
-                            key={userId}
-                            label={`${getUserName(userId)} (${getUserRole(userId)})`}
-                            size="small"
-                            color="primary"
-                            variant="outlined"
-                          />
-                        ))}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      {resource.type === 'text' ? (
+  {tableLoading ? (
+    <div className="flex justify-center items-center h-32">
+      <CircularProgress />
+    </div>
+  ) : (
+    <>
+      <TableContainer>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Name</TableCell>
+              <TableCell>Type</TableCell>
+              <TableCell>Uploaded By</TableCell>
+              <TableCell>Role</TableCell>
+              <TableCell>Tagged Users</TableCell>
+              <TableCell>Content/URL</TableCell>
+              <TableCell>Date</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {resources.map((resource) => (
+              <TableRow key={resource.id}>
+                <TableCell>{resource.name}</TableCell>
+                <TableCell>{resource.type}</TableCell>
+                <TableCell>{getUserName(resource.created_by)}</TableCell>
+                <TableCell>{getUserRole(resource.created_by)}</TableCell>
+                <TableCell>
+                  <div className="flex flex-wrap gap-1">
+                    {resource.tagged_users.map((userId) => (
+                      <Chip
+                        key={userId}
+                        label={`${getUserName(userId)} (${getUserRole(userId)})`}
+                        size="small"
+                        color="primary"
+                        variant="outlined"
+                      />
+                    ))}
+                  </div>
+                </TableCell>
+                <TableCell>
+                  {resource.type === 'text' ? (
+                    <Button onClick={() => handleTextClick(resource.context)} color="primary">
+                      View Text
+                    </Button>
+                  ) : resource.type === 'audio' ? (
+                    <div className="flex flex-col gap-1">
+                      <Link
+                        href={resource.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mb-1 flex items-center"
+                        sx={{ display: 'flex', alignItems: 'center' }}
+                      >
+                        <i className="fa fa-headphones mr-1"></i> Listen Audio
+                      </Link>
+                      {resource.context && (
                         <Button
-                          onClick={() => handleTextClick(resource.context)}
+                          onClick={() => {
+                            console.log("Audio resource data:", resource);
+                            setTranscript(resource.context || "No transcript available");
+                            setAudioSummary(resource.summary || "No summary available");
+                          }}
                           color="primary"
+                          size="small"
+                          variant="outlined"
+                          sx={{ mt: 1 }}
                         >
-                          View Text
+                          View Transcript & Summary
                         </Button>
-                      ) : resource.type === 'audio' ? (
-                        <div className="flex flex-col gap-1">
-                          <Link
-                            href={resource.url}
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="mb-1 flex items-center"
-                            sx={{ display: 'flex', alignItems: 'center' }}
-                          >
-                            <i className="fa fa-headphones mr-1"></i> Listen Audio
-                          </Link>
-                          {resource.context && (
-                            <Button
-                              onClick={() => {
-                                console.log("Audio resource data:", resource);
-                                setTranscript(resource.context || "No transcript available");
-                                setAudioSummary(resource.summary || "No summary available");
-                              }}
-                              color="primary"
-                              size="small"
-                              variant="outlined"
-                              sx={{ mt: 1 }}
-                            >
-                              View Transcript & Summary
-                            </Button>
-                          )}
-                        </div>
-                      ) : resource.type === 'website' ? (
-                        <div className="flex flex-col gap-1">
-                          <Link
-                            href={resource.url || resource.source_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            Visit Website
-                          </Link>
-                          {resource.summary && (
-                            <Button
-                              onClick={() => setWebsiteSummary(resource.summary)}
-                              color="secondary"
-                              size="small"
-                              variant="outlined"
-                              style={{ marginTop: '4px' }}
-                            >
-                              View Summary
-                            </Button>
-                          )}
-                        </div>
-                      ) : (
-                        resource.url && (
-                          <Link
-                            href={resource.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            View File
-                          </Link>
-                        )
                       )}
-                    </TableCell>
-                    <TableCell>
-                      {new Date(resource.created_at).toLocaleDateString()}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-          </>}
-        </div>
+                    </div>
+                  ) : resource.type === 'website' ? (
+                    <div className="flex flex-col gap-1">
+                      <Link href={resource.url || resource.source_url} target="_blank" rel="noopener noreferrer">
+                        Visit Website
+                      </Link>
+                      {resource.summary && (
+                        <Button
+                          onClick={() => setWebsiteSummary(resource.summary)}
+                          color="secondary"
+                          size="small"
+                          variant="outlined"
+                          style={{ marginTop: '4px' }}
+                        >
+                          View Summary
+                        </Button>
+                      )}
+                    </div>
+                  ) : (
+                    resource.url && (
+                      <Link href={resource.url} target="_blank" rel="noopener noreferrer">
+                        View File
+                      </Link>
+                    )
+                  )}
+                </TableCell>
+                <TableCell>{new Date(resource.created_at).toLocaleDateString()}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </>
+  )}
+</div>
+
 
         <div className='col-span-1 border border-gray-400 bg-white p-3 flex flex-col rounded-md'>
           <div className="text-lg font-bold mb-2">Recent Activity</div>

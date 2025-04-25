@@ -342,11 +342,11 @@ const SingleProjectDocs = () => {
 
           <div className='flex flex-col mt-2 overflow-y-auto'>
             {documents.map((doc) => (
-              <div
+              <button
                 key={doc.id}
-                className={`flex flex-col border-y p-2 
-                  ${selectedDoc?.id === doc.id ? 'bg-blue-100 border-l-4 border-blue-500' : 'hover:bg-gray-50'}
-                `}
+                className={`flex flex-col text-left border-y p-2 
+                  ${selectedDoc?.id === doc.id ? 'bg-blue-100 border-l-4 border-blue-500' : 'hover:bg-gray-50 cursor-pointer'}
+                `} onClick={() => setSelectedDoc(doc)}
               >
                 <div
                   className="flex justify-between items-center cursor-pointer"
@@ -453,7 +453,7 @@ const SingleProjectDocs = () => {
                     </div>
                   </>
                 )}
-              </div>
+              </button>
             ))}
           </div>
         </div>
@@ -498,7 +498,7 @@ const SingleProjectDocs = () => {
 
               <div className="flex flex-1 overflow-hidden">
                 {showVersionHistory && (
-                  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                  <div className="fixed inset-0 bg-opacity-50 flex items-center justify-center z-50 bg-opacity-50 backdrop-blur-sm">
                     <div className="bg-white rounded-lg p-8 max-w-4xl w-full max-h-[80vh] overflow-y-auto">
                       <div className="flex justify-between items-center mb-6">
                         <h2 className="text-xl font-bold">Version History</h2>
@@ -518,6 +518,7 @@ const SingleProjectDocs = () => {
                         </div>
                       ) : (
                         <>
+                        asas
                           <div className="mb-4">
                             <h3 className="font-medium text-gray-700">
                               {selectedDoc.template_type === 'srs' ? 'Software Requirement Specification' : 'Business Requirement Document'} Versions

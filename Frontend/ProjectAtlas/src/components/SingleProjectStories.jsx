@@ -6,6 +6,8 @@ import { SiJira } from "react-icons/si";
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
+import { FaTrashAlt } from "react-icons/fa";
+
 
 const SingleProjectStories = () => {
   const { id: projectId } = useParams();
@@ -349,9 +351,9 @@ const SingleProjectStories = () => {
 
   return (
     <div className="flex flex-col mx-3 my-0 h-screen">
-      <div className='grid grid-cols-3 gap-4 mt-2 h-full'>
+      <div className='grid grid-cols-5 gap-4 mt-2 h-full'>
         {/* Left Panel */}
-        <div className='col-span-1 row-span-1 border border-gray-400 p-3 flex flex-col rounded-md bg-white h-full h-[150px] overflow-auto'>
+        <div className='col-span-2 row-span-1 border border-gray-400 p-3 flex flex-col rounded-md bg-white h-full h-[150px] overflow-auto'>
           <div className='flex justify-between items-center mb-4'>
             <div className='text-lg font-semibold'>All Stories</div>
             <div className='flex gap-2'>
@@ -395,12 +397,13 @@ const SingleProjectStories = () => {
                 )}
               </button>
               <button
-                className='text-xs bg-red-500 px-2 rounded-md text-white flex justify-center items-center gap-2'
+                className='text-xs bg-red-500 px-2 rounded-md text-white flex justify-center items-center gap-2 py-2'
                 onClick={handleBulkDelete}
                 disabled={loading}
               >
                 {loading ? 'Deleting...' : (
                   <>
+                    <FaTrashAlt />
                     Delete {selectedStories.size}
                   </>
                 )}
@@ -429,8 +432,8 @@ const SingleProjectStories = () => {
                       className={`flex justify-between items-center mt-2 p-1 rounded-md border bg-${
                         selectedStory?.id == story.id ? 
                         (story.priority === 'Must Have' ? 'red-200' :
-                        story.priority === 'Should Have' ? 'yellow-300' : 'green-200') :
-                        'bg-yellow-300'
+                        story.priority === 'Should Have' ? 'yellow-100' : 'green-200') :
+                        'bg-white'
                       } ${
                         story.priority === 'Must Have' ? 'border-red-40' :
                         story.priority === 'Should Have' ? 'border-yellow-400' :
@@ -479,66 +482,71 @@ const SingleProjectStories = () => {
 
                 {/* Pushed Stories Section */}
                 {pushedStories.length > 0 && (
-                  <div>
-                    <div className="text-sm font-semibold text-gray-600 mb-2">Pushed to Jira</div>
-                    {pushedStories.map((story) => (
-                      <div
-                        key={story.id}
-                        className={`flex justify-between items-center mt-2 p-1 rounded-md border ${
-                          story.priority === 'Must Have' ? 'border-red-40' :
-                          story.priority === 'Should Have' ? 'border-yellow-400' :
-                          'border-green-400'
-                        } bg-${
-                          selectedStory?.id == story.id ? 
-                          (story.priority === 'Must Have' ? 'red-200' :
-                          story.priority === 'Should Have' ? 'yellow-200' : 'green-200') :
-                          'bg-yellow-300'
-                        }  cursor-pointer`}
-                        onClick={() => {
-                          console.log('Story selected:', story);
-                          setSelectedStory(story);
-                        }}
-                      >
-                        <input
-                          type="checkbox"
-                          checked={selectedStories.has(story.id)}
-                          onChange={(e) => {
-                            e.stopPropagation();
-                            handleStorySelect(story.id);
-                          }}
-                          className='mr-2 h-4 w-4'
-                        />
-                        <div className='h-10 w-10 rounded-md border border-gray-400 flex flex-col justify-center items-center text-green-700 bg-white'>
-                          <CiBookmark />
-                        </div>
-                        <div className='w-60 flex flex-col ml-2'>
-                          <div className='flex justify-between items-center'>
-                            <div className='text-xs text-gray-500'>{story.source_doc_type.toUpperCase()}</div>
-                            <div className={`text-xs font-bold ${
-                              story.priority === 'Must Have' ? 'text-red-600' :
-                              story.priority === 'Should Have' ? 'text-yellow-600' :
-                              'text-green-600'
-                            }`}>
-                              {story.priority}
-                            </div>
-                          </div>
-                          <div className='font-semibold text-sm'>{story.title.length > 50 ? story.title.slice(0, 50) + "..." : story.title}</div>
-                          <div className='text-xs text-blue-600'>Jira: {story.jira_issue_id}</div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
+  <div>
+    <div className="text-sm font-semibold text-gray-600 mb-2">Pushed to Jira</div>
+    {pushedStories.map((story) => (
+      <div
+        key={story.id}
+        className={`flex justify-between items-center mt-2 p-1 rounded-md border ${
+          story.priority === 'Must Have' ? 'border-red-600' :
+          story.priority === 'Should Have' ? 'border-yellow-400' :
+          'border-green-400'
+        } ${
+          selectedStory?.id === story.id ?
+            (story.priority === 'Must Have' ? 'bg-red-200' :
+            story.priority === 'Should Have' ? 'bg-yellow-100' : 'bg-green-200') :
+            ('bg-white')
+        } cursor-pointer`}
+        onClick={() => {
+          console.log('Story selected:', story);
+          setSelectedStory(story);
+        }}
+      >
+        <input
+          type="checkbox"
+          checked={selectedStories.has(story.id)}
+          onChange={(e) => {
+            e.stopPropagation();
+            handleStorySelect(story.id);
+          }}
+          className="mr-2 h-4 w-4"
+        />
+        <div className="h-10 w-10 rounded-md border border-gray-400 flex flex-col justify-center items-center text-green-700 bg-white">
+          <CiBookmark />
+        </div>
+        <div className="w-60 flex flex-col ml-2">
+          <div className="flex justify-between items-center">
+            <div className="text-xs text-gray-500">{story.source_doc_type.toUpperCase()}</div>
+            <div
+              className={`text-xs font-bold ${
+                story.priority === 'Must Have' ? 'text-red-600' :
+                story.priority === 'Should Have' ? 'text-yellow-600' :
+                'text-green-600'
+              }`}
+            >
+              {story.priority}
+            </div>
+          </div>
+          <div className="font-semibold text-sm">
+            {story.title.length > 50 ? story.title.slice(0, 50) + "..." : story.title}
+          </div>
+          <div className="text-xs text-blue-600">Jira: {story.jira_issue_id}</div>
+        </div>
+      </div>
+    ))}
+  </div>
+)}
+
               </>
             )}
           </div>
         </div>
 
         {/* Right Panel */}
-        <div className='col-span-2 row-span-1 border border-gray-400 bg-white p-3 flex flex-col rounded-md h-full'>
+        <div className='col-span-3 row-span-1 border border-gray-400 bg-white p-3 flex flex-col rounded-md h-full'>
           {selectedStory ? (
             <>
-              <div className='flex justify-between items-center'>
+              <div className='flex w-full justify-between items-center '>
                 {isEditing ? (
                   <input
                     type="text"
@@ -549,13 +557,13 @@ const SingleProjectStories = () => {
                 ) : (
                   <div className='text-xl font-bold'>{selectedStory.title}</div>
                 )}
-                <div className='flex justify-center items-center gap-2'>
+                <div className='w-full flex justify-end items-center gap-2'>
                   <button 
                     className={`border ${
                       selectedStory.jira_issue_id 
                         ? 'border-green-500 text-green-500' 
                         : 'border-blue-500 text-blue-500'
-                    } text-sm p-1 mx-1 rounded-md flex justify-center gap-1 items-center`}
+                    } text-sm p-1 ml-1 rounded-md flex justify-center gap-1 items-center w-1/2`}
                     onClick={() => handleSinglePushToJira(selectedStory.id)}
                     disabled={loading || !!selectedStory.jira_issue_id}
                   >
@@ -563,7 +571,7 @@ const SingleProjectStories = () => {
                     {selectedStory.jira_issue_id ? 'Pushed to Jira' : 'Push to Jira'}
                   </button>
                   <button 
-                    className='w-10 h-10 rounded-full bg-blue-500 mx-1 items-center text-white p-3'
+                    className='w-10 h-10 rounded-full bg-blue-500 items-center text-white p-3'
                     onClick={handleEditClick}
                   >
                     <MdModeEdit />
