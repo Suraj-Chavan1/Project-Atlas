@@ -28,6 +28,10 @@ import {
   IconButton, 
   Backdrop
 } from '@mui/material';
+import ReactMarkdown from "react-markdown";
+import { RiPencilFill } from "react-icons/ri";
+
+
 
 import { AttachFile, TextFields } from '@mui/icons-material';
 
@@ -965,37 +969,10 @@ const SingleProjectReqs = ({ projectId }) => {
           )}
 
           {/* Current Role Template Button */}
-          {user?.roles[0] && (
-            <div className="mb-4">
-              <div className="text-sm font-semibold mb-2">Your Template ({user.roles[0].toUpperCase()})</div>
-              <div className="flex flex-col gap-2">
-                <button 
-                  className='p-2 bg-[#f3dfbf] rounded-md text-sm' 
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    handleViewDocument(
-                      user.roles[0] === 'SDE' ? sdeDoc : 
-                      user.roles[0] === 'BA' ? baDoc : 
-                      user.roles[0] === 'Client' ? clientDoc : 
-                      devopsDoc, 
-                      user.roles[0]
-                    );
-                  }}
-                  disabled={docLoading[user.roles[0]]}
-                >
-                  {docLoading[user.roles[0]] ? 'Loading...' : 
-                   (user.roles[0] === 'SDE' ? sdeDoc : 
-                    user.roles[0] === 'BA' ? baDoc : 
-                    user.roles[0] === 'Client' ? clientDoc : 
-                    devopsDoc) ? `View ${user.roles[0].toUpperCase()} Template` : `Generate ${user.roles[0].toUpperCase()} Template`}
-                </button>
-              </div>
-            </div>
-          )}
+          
 
           {/* Generated Templates List */}
-          <div className="mt-4">
+          <div className="mt-1">
             <div className="text-sm font-semibold mb-2">Generated Templates</div>
             <div className="space-y-2">
               {sdeDoc?.blob_url && (
@@ -1326,9 +1303,9 @@ const SingleProjectReqs = ({ projectId }) => {
       )}
 
       {showTemplate && (
-        <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
+        <div className="fixed inset-0 z-50  backdrop-blur-sm flex items-center justify-center">
           <div className="bg-white p-6 rounded-lg w-[95%] max-w-4xl h-[90vh] overflow-y-auto">
-            <h2 className="text-2xl font-semibold mb-4">Generated Document</h2>
+            <h2 className="text-2xl font-semibold mb-4">Generated Documents</h2>
 
             {/* ACTION BUTTONS */}
             <div className="flex justify-end gap-3 mb-4">
@@ -1338,19 +1315,12 @@ const SingleProjectReqs = ({ projectId }) => {
                   e.stopPropagation();
                   setIsEditing(true);
                 }}>
-                  Edit
+                  <RiPencilFill /> Edit
+
                 </Button>
               ) : (
                 <>
-                  <Button 
-                    variant="contained" 
-                    color="primary" 
-                    onClick={handleSaveTemplate}
-                    disabled={loading}
-                    type="button"
-                  >
-                    {loading ? <CircularProgress size={24} /> : 'Save'}
-                  </Button>
+                  
                   <Button 
                     variant="outlined" 
                     onClick={(e) => {
@@ -1419,10 +1389,9 @@ const SingleProjectReqs = ({ projectId }) => {
                       variant="contained"
                       color="primary"
                       onClick={handleSaveTemplate}
-                      disabled={loading}
                       type="button"
                     >
-                      {loading ? <CircularProgress size={24} /> : 'Save'}
+                      Save
                     </Button>
                     <Button
                       variant="outlined"
@@ -1439,8 +1408,10 @@ const SingleProjectReqs = ({ projectId }) => {
                   </div>
                 </>
               ) : (
-                <div className="p-4 bg-gray-50 rounded-md whitespace-pre-wrap">
+                <div className='px-4 border border-gray-300 rounded-md bg-gray-100'>
+                <ReactMarkdown >
                   {textContent}
+                </ReactMarkdown>
                 </div>
               )}
             </div>
