@@ -1,11 +1,14 @@
 import React from 'react';
 import HomeBG from '../assets/HomeBG1.png'; 
-import AtomicStructure from '../assets/AtomicStructure.png'; 
-import Logo from '../assets/logo.png'; 
+import AtomicStructure from '../assets/AtomicStructure.png';  // This is for the rotating outer rings
+import Logo from '../assets/logo.png';  // This is for the center logo
+import Rings from '../assets/Rings2.png';  // This is for the center logo
+import Barclays from '../assets/Barclays.png';  // This is for the center logo
+
 import { useNavigate } from 'react-router-dom';
 
 const HomePage2 = () => {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
   return (
     <div
       className="min-h-screen bg-cover bg-center text-white relative"
@@ -36,14 +39,33 @@ const HomePage2 = () => {
           <div className=" mb-4">Team Cyber Wardens, VIT Pune</div>
           <h1 className="text-5xl md:text-5xl mb-4">Bridge the Gap Between Ideas and Execution</h1>
           <p className="text-sm md:text-xl text-gray-200 max-w-xl">
-          Project Atlas allows you to move from ideation to requirement gathering, while maintaining document versioning and scaffolding test cases for you!
+            Project Atlas allows you to move from ideation to requirement gathering, while maintaining document versioning and scaffolding test cases for you!
           </p>
         </div>
 
         {/* Image Section */}
-        <div className="w-full md:w-1/2 flex justify-center">
-          <img src={AtomicStructure} alt="Atomic Structure" className="w-full max-w-md object-contain" />
-        </div>
+        {/* Image Section */}
+<div className="w-full md:w-1/2 flex justify-center items-center relative">
+  {/* Container for both rotating and fixed images */}
+  <div className="relative w-[550px] h-[550px] flex justify-center items-center">
+
+    
+    {/* Rotating Outer Rings */}
+    <img 
+      src={Rings} 
+      alt="Rotating Rings" 
+      className="absolute top-0 left-0 w-full h-full object-contain animate-spin-slow"
+    />
+
+    {/* Fixed Center Logo */}
+    <img 
+      src={Barclays} 
+      alt="Center Logo" 
+      className="w-16 h-16 object-contain z-10"
+    />
+  </div>
+</div>
+
       </section>
     </div>
   );

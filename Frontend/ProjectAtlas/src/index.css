@@ -18,4 +18,20 @@
   .react-calendar-heatmap .react-calendar-heatmap-4 {
     fill: #1d4ed8; /* Tailwind's blue-700 */
   }
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  @keyframes spin-slow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  
+  .animate-spin-slow {
+    animation: spin-slow 10s linear infinite;
+  }
   
