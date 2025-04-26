@@ -222,10 +222,11 @@ const SingleProjectStories = () => {
         toast.error('Please select at least one story');
         return;
       }
-
+  
       setLoading(true);
       const results = [];
-      
+  
+      // Iterate through the selected stories and push them individually to Jira
       for (const storyId of selectedStories) {
         try {
           const response = await axios.post(
@@ -233,38 +234,54 @@ const SingleProjectStories = () => {
           );
           if (response.data.success) {
             results.push({ storyId, success: true, jiraId: response.data.jira_issue_id });
+            toast.success(`Story ID ${storyId} pushed to Jira successfully`);
           } else {
             results.push({ storyId, success: false, error: response.data.error });
+            toast.error(`Failed to push Story ID ${storyId}: ${response.data.error}`);
           }
         } catch (error) {
-          results.push({ storyId, success: false, error: error.response?.data?.error || 'Failed to push to Jira' });
+          results.push({
+            storyId,
+            success: false,
+            error: error.response?.data?.error || 'Failed to push to Jira',
+          });
+          toast.error(`Error pushing Story ID ${storyId} to Jira`);
         }
       }
-
-      // Show summary of results
-      const successCount = results.filter(r => r.success).length;
-      const failCount = results.filter(r => !r.success).length;
+  
+      // Update stories with Jira IDs in the state without needing to reload
+      const updatedStories = stories.map((story) => {
+        const result = results.find((r) => r.storyId === story.id);
+        if (result?.success) {
+          return { ...story, jira_issue_id: result.jiraId }; // Update the Jira issue ID for successful pushes
+        }
+        return story;
+      });
+  
+      // Update the state with the newly updated stories
+      setStories(updatedStories);
       
+      // IMPORTANT: Also update the pushedStories and notPushedStories arrays
+      const pushed = updatedStories.filter(story => story.jira_issue_id);
+      const notPushed = updatedStories.filter(story => !story.jira_issue_id);
+      
+      setPushedStories(pushed);
+      setNotPushedStories(notPushed);
+  
+      // Clear the selection after push
+      setSelectedStories(new Set());
+  
+      // Show a summary toast
+      const successCount = results.filter((r) => r.success).length;
+      const failCount = results.filter((r) => !r.success).length;
+  
       if (successCount > 0) {
         toast.success(`Successfully pushed ${successCount} stories to Jira`);
       }
       if (failCount > 0) {
         toast.error(`Failed to push ${failCount} stories to Jira`);
       }
-
-      // Update stories with Jira IDs
-      const updatedStories = stories.map(story => {
-        const result = results.find(r => r.storyId === story.id);
-        if (result?.success) {
-          return { ...story, jira_issue_id: result.jiraId };
-        }
-        return story;
-      });
-      setStories(updatedStories);
-
-      // Clear selection
-      setSelectedStories(new Set());
-      
+  
     } catch (error) {
       console.error('Error in bulk push to Jira:', error);
       toast.error('Error during bulk push to Jira');
@@ -272,6 +289,8 @@ const SingleProjectStories = () => {
       setLoading(false);
     }
   };
+  
+  
 
   const handleBulkDelete = async () => {
     try {
@@ -279,7 +298,7 @@ const SingleProjectStories = () => {
         toast.error('Please select at least one story');
         return;
       }
-
+  
       setLoading(true);
       const results = [];
       
@@ -297,7 +316,7 @@ const SingleProjectStories = () => {
           results.push({ storyId, success: false, error: error.response?.data?.error || 'Failed to delete' });
         }
       }
-
+  
       // Show summary of results
       const successCount = results.filter(r => r.success).length;
       const failCount = results.filter(r => !r.success).length;
@@ -308,9 +327,26 @@ const SingleProjectStories = () => {
       if (failCount > 0) {
         toast.error(`Failed to delete ${failCount} stories`);
       }
-
-      // Update stories list
-      setStories(stories.filter(story => !selectedStories.has(story.id)));
+  
+      // Get IDs of successfully deleted stories
+      const successfullyDeleted = results
+        .filter(r => r.success)
+        .map(r => r.storyId);
+  
+      // Update all story states
+      const updatedStories = stories.filter(story => !successfullyDeleted.includes(story.id));
+      setStories(updatedStories);
+      
+      // Update pushed/not pushed story arrays
+      const pushed = updatedStories.filter(story => story.jira_issue_id);
+      const notPushed = updatedStories.filter(story => !story.jira_issue_id);
+      setPushedStories(pushed);
+      setNotPushedStories(notPushed);
+      
+      // If currently selected story was deleted, clear selection
+      if (selectedStory && successfullyDeleted.includes(selectedStory.id)) {
+        setSelectedStory(null);
+      }
       
       // Clear selection
       setSelectedStories(new Set());
@@ -359,7 +395,7 @@ const SingleProjectStories = () => {
 
   return (
     <div className="flex flex-col mx-3 my-0 h-screen">
-      <div className='grid grid-cols-5 gap-4 mt-2 h-full'>
+      <div className='grid grid-cols-5   gap-4 mt-2 h-full'>
         {/* Left Panel */}
         <div className='col-span-2 row-span-1 border border-gray-400 p-3 flex flex-col rounded-md bg-white h-full h-[150px] overflow-auto'>
           <div className='flex justify-between items-center mb-4'>
@@ -437,7 +473,7 @@ const SingleProjectStories = () => {
                     {notPushedStories.map((story) => (
                       <div
                       key={story.id}
-                      className={`flex justify-between items-center mt-2 p-1 rounded-md border bg-${
+                      className={`flex justify-start w-full items-center mt-2 p-1 rounded-md border bg-${
                         selectedStory?.id == story.id ? 
                         (story.priority === 'Must Have' ? 'red-200' :
                         story.priority === 'Should Have' ? 'yellow-100' : 'green-200') :
@@ -470,10 +506,13 @@ const SingleProjectStories = () => {
                         </div>
 
                         </div>
-                        <div className='flex flex-col ml-2'>
-                          <div className='flex justify-between items-center'>
-                            <div className='text-xs text-gray-500 mx-2'>{story.source_doc_type.toUpperCase()}</div>
-                            <div className={`text-xs font-bold ${
+                        <div className='flex flex-col w-full '>
+                          <div className='w-full flex justify-between items-center'>
+                            <div className='flex justify-center items-center'>
+                            <div className='text-sm text-gray-500 mx-2 text-left mr-2'>{story.source_doc_type.toUpperCase()}</div>
+                            <div className='font-semibold text-sm py-1 px-2 bg-blue-300 border border-blue-500 rounded-full ml-2'>{story.status}</div>
+                            </div>
+                            <div className={`text-sm font-bold ${
                               story.priority === 'Must Have' ? 'text-red-600' :
                               story.priority === 'Should Have' ? 'text-yellow-600' :
                               'text-green-600'
@@ -481,7 +520,8 @@ const SingleProjectStories = () => {
                               {story.priority}
                             </div>
                           </div>
-                          <div className='font-semibold text-sm'>{story.title}</div>
+                          <div className='font-semibold text-md ml-2'>{story.title}</div>
+            
                         </div>
                       </div>
                     ))}
@@ -495,7 +535,7 @@ const SingleProjectStories = () => {
     {pushedStories.map((story) => (
       <div
         key={story.id}
-        className={`flex justify-between items-center mt-2 p-1 rounded-md border ${
+        className={` flex justify-start items-center mt-2 px-1 py-2 rounded-md border ${
           story.priority === 'Must Have' ? 'border-red-600' :
           story.priority === 'Should Have' ? 'border-yellow-400' :
           'border-green-400'
@@ -522,11 +562,20 @@ const SingleProjectStories = () => {
         <div className="h-10 w-10 rounded-md border border-gray-400 flex flex-col justify-center items-center text-green-700 bg-white">
           <CiBookmark />
         </div>
-        <div className="w-60 flex flex-col ml-2">
-          <div className="flex justify-between items-center">
-            <div className="text-xs text-gray-500">{story.source_doc_type.toUpperCase()}</div>
+        <div className=" flex flex-col ml-2 w-full">
+          <div className="flex justify-between items-center w-full">
+          <div className='flex justify-start items-center'>
+            <div className="text-sm text-gray-500">{story.source_doc_type.toUpperCase()}</div>
+            
+            <div className={`font-semibold text-sm py-1 px-2 rounded-full ml-2 
+  ${story.status === 'In Progress' ? 'bg-green-300 border-green-500' : ''} 
+  ${story.status === 'Complete' ? 'bg-red-300 border-red-500' : ''} 
+  ${story.status === 'Backlog' ? 'bg-yellow-300 border-yellow-500' : ''}`}>
+  {story.status}
+</div>
+            </div>
             <div
-              className={`text-xs font-bold ${
+              className={`text-sm font-bold ${
                 story.priority === 'Must Have' ? 'text-red-600' :
                 story.priority === 'Should Have' ? 'text-yellow-600' :
                 'text-green-600'
@@ -535,8 +584,8 @@ const SingleProjectStories = () => {
               {story.priority}
             </div>
           </div>
-          <div className="font-semibold text-sm">
-            {story.title.length > 50 ? story.title.slice(0, 50) + "..." : story.title}
+          <div className="font-semibold text-md">
+            {story.title.length > 70 ? story.title.slice(0, 70) + "..." : story.title}
           </div>
           <div className="text-xs text-blue-600">Jira: {story.jira_issue_id}</div>
         </div>
@@ -565,12 +614,11 @@ const SingleProjectStories = () => {
                 ) : (
                   <>
                     <div className='text-xl font-bold'>{selectedStory.title}</div>
-                    <div className={`px-3 py-1 rounded-full text-sm font-medium ${
-                      selectedStory.status === 'Backlog' ? 'bg-gray-100 text-gray-800' :
-                      selectedStory.status === 'In Progress' ? 'bg-blue-100 text-blue-800' :
-                      selectedStory.status === 'Complete' ? 'bg-green-100 text-green-800' :
-                      'bg-gray-100 text-gray-800'
-                    }`}>
+                    <div className={`font-semibold text-sm py-1 px-2 rounded-full ml-2 
+  ${selectedStory.status === 'In Progress' ? 'bg-green-300 border-green-500' : ''} 
+  ${selectedStory.status === 'Complete' ? 'bg-red-300 border-red-500' : ''} 
+  ${selectedStory.status === 'Backlog' ? 'bg-blue-300 border-blue-500' : ''}`}>
+  
                       {selectedStory.status}
                     </div>
                   </>
