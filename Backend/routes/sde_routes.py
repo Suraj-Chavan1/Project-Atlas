@@ -62,7 +62,10 @@ SDE_TEMPLATE = """SDE Team – SRS Input Template
 - Entity relationships (if any)
 5. Integration Points
 - External system/API mentions
-- Anticipated modules/services to interface with"""
+- Anticipated modules/services to interface with
+6. Project Management Notes
+- RAID Analysis,(Risk, Assumption, Issue, Dependency),
+- Timeline for each phase estimated"""
 
 # Template sections
 SDE_SECTIONS = [
@@ -70,7 +73,9 @@ SDE_SECTIONS = [
     "Functional Requirements (Detailed)",
     "Non-Functional Requirements (NFRs)",
     "Data Models & Inputs",
-    "Integration Points"
+    "Integration Points",
+    "Project Management Notes",
+    
 ]
 
 # Global Cosmos DB client

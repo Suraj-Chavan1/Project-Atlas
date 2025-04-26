@@ -245,6 +245,8 @@ class MultiMediaProcessor:
                 "Project Constraints",
                 "Cost-Benefit Analysis",
                 "MoSCoW Prioritization",
+                "RAID Analysis,(Risk, Assumption, Issue, Dependency)",
+                "Estimated timeline for each phase ",
                 "References"
             ]
             prompt_template = (
@@ -262,7 +264,10 @@ class MultiMediaProcessor:
                 "Functional Requirements",
                 "Non-Functional Requirements",
                 "Interface Requirements",
-                "Design Constraints"
+                "Design Constraints",
+                "RAID Analysis,(Risk, Assumption, Issue, Dependency)",
+                "Timeline for each phase estimated"
+                
             ]
             prompt_template = (
                 "Generate a VERY CONCISE section titled '{section}' for the Software Requirements Specification. "
