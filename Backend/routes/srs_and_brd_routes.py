@@ -351,10 +351,17 @@ class MultiMediaProcessor:
     def evaluate_section_completeness(self, section_name: str, section_content: str) -> Dict:
         """Evaluate if a section has all necessary information."""
         try:
+            # Create a more specific prompt that considers the section type and content
             prompt = f"""Analyze this {section_name} section and identify any missing or incomplete information.
+            Consider the following aspects:
+            1. Content completeness for this specific section type
+            2. Required elements for {section_name}
+            3. Quality and depth of information
+            4. Consistency with other sections
+            
             Respond in valid JSON format with exactly these fields:
             {{
-                "completeness_score": <number between 0-100>,
+                "completeness_score": <number between 0-100, must be unique for each section>,
                 "missing_elements": [<list of strings describing missing items>],
                 "suggestions": [<list of strings with improvement suggestions>]
             }}
@@ -368,20 +375,22 @@ class MultiMediaProcessor:
                 messages=[
                     {"role": "system", "content": """You are an expert requirements document analyst. 
                      Always respond with valid JSON containing exactly these fields:
-                     {
-                         "completeness_score": <number between 0-100>,
+                     {{
+                         "completeness_score": <number between 0-100, must be unique for each section>,
                          "missing_elements": [<list of strings>],
                          "suggestions": [<list of strings>]
-                     }"""},
+                     }}
+                     
+                     IMPORTANT: The completeness_score must be different for each section based on its actual content quality and completeness.
+                     Do not use the same score for multiple sections."""},
                     {"role": "user", "content": prompt}
                 ],
-                temperature=0.3
+                temperature=0.7  # Increased temperature for more varied responses
             )
             
             try:
                 # Get the response text and clean it to ensure valid JSON
                 response_text = response.choices[0].message.content.strip()
-                # Remove any markdown code block indicators if present
                 response_text = re.sub(r'^```json\s*|\s*```$', '', response_text)
                 response_text = re.sub(r'^```\s*|\s*```$', '', response_text)
                 
@@ -393,8 +402,16 @@ class MultiMediaProcessor:
                 if not all(field in evaluation for field in required_fields):
                     raise ValueError("Response missing required fields")
                 
-                # Ensure completeness_score is within bounds
-                evaluation["completeness_score"] = max(0, min(100, float(evaluation["completeness_score"])))
+                # Ensure completeness_score is within bounds and unique
+                score = float(evaluation["completeness_score"])
+                
+                # Check if this score has been used before for this document
+                used_scores = [eval.get("completeness_score", 0) for eval in self.section_evaluations.values()]
+                while score in used_scores:
+                    # Adjust the score slightly to make it unique
+                    score = max(0, min(100, score + (1 if score < 50 else -1)))
+                
+                evaluation["completeness_score"] = score
                 
                 # Ensure lists are actually lists
                 if not isinstance(evaluation["missing_elements"], list):
