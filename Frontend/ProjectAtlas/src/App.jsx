@@ -16,6 +16,7 @@ import RequirementsPage from './pages/RequirementsPage'
 import HomePage2 from './pages/HomePage2'
 import Test from './components/Test'
 import ProjectsPage2 from './pages/ProjectsPage2'
+import CodeGenerationPage from './pages/CodeGenerationPage'
 
 function App() {
 
@@ -90,7 +91,11 @@ function App() {
 
           <Route path="/requirements" element={
             <ProjectsPage2 />
-          } />  
+          } /> 
+
+          <Route path="/code-gen" element={
+            <CodeGenerationPage />
+          } />   
           </Routes>
 
         
