@@ -5,7 +5,8 @@ import NewProjectModal from './NewProjectModal';
 import { useUser } from '../contexts/UserContext';
 import axios from 'axios';
 import { CircularProgress, Alert } from '@mui/material';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Area, AreaChart } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, PieChart, Pie, Cell, Area, AreaChart, Tooltip, Legend } from 'recharts';
+
 import CalendarHeatmap from 'react-calendar-heatmap';
 import 'react-calendar-heatmap/dist/styles.css';
 
@@ -98,6 +99,7 @@ const ProjectsMain = () => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [userStories, setUserStories] = useState({});
   const { user } = useUser();
 
   // Fetch user's projects when component mounts or when user changes
@@ -127,6 +129,8 @@ const ProjectsMain = () => {
 
       if (response.data.success) {
         setProjects(response.data.projects);
+        // Fetch stories for each project
+        await fetchStoriesForProjects(response.data.projects);
       } else {
         setError('Failed to fetch projects');
       }
@@ -136,6 +140,37 @@ const ProjectsMain = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const fetchStoriesForProjects = async (projects) => {
+    try {
+      const storiesByProject = {};
+      
+      for (const project of projects) {
+        const response = await axios.get(`http://localhost:5000/srs_brd_to_stories/stories/${project.id}`);
+        if (response.data.success) {
+          storiesByProject[project.id] = response.data.stories;
+        }
+      }
+      
+      setUserStories(storiesByProject);
+    } catch (err) {
+      console.error('Error fetching stories:', err);
+    }
+  };
+
+  const getStoryStats = (projectId) => {
+    const stories = userStories[projectId] || [];
+    const completed = stories.filter(story => story.status === 'Complete').length;
+    const inProgress = stories.filter(story => story.status === 'In Progress').length;
+    const backlog = stories.filter(story => story.status === 'Backlog').length;
+    
+    return {
+      completed,
+      inProgress,
+      backlog,
+      total: stories.length
+    };
   };
   
   const handleAddProject = (newProject) => {
@@ -222,73 +257,79 @@ const ProjectsMain = () => {
             <CircularProgress />
           </div>
         ) : (
-          <div className=" grid grid-cols-3 gap-4 p-2 mt-4">
+          <div className=" grid grid-cols-2 gap-4 p-2 mt-4">
       {projects.length === 0 ? (
         <div className="col-span-3 text-center text-gray-500">
           No projects found. Create a new project to get started!
         </div>
       ) : (
         projects.map((project) => {
-          // Dummy values
-          const storiesCompleted = Math.floor(Math.random() * 50) + 10;
-          const storiesRemaining = Math.floor(Math.random() * 20) + 5;
-
-          const data = [
-            { name: 'Completed', value: storiesCompleted },
-            { name: 'Remaining', value: storiesRemaining },
+          const stats = getStoryStats(project.id);
+          const percentage = stats.total > 0 ? Math.floor((stats.completed / stats.total) * 100) : 0;
+  
+          // Prepare data for the donut chart
+          const donutData = [
+            { name: 'Completed', value: stats.completed },
+            { name: 'In Progress', value: stats.inProgress },
+            { name: 'Backlog', value: stats.backlog },
           ];
-
-          const percentage = Math.floor((storiesCompleted / (storiesCompleted + storiesRemaining)) * 100);
-
+  
+          // Define colors for each section
+          const COLORS = ['#4caf50', '#ffa500', '#f44336'];
+  
           return (
             <div key={project.id} className="bg-white p-2 border border-gray-400 flex flex-col my-1 text-center">
               <div className="text-left text-md font-bold">{project.name}</div>
-
+  
               <div className="text-sm text-left text-gray-600 mt-1">
                 Project Key: {project.projectKey}
               </div>
-
-              <div className="flex justify-between items-center gap-1 mt-3">
-                <div className="w-1/2 text-sm  flex flex-col">
-                  <div className='text-left'>Stories</div>
-                  <div className='text-green-600 text-left'>Completed: {storiesCompleted}</div>
-                  <div className='text-red-600 text-left'>Backlog: {storiesRemaining}</div>
-                  <div className='text-yellow-600 text-left'>In progress: {storiesRemaining}</div>
+  
+              <div className="mt-2">
+                <div className="flex justify-between text-sm">
+                  <span>Completed: {stats.completed}</span>
+                  <span>In Progress: {stats.inProgress}</span>
+                  <span>Backlog: {stats.backlog}</span>
                 </div>
 
-                <div className="w-1/2 flex justify-center items-center">
-                  <PieChart width={80} height={80}>
+                <div className="w-full bg-gray-200 rounded-full h-2.5 mt-2">
+                  <div
+                    className="bg-blue-600 h-2.5 rounded-full"
+                    style={{ width: `${percentage}%` }}
+                  ></div>
+                </div>
+  
+                {/* Donut Chart */}
+                <div className="mt-4 flex justify-center items-center">
+                  <PieChart width={100} height={100}>
                     <Pie
-                      data={data}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={20}
-                      outerRadius={30}
-                      startAngle={90}
-                      endAngle={-270}
+                      data={donutData}
                       dataKey="value"
+                      innerRadius={30}
+                      outerRadius={40}
+                      fill="#8884d8"
+                      paddingAngle={5}
+                      
                     >
-                      {data.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      {donutData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index]} />
                       ))}
                     </Pie>
-                    <text
-                      x="50%"
-                      y="50%"
-                      textAnchor="middle"
-                      dominantBaseline="middle"
-                      className="text-xs font-bold fill-black"
-                    >
-                      {percentage}%
-                    </text>
                   </PieChart>
                 </div>
+  
+                {/* Progress bar */}
+                
+  
+                <div className="text-xs text-gray-500 mt-1">
+                  {percentage}% Complete
+                </div>
               </div>
-
-              {/* Optional: Link to project */}
+  
+              {/* Link to project */}
               <a
                 href={`/project/${project.id}`}
-                className="mt-3 bg-blue-500 p-1  text-white rounded-md hover:underline text-sm"
+                className="mt-3 bg-blue-500 p-1 text-white rounded-md hover:underline text-sm"
               >
                 View Project
               </a>
