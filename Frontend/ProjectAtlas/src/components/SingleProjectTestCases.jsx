@@ -4,6 +4,7 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { useParams, useLocation } from 'react-router-dom';
 import ReactMarkdown from "react-markdown";
+import CoverageComponent from './CoverageComponent';
 
 const SingleProjectTestCases = () => {
     const { projectId } = useParams(); // Extract project ID from URL
@@ -445,6 +446,7 @@ const SingleProjectTestCases = () => {
     return (
         <div className="flex flex-col mx-3 my-0 h-screen">
             <div className="mb-4">
+            <CoverageComponent />
                 <button
                     onClick={handleInstallClick}
                     style={{
@@ -653,7 +655,7 @@ const SingleProjectTestCases = () => {
                                                     </SyntaxHighlighter>
                                                 </div>
                                             ))}*/}
-                                            Test Coverage here:
+                                            Test Coverage here: <CoverageComponent />
                                         </div>
                                         
                                         {testCasesMap[story.key].blobUrl && (

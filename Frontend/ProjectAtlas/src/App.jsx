@@ -15,6 +15,7 @@ import SingleProjectPage from './pages/SingleProjectPage'
 import RequirementsPage from './pages/RequirementsPage'
 import HomePage2 from './pages/HomePage2'
 import Test from './components/Test'
+import ProjectsPage2 from './pages/ProjectsPage2'
 
 function App() {
 
@@ -58,11 +59,11 @@ function App() {
             </ProtectedRoute>
           } />
 
-          <Route path="/requirements" element={
+          {/*<Route path="/requirements" element={
             <ProtectedRoute>
               <RequirementsPage />
             </ProtectedRoute>
-          } />
+          } />*/}
 
           {/* Role-specific Routes */}
           <Route path="/ai-requirements" element={
@@ -85,6 +86,10 @@ function App() {
 
           <Route path="/test" element={
             <Test />
+          } />  
+
+          <Route path="/requirements" element={
+            <ProjectsPage2 />
           } />  
           </Routes>
 
