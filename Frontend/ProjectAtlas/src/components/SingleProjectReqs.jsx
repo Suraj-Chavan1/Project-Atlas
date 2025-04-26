@@ -1397,7 +1397,17 @@ const SingleProjectReqs = ({ projectId }) => {
               </div>
             ) : inputType === 'confluence' ? (
               <div className="mb-4">
-                
+                <Button
+                  variant="outlined"
+                  startIcon={<CloudDownload />}
+                  onClick={() => {
+                    setShowModal(false);
+                    setShowConfluenceModal(true);
+                    fetchConfluenceSpaces();
+                  }}
+                >
+                  Import from Confluence 1
+                </Button>
               </div>
             ) : (
               <TextField
@@ -1806,7 +1816,18 @@ const SingleProjectReqs = ({ projectId }) => {
         </Dialog>
       )}
 
-      
+      {/*<Button
+        variant="contained"
+        color="primary"
+        startIcon={<CloudDownload />}
+        onClick={() => {
+          setShowConfluenceModal(true);
+          fetchConfluenceSpaces();
+        }}
+        style={{ margin: '10px' }}
+      >
+        Import from Confluence 2
+      </Button>*/}
 
       {/* Confluence Import Modal */}
       <Dialog 
