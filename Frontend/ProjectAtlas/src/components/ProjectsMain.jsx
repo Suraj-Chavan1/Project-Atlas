@@ -50,6 +50,32 @@ const data3 = [
   { name: 'Fri', value: 120 },
 ];
 
+const tasks = {
+  delayed: [
+    { id: 1, title: "Risk Profile Summary", storiesInProgress: 12, storiesCompleted: 23 },
+    { id: 2, title: "Validate Beneficiary Details", storiesInProgress: 5, storiesCompleted: 10 },
+  ],
+  removed: [
+    { id: 3, title: "Scheduling Periodic Account Review", storiesInProgress: 2, storiesCompleted: 7 },
+  ],
+  onTime: [
+    { id: 4, title: "Pending Alert Tracking", storiesInProgress: 8, storiesCompleted: 20 },
+  ],
+};
+
+const createChartData = (inProgress, completed) => {
+  const total = inProgress + completed;
+  const completedPercent = total === 0 ? 0 : (completed / total) * 100;
+
+  return {
+    data: [
+      { name: 'Completed', value: completed },
+      { name: 'Remaining', value: inProgress },
+    ],
+    percentage: Math.round(completedPercent),
+  };
+};
+
 const COLORS = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b'];
 
 import { subDays, format } from 'date-fns'; // Add this
@@ -173,7 +199,7 @@ const ProjectsMain = () => {
           </div>
         </div>
 
-        <div className="col-span-2 mx-2 my-1 bg-white border border-[#989898] rounded-md flex flex-col p-3 h-100">
+        <div className="col-span-2 mx-2 my-1 bg-gray-200 border border-[#989898] rounded-md flex flex-col p-3 h-100">
           <div className='flex justify-between items-center'>
             <div className='text-xl font-bold'>Your Projects</div>
           <button
@@ -196,23 +222,81 @@ const ProjectsMain = () => {
             <CircularProgress />
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-4 mt-4">
-            {projects.length === 0 ? (
-              <div className="col-span-3 text-center text-gray-500">
-                No projects found. Create a new project to get started!
+          <div className=" grid grid-cols-3 gap-4 p-2 mt-4">
+      {projects.length === 0 ? (
+        <div className="col-span-3 text-center text-gray-500">
+          No projects found. Create a new project to get started!
+        </div>
+      ) : (
+        projects.map((project) => {
+          // Dummy values
+          const storiesCompleted = Math.floor(Math.random() * 50) + 10;
+          const storiesRemaining = Math.floor(Math.random() * 20) + 5;
+
+          const data = [
+            { name: 'Completed', value: storiesCompleted },
+            { name: 'Remaining', value: storiesRemaining },
+          ];
+
+          const percentage = Math.floor((storiesCompleted / (storiesCompleted + storiesRemaining)) * 100);
+
+          return (
+            <div key={project.id} className="bg-white p-2 border border-gray-400 flex flex-col my-1 text-center">
+              <div className="text-left text-md font-bold">{project.name}</div>
+
+              <div className="text-sm text-left text-gray-600 mt-1">
+                Project Key: {project.projectKey}
               </div>
-            ) : (
-              projects.map((project) => (
-                <ProjectCard
-                  key={project.id}
-                  name={project.name}
-                  url={`/project/${project.id}`}
-                  role={project.stakeholders.find(s => s.id === (user?.id || localStorage.getItem('userId')))?.role}
-                  projectKey={project.projectKey}
-                />
-              ))
-            )}
-          </div>
+
+              <div className="flex justify-between items-center gap-1 mt-3">
+                <div className="w-1/2 text-sm  flex flex-col">
+                  <div className='text-left'>Stories</div>
+                  <div className='text-green-600 text-left'>Completed: {storiesCompleted}</div>
+                  <div className='text-red-600 text-left'>Backlog: {storiesRemaining}</div>
+                  <div className='text-yellow-600 text-left'>In progress: {storiesRemaining}</div>
+                </div>
+
+                <div className="w-1/2 flex justify-center items-center">
+                  <PieChart width={80} height={80}>
+                    <Pie
+                      data={data}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={20}
+                      outerRadius={30}
+                      startAngle={90}
+                      endAngle={-270}
+                      dataKey="value"
+                    >
+                      {data.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <text
+                      x="50%"
+                      y="50%"
+                      textAnchor="middle"
+                      dominantBaseline="middle"
+                      className="text-xs font-bold fill-black"
+                    >
+                      {percentage}%
+                    </text>
+                  </PieChart>
+                </div>
+              </div>
+
+              {/* Optional: Link to project */}
+              <a
+                href={`/project/${project.id}`}
+                className="mt-3 bg-blue-500 p-1  text-white rounded-md hover:underline text-sm"
+              >
+                View Project
+              </a>
+            </div>
+          );
+        })
+      )}
+    </div>
         )}
       </div>
 
