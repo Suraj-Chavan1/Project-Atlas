@@ -370,6 +370,12 @@ def push_story_to_jira(story: dict):
         response = requests.post(jira_url, auth=auth, headers=headers, data=json.dumps(payload))
         if response.status_code == 201:
             print(f"Story '{story.get('title')}' successfully pushed to Jira.")
+            # Update story status to 'In Progress' in Cosmos DB
+            if story.get('id'):
+                database = cosmos_client.get_database_client(COSMOS_DATABASE)
+                user_stories_container = database.get_container_client("UserStories")
+                story['status'] = 'In Progress'
+                user_stories_container.replace_item(item=story['id'], body=story)
             return response.json().get('key')  # Return the Jira issue key
         else:
             print(f"Failed to push story '{story.get('title')}' to Jira. Status code: {response.status_code}. Response: {response.text}")
@@ -404,7 +410,7 @@ def store_story_in_cosmos(story: dict, project_id: str, standard_doc_id: str) ->
             "priority": story.get("priority", "Must Have"),
             "document": story.get("document", ""),
             "jira_issue_id": story.get("jira_issue_id", ""),
-            "status": "To Do",
+            "userstories_status": "Backlog",  # Changed from 'status' to 'userstories_status'
             "created_at": datetime.utcnow().isoformat(),
         }
         
@@ -513,7 +519,7 @@ def generate_stories_from_docs():
                         "acceptance_criteria": story.get("acceptance_criteria", ""),
                         "priority": story.get("priority", "Must Have"),
                         "document": doc.get("title", ""),
-                        "status": "To Do",
+                        "status": "Backlog",
                         "created_at": datetime.utcnow().isoformat(),
                         "source_doc_type": doc.get("template_type", "Unknown"),
                         "jira_issue_id": ""
@@ -677,21 +683,40 @@ def update_story_status(story_id):
         if not new_status:
             return jsonify({'error': 'Status is required'}), 400
             
+        # Validate status
+        valid_statuses = ['Backlog', 'In Progress', 'Complete']
+        if new_status not in valid_statuses:
+            return jsonify({'error': f'Invalid status. Must be one of: {", ".join(valid_statuses)}'}), 400
+            
         database = cosmos_client.get_database_client(COSMOS_DATABASE)
         user_stories_container = database.get_container_client("UserStories")
         
-        # Get the story
-        story = user_stories_container.read_item(item=story_id, partition_key=story_id)
+        # First find the story using a query
+        query = f"SELECT * FROM c WHERE c.id = '{story_id}'"
+        items = list(user_stories_container.query_items(
+            query=query,
+            enable_cross_partition_query=True
+        ))
         
-        # Update the status
+        if not items:
+            print(f"Story not found with ID: {story_id}")
+            return jsonify({'error': 'Story not found'}), 404
+            
+        story = items[0]
+        print("Story found:", story)
+        
+        # Update the status using the correct field name
         story['status'] = new_status
-        user_stories_container.replace_item(item=story_id, body=story)
+        
+        # Update the story using upsert_item
+        updated_story = user_stories_container.upsert_item(body=story)
+        print("Updated story:", updated_story)
         
         print(f"Story status updated to: {new_status}")
         return jsonify({
             'success': True,
             'message': 'Story status updated successfully',
-            'story': story
+            'story': updated_story
         })
     except exceptions.CosmosResourceNotFoundError:
         print(f"Story not found with ID: {story_id}")
@@ -855,6 +880,36 @@ def push_to_jira(story_id):
             
     except Exception as e:
         print(f"Error in push-to-jira route: {str(e)}")
+        print("Stack trace:", traceback.format_exc())
+        return jsonify({'error': str(e)}), 500
+
+@srs_brd_to_stories_bp.route('/stories/<story_id>/complete', methods=['POST'])
+def mark_story_complete(story_id):
+    try:
+        print("\n=== Starting mark_story_complete request ===")
+        print(f"Story ID: {story_id}")
+        
+        database = cosmos_client.get_database_client(COSMOS_DATABASE)
+        user_stories_container = database.get_container_client("UserStories")
+        
+        # Get the story
+        story = user_stories_container.read_item(item=story_id, partition_key=story_id)
+        
+        # Update the status to Complete
+        story['status'] = 'Complete'
+        user_stories_container.replace_item(item=story_id, body=story)
+        
+        print(f"Story marked as complete: {story_id}")
+        return jsonify({
+            'success': True,
+            'message': 'Story marked as complete',
+            'story': story
+        })
+    except exceptions.CosmosResourceNotFoundError:
+        print(f"Story not found with ID: {story_id}")
+        return jsonify({'error': 'Story not found'}), 404
+    except Exception as e:
+        print(f"Error marking story as complete: {str(e)}")
         print("Stack trace:", traceback.format_exc())
         return jsonify({'error': str(e)}), 500
 

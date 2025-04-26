@@ -175,11 +175,16 @@ const SingleProjectStories = () => {
 
   const handleUpdateStatus = async (storyId, newStatus) => {
     try {
+      console.log('Updating status for story:', storyId);
+      console.log('New status:', newStatus);
+      
       setLoading(true);
       const response = await axios.put(
         `http://localhost:5000/srs_brd_to_stories/stories/${storyId}/status`,
         { status: newStatus }
       );
+
+      console.log('Status update response:', response.data);
 
       if (response.data.success) {
         toast.success('Story status updated successfully');
@@ -190,6 +195,9 @@ const SingleProjectStories = () => {
       }
     } catch (error) {
       console.error('Error updating story status:', error);
+      console.error('Error response:', error.response?.data);
+      console.error('Error status:', error.response?.status);
+      console.error('Error headers:', error.response?.headers);
       toast.error(error.response?.data?.error || 'Failed to update story status');
     } finally {
       setLoading(false);
@@ -555,7 +563,17 @@ const SingleProjectStories = () => {
                     className='text-xl font-bold border border-gray-300 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500'
                   />
                 ) : (
-                  <div className='text-xl font-bold'>{selectedStory.title}</div>
+                  <>
+                    <div className='text-xl font-bold'>{selectedStory.title}</div>
+                    <div className={`px-3 py-1 rounded-full text-sm font-medium ${
+                      selectedStory.status === 'Backlog' ? 'bg-gray-100 text-gray-800' :
+                      selectedStory.status === 'In Progress' ? 'bg-blue-100 text-blue-800' :
+                      selectedStory.status === 'Complete' ? 'bg-green-100 text-green-800' :
+                      'bg-gray-100 text-gray-800'
+                    }`}>
+                      {selectedStory.status}
+                    </div>
+                  </>
                 )}
                 <div className='w-full flex justify-end items-center gap-2'>
                   <button 
@@ -570,6 +588,19 @@ const SingleProjectStories = () => {
                     <SiJira /> 
                     {selectedStory.jira_issue_id ? 'Pushed to Jira' : 'Push to Jira'}
                   </button>
+                  {selectedStory.jira_issue_id && (
+                    <button 
+                      className={`border ${
+                        selectedStory.status === 'Complete'
+                          ? 'border-green-500 text-green-500 bg-green-100'
+                          : 'border-blue-500 text-blue-500'
+                      } text-sm p-1 ml-1 rounded-md flex justify-center gap-1 items-center w-1/2`}
+                      onClick={() => handleUpdateStatus(selectedStory.id, 'Complete')}
+                      disabled={loading || selectedStory.status === 'Complete'}
+                    >
+                      {selectedStory.status === 'Complete' ? 'Completed' : 'Mark Complete'}
+                    </button>
+                  )}
                   <button 
                     className='w-10 h-10 rounded-full bg-blue-500 items-center text-white p-3'
                     onClick={handleEditClick}
