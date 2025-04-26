@@ -14,6 +14,7 @@ from azure.cosmos import CosmosClient, exceptions
 import traceback
 import tempfile
 import zipfile
+import io
 
 # Create blueprint
 testcode_bp = Blueprint('testcode', __name__)
@@ -838,6 +839,209 @@ def push_to_github():
             }), response.status_code
 
     except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@testcode_bp.route('/generate-code', methods=['POST'])
+def generate_code():
+    """
+    Generate code based on user input using Azure OpenAI.
+    """
+    try:
+        data = request.get_json()
+        user_input = data.get('input')
+        language = data.get('language', 'python')
+        framework = data.get('framework', '')
+        context = data.get('context', '')
+
+        if not user_input:
+            return jsonify({
+                'success': False,
+                'error': 'Missing input parameter'
+            }), 400
+
+        # Build the prompt
+        prompt = f"""
+        Generate code based on the following requirements:
+        
+        Language: {language}
+        Framework: {framework}
+        Requirements: {user_input}
+        
+        Additional Context: {context}
+        
+        Please provide:
+        1. Complete, working code
+        2. Clear comments explaining the code
+        3. Any necessary imports or dependencies
+        4. Example usage if applicable
+        """
+
+        # Make the API call
+        response = client.chat.completions.create(
+            model=DEPLOYMENT_NAME,
+            messages=[
+                {
+                    "role": "system",
+                    "content": f"You are a {language} programming expert. Generate clean, efficient, and well-documented code."
+                },
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ],
+            max_tokens=4096,
+            temperature=0.7,
+            top_p=0.9
+        )
+
+        generated_code = response.choices[0].message.content
+
+        return jsonify({
+            'success': True,
+            'code': generated_code,
+            'timestamp': datetime.now().isoformat()
+        })
+
+    except Exception as e:
+        print(f"Error generating code: {str(e)}")
+        traceback.print_exc()
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@testcode_bp.route('/push-code-to-github', methods=['POST'])
+def push_code_to_github():
+    try:
+        print("Starting push-code-to-github route...")
+        data = request.get_json()
+        code = data.get('code')
+        language = data.get('language', 'python')
+        framework = data.get('framework', '')
+        path = data.get('path', '')
+        is_test_case = data.get('is_test_case', False)  # New parameter to identify test cases
+
+        print(f"Received request with language: {language}, framework: {framework}, path: {path}, is_test_case: {is_test_case}")
+        print(f"Code length: {len(code) if code else 0}")
+
+        if not code:
+            print("Error: No code provided")
+            return jsonify({
+                'success': False,
+                'error': 'Missing code parameter'
+            }), 400
+
+        # Create zip file in memory
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        zip_filename = f"code_{timestamp}.zip"
+        
+        # Create a BytesIO object to hold the zip file
+        zip_buffer = io.BytesIO()
+        
+        # Determine file extension and name based on language and framework
+        if language.lower() == 'python':
+            if framework.lower() == 'pytest':
+                file_extension = '.py'
+                file_name = f"test_{timestamp}{file_extension}" if is_test_case else f"code{file_extension}"
+            else:
+                file_extension = '.py'
+                file_name = f"{timestamp}_test{file_extension}" if is_test_case else f"code{file_extension}"
+        else:  # JavaScript
+            if framework.lower() == 'jest':
+                file_extension = '.js'
+                file_name = f"{timestamp}.test{file_extension}" if is_test_case else f"code{file_extension}"
+            elif framework.lower() == 'mocha':
+                file_extension = '.js'
+                file_name = f"{timestamp}.spec{file_extension}" if is_test_case else f"code{file_extension}"
+            else:
+                file_extension = '.js'
+                file_name = f"{timestamp}_test{file_extension}" if is_test_case else f"code{file_extension}"
+        
+        # Create the zip file
+        with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zipf:
+            # Add the code file to the zip with appropriate name
+            zipf.writestr(file_name, code)
+        
+        # Reset the buffer position to the beginning
+        zip_buffer.seek(0)
+        
+        # Upload the zip file to blob storage
+        blob_name = f"generated_code/{zip_filename}"
+        print(f"Uploading zip file to blob: {blob_name}")
+        
+        blob_client = container_client.get_blob_client(blob_name)
+        blob_client.upload_blob(zip_buffer, overwrite=True)
+        print("Zip file uploaded successfully to blob storage")
+
+        # Generate SAS token for the blob
+        print("Generating SAS token...")
+        sas_token = generate_blob_sas(
+            account_name=account_name,
+            container_name=container_name,
+            blob_name=blob_name,
+            account_key=account_key,
+            permission=BlobSasPermissions(read=True),
+            expiry=datetime.utcnow() + timedelta(hours=24)
+        )
+        print("SAS token generated successfully")
+
+        # Construct the blob URL with SAS token
+        blob_url = f"https://{account_name}.blob.core.windows.net/{container_name}/{blob_name}?{sas_token}"
+        print(f"Generated blob URL: {blob_url}")
+
+        # Make request to GitHub bot
+        github_bot_url = "https://git-hub-bot-git-main-anujs-projects-b5a04637.vercel.app/push_test_using_url"
+        print(f"Making request to GitHub bot: {github_bot_url}")
+        
+        # Ensure the path is properly formatted for test cases
+        if is_test_case:
+            if not path:
+                path = f"tests/{file_name}"
+            elif not path.endswith(file_extension):
+                path = f"{path}/{file_name}" if path.endswith('/') else f"{path}{file_extension}"
+        else:
+            if not path:
+                path = f"src/{file_name}"
+            elif not path.endswith(file_extension):
+                path = f"{path}/{file_name}" if path.endswith('/') else f"{path}{file_extension}"
+        
+        payload = {
+            "owner": "ANUJT65",
+            "repo": "Jira_Testcases",
+            "fileUrl": blob_url,
+            "path": path
+        }
+        print(f"Request payload: {json.dumps(payload, indent=2)}")
+        
+        headers = {
+            "Content-Type": "application/json"
+        }
+
+        print("Sending request to GitHub bot...")
+        response = requests.post(github_bot_url, json=payload, headers=headers)
+        print(f"GitHub bot response status: {response.status_code}")
+        print(f"GitHub bot response: {response.text}")
+
+        if response.ok:
+            print("Successfully pushed code to GitHub")
+            return jsonify({
+                'success': True,
+                'message': 'Successfully pushed code to GitHub',
+                'data': response.json()
+            })
+        else:
+            print(f"GitHub bot error: {response.text}")
+            return jsonify({
+                'success': False,
+                'error': f'GitHub bot error: {response.text}'
+            }), response.status_code
+
+    except Exception as e:
+        print(f"Error in push-code-to-github: {str(e)}")
+        print(f"Stack trace: {traceback.format_exc()}")
         return jsonify({
             'success': False,
             'error': str(e)

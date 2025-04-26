@@ -5,6 +5,247 @@ import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { useParams, useLocation } from 'react-router-dom';
 import ReactMarkdown from "react-markdown";
 import CoverageComponent from './CoverageComponent';
+import {
+    Box,
+    Drawer,
+    IconButton,
+    TextField,
+    Button,
+    Typography,
+    Select,
+    MenuItem,
+    FormControl,
+    InputLabel,
+    CircularProgress,
+    Alert,
+    Snackbar
+} from '@mui/material';
+import CodeIcon from '@mui/icons-material/Code';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+
+const drawerWidth = 400;
+
+const CodeGenSidebar = ({ open, onClose }) => {
+    const [input, setInput] = useState('');
+    const [language, setLanguage] = useState('python');
+    const [framework, setFramework] = useState('');
+    const [context, setContext] = useState('');
+    const [generatedCode, setGeneratedCode] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
+    const [pushing, setPushing] = useState(false);
+    const [githubConfig, setGithubConfig] = useState({
+        owner: 'ANUJT65',
+        repo: 'Jira_Testcases',
+        path: ''
+    });
+
+    const handleGenerateCode = async () => {
+        try {
+            setLoading(true);
+            setError('');
+            const response = await axios.post('http://localhost:5000/testcode/generate-code', {
+                input,
+                language,
+                framework,
+                context
+            });
+
+            if (response.data.success) {
+                setGeneratedCode(response.data.code);
+                setSuccess('Code generated successfully');
+            } else {
+                setError(response.data.error);
+            }
+        } catch (err) {
+            setError(err.response?.data?.error || 'Failed to generate code');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handlePushToGitHub = async () => {
+        if (!generatedCode) {
+            setError('No code to push. Please generate code first.');
+            return;
+        }
+
+        try {
+            setPushing(true);
+            setError('');
+            const response = await axios.post('http://localhost:5000/testcode/push-code-to-github', {
+                code: generatedCode,
+                language,
+                framework,
+                path: githubConfig.path || `generated_code/${Date.now()}.${language}`
+            });
+
+            if (response.data.success) {
+                setSuccess('Code pushed to GitHub successfully');
+            } else {
+                setError(response.data.error);
+            }
+        } catch (err) {
+            setError(err.response?.data?.error || 'Failed to push code to GitHub');
+        } finally {
+            setPushing(false);
+        }
+    };
+
+    return (
+        <Drawer
+            variant="persistent"
+            anchor="right"
+            open={open}
+            sx={{
+                width: drawerWidth,
+                flexShrink: 0,
+                '& .MuiDrawer-paper': {
+                    width: drawerWidth,
+                    boxSizing: 'border-box',
+                    backgroundColor: '#f5f5f5',
+                },
+            }}
+        >
+            <Box sx={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'space-between',
+                p: 2,
+                borderBottom: '1px solid #e0e0e0'
+            }}>
+                <Typography variant="h6">Code Generator</Typography>
+                <IconButton onClick={onClose}>
+                    <ChevronLeftIcon />
+                </IconButton>
+            </Box>
+
+            <Box sx={{ p: 2 }}>
+                <TextField
+                    fullWidth
+                    multiline
+                    rows={4}
+                    label="Enter your requirements"
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    sx={{ mb: 2 }}
+                />
+
+                <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+                    <FormControl sx={{ minWidth: 120 }}>
+                        <InputLabel>Language</InputLabel>
+                        <Select
+                            value={language}
+                            label="Language"
+                            onChange={(e) => setLanguage(e.target.value)}
+                        >
+                            <MenuItem value="python">Python</MenuItem>
+                            <MenuItem value="javascript">JavaScript</MenuItem>
+                            <MenuItem value="java">Java</MenuItem>
+                            <MenuItem value="csharp">C#</MenuItem>
+                        </Select>
+                    </FormControl>
+
+                    <TextField
+                        label="Framework (optional)"
+                        value={framework}
+                        onChange={(e) => setFramework(e.target.value)}
+                    />
+                </Box>
+
+                <TextField
+                    fullWidth
+                    multiline
+                    rows={2}
+                    label="Additional Context (optional)"
+                    value={context}
+                    onChange={(e) => setContext(e.target.value)}
+                    sx={{ mb: 2 }}
+                />
+
+                <Button
+                    variant="contained"
+                    onClick={handleGenerateCode}
+                    disabled={loading || !input}
+                    fullWidth
+                    sx={{ mb: 2 }}
+                >
+                    {loading ? <CircularProgress size={24} /> : 'Generate Code'}
+                </Button>
+
+                {generatedCode && (
+                    <Box sx={{ mt: 2 }}>
+                        <Typography variant="subtitle1" gutterBottom>
+                            Generated Code:
+                        </Typography>
+                        <Box
+                            component="pre"
+                            sx={{
+                                p: 2,
+                                bgcolor: '#1e1e1e',
+                                borderRadius: 1,
+                                overflow: 'auto',
+                                maxHeight: '400px'
+                            }}
+                        >
+                            <SyntaxHighlighter
+                                language={language}
+                                style={vscDarkPlus}
+                            >
+                                {generatedCode}
+                            </SyntaxHighlighter>
+                        </Box>
+
+                        <Box sx={{ mt: 2, mb: 2 }}>
+                            <Typography variant="subtitle2" gutterBottom>
+                                GitHub Configuration:
+                            </Typography>
+                            <TextField
+                                fullWidth
+                                label="Repository Path (optional)"
+                                value={githubConfig.path}
+                                onChange={(e) => setGithubConfig(prev => ({ ...prev, path: e.target.value }))}
+                                placeholder="e.g., src/generated/code.py"
+                                sx={{ mb: 1 }}
+                            />
+                        </Box>
+
+                        <Button
+                            variant="contained"
+                            color="secondary"
+                            onClick={handlePushToGitHub}
+                            disabled={pushing}
+                            fullWidth
+                        >
+                            {pushing ? <CircularProgress size={24} /> : 'Push to GitHub'}
+                        </Button>
+                    </Box>
+                )}
+
+                <Snackbar
+                    open={!!error}
+                    autoHideDuration={6000}
+                    onClose={() => setError('')}
+                >
+                    <Alert severity="error" onClose={() => setError('')}>
+                        {error}
+                    </Alert>
+                </Snackbar>
+
+                <Snackbar
+                    open={!!success}
+                    autoHideDuration={6000}
+                    onClose={() => setSuccess('')}
+                >
+                    <Alert severity="success" onClose={() => setSuccess('')}>
+                        {success}
+                    </Alert>
+                </Snackbar>
+            </Box>
+        </Drawer>
+    );
+};
 
 const SingleProjectTestCases = () => {
     const { projectId } = useParams(); // Extract project ID from URL
@@ -22,9 +263,16 @@ const SingleProjectTestCases = () => {
     const [editContentMap, setEditContentMap] = useState({});
     const [regenerationContextMap, setRegenerationContextMap] = useState({});
     const [showRegenerationInputMap, setShowRegenerationInputMap] = useState({});
-    const [githubConfig, setGithubConfig] = useState({
-        owner: 'ANUJT65',
-        repo: 'Jira_Testcases'
+    const [codeGenOpen, setCodeGenOpen] = useState(false);
+    const [snackbar, setSnackbar] = useState({
+        open: false,
+        message: '',
+        severity: 'success'
+    });
+    const [notification, setNotification] = useState({
+        open: false,
+        message: '',
+        severity: 'success' // 'success' or 'error'
     });
 
     // Extract project ID from URL if not available in params
@@ -370,330 +618,389 @@ const SingleProjectTestCases = () => {
         });
     };
 
-    const handlePushToGitHub = async (storyKey) => {
+    const handleCloseNotification = () => {
+        setNotification(prev => ({ ...prev, open: false }));
+    };
+
+    const handlePushToGitHub = async (testFiles) => {
         try {
-            setGithubPushingMap(prev => ({ ...prev, [storyKey]: true }));
+            console.log('Pushing test cases with project ID:', projectId);
             
-            // Get the test files from the preview or edited content
-            let testFiles = [];
-            
-            if (editingMap[storyKey]) {
-                // If we're editing, use the edited content
-                testFiles = Object.entries(editContentMap[storyKey]).map(([name, content]) => ({
-                    name,
-                    content
-                }));
-            } else if (previewMap[storyKey]) {
-                // Otherwise use the preview content
-                testFiles = previewMap[storyKey].testFiles;
-            } else if (testCasesMap[storyKey]) {
-                // If we have saved test cases, use those
-                testFiles = testCasesMap[storyKey].testFiles.map(file => {
+            // Default GitHub configuration
+            const defaultConfig = {
+                owner: 'ANUJT65',
+                repo: 'Jira_Testcases',
+                path: 'tests'
+            };
+
+            // Format test files properly
+            const formattedTestFiles = testFiles.map(file => {
+                if (typeof file === 'string') {
                     const [name, ...contentParts] = file.split('\n');
                     return {
-                        name: name.replace(':', ''),
-                        content: contentParts.join('\n')
+                        name: name.replace(':', '').trim(),
+                        content: contentParts.join('\n').trim()
                     };
-                });
-            }
-            
-            if (testFiles.length === 0) {
-                alert('No test cases found to push to GitHub');
-                return;
-            }
-            
-            const currentProjectId = getProjectId();
-            console.log("Pushing test cases with project ID:", currentProjectId);
-            
-            if (!currentProjectId) {
-                alert('Error: Project ID not found. Please make sure you are on a valid project page.');
-                return;
-            }
-            
-            // First save and upload to get the blob URL
-            const saveResponse = await axios.post('http://localhost:5000/testcode/generate-tests', {
-                story_key: storyKey,
-                project_id: currentProjectId,
-                test_files: testFiles
+                }
+                return {
+                    name: file.name,
+                    content: file.content
+                };
             });
-            
-            if (saveResponse.data.success) {
-                const blobUrl = saveResponse.data.blob_url;
-                
-                // Now push to GitHub using the blob URL
-                const response = await axios.post('http://localhost:5000/testcode/push-to-github', {
-                    owner: githubConfig.owner,
-                    repo: githubConfig.repo,
-                    fileUrl: blobUrl,
-                    path: `tests/${storyKey}_tests.py`
+
+            console.log('Formatted test files:', formattedTestFiles);
+
+            let successCount = 0;
+            let errorCount = 0;
+
+            for (const file of formattedTestFiles) {
+                if (!file.content) {
+                    console.error('Empty content for file:', file.name);
+                    errorCount++;
+                    continue;
+                }
+
+                const response = await fetch('http://localhost:5000/testcode/push-code-to-github', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        code: file.content,
+                        language: 'python',
+                        framework: 'pytest',
+                        is_test_case: true,
+                        path: `${defaultConfig.path}/${file.name}`
+                    }),
                 });
 
-                if (response.data.success) {
-                    alert('Successfully pushed test cases to GitHub');
-                    setPushedMap(prev => ({ ...prev, [storyKey]: true })); 
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    console.error(`Failed to push ${file.name}:`, errorData.error);
+                    errorCount++;
                 } else {
-                    alert(`Failed to push to GitHub: ${response.data.error}`);
+                    const result = await response.json();
+                    console.log(`Successfully pushed ${file.name}:`, result);
+                    successCount++;
                 }
-            } else {
-                alert('Failed to save test cases before pushing to GitHub');
             }
+
+            // Show appropriate notification
+            if (errorCount === 0) {
+                setNotification({
+                    open: true,
+                    message: `Successfully pushed ${successCount} test file(s) to GitHub`,
+                    severity: 'success'
+                });
+            } else if (successCount === 0) {
+                setNotification({
+                    open: true,
+                    message: `Failed to push ${errorCount} test file(s) to GitHub`,
+                    severity: 'error'
+                });
+            } else {
+                setNotification({
+                    open: true,
+                    message: `Pushed ${successCount} test file(s) successfully, ${errorCount} failed`,
+                    severity: 'warning'
+                });
+            }
+
         } catch (error) {
             console.error('Error pushing to GitHub:', error);
-            alert('Failed to push test cases to GitHub');
-        } finally {
-            setLoadingMap(prev => ({ ...prev, [storyKey]: false }));
-            setGithubPushingMap(prev => ({ ...prev, [storyKey]: false })); 
+            setNotification({
+                open: true,
+                message: `Error pushing to GitHub: ${error.message}`,
+                severity: 'error'
+            });
         }
     };
 
     return (
-        <div className="flex flex-col mx-3 my-0 h-screen">
-            <div className="mb-4">
-            <CoverageComponent />
-                <button
-                    onClick={handleInstallClick}
-                    style={{
-                        padding: "10px 20px",
-                        borderRadius: "8px",
-                        background: "#24292e",
-                        color: "#fff",
-                        border: "none",
-                        fontWeight: "bold",
-                        cursor: "pointer"
-                    }}
-                >
-                    Connect GitHub App
-                </button>
-            </div>
+        <Box sx={{ display: 'flex', height: '100vh' }}>
+            <Box sx={{ flexGrow: 1, overflow: 'auto', p: 3 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                    <CoverageComponent />
+                    <Box>
+                        <IconButton
+                            onClick={() => setCodeGenOpen(true)}
+                            sx={{
+                                backgroundColor: '#1976d2',
+                                color: 'white',
+                                '&:hover': {
+                                    backgroundColor: '#1565c0',
+                                },
+                            }}
+                        >
+                            <CodeIcon />
+                        </IconButton>
+                        <button
+                            onClick={handleInstallClick}
+                            style={{
+                                padding: "10px 20px",
+                                borderRadius: "8px",
+                                background: "#24292e",
+                                color: "#fff",
+                                border: "none",
+                                fontWeight: "bold",
+                                cursor: "pointer",
+                                marginLeft: '10px'
+                            }}
+                        >
+                            Connect GitHub App
+                        </button>
+                    </Box>
+                </Box>
 
-            <div className="mt-2 h-full overflow-y-auto">
-                {loading ? (
-                    <p className="text-center p-4">Loading stories...</p>
-                ) : (
-                    <div className="space-y-6">
-                        {stories.map((story) => (
-                            <div
-                                key={story.key}
-                                className={`p-4 border rounded-lg bg-white  ${
-                                    selectedStory?.key === story.key ? 'border-blue-500' : 'border-gray-500'
-                                }`}
-                            >
-                                <div className="flex justify-between items-start">
-                                    <div 
-                                        className="cursor-pointer flex-grow"
-                                        onClick={() => setSelectedStory(story)}
-                                    >
-                                        <h3 className="font-bold">{story.key}: {story.summary}</h3>
-                                        <ReactMarkdown  >{story.description}</ReactMarkdown >
-                                        <div className="flex justify-between mt-2">
-                                            <span className="text-sm">Status: {story.status}</span>
-                                            <span className="text-sm">Priority: {story.priority}</span>
+                <div className="mt-2 h-full overflow-y-auto">
+                    {loading ? (
+                        <p className="text-center p-4">Loading stories...</p>
+                    ) : (
+                        <div className="space-y-6">
+                            {stories.map((story) => (
+                                <div
+                                    key={story.key}
+                                    className={`p-4 border rounded-lg bg-white  ${
+                                        selectedStory?.key === story.key ? 'border-blue-500' : 'border-gray-500'
+                                    }`}
+                                >
+                                    <div className="flex justify-between items-start">
+                                        <div 
+                                            className="cursor-pointer flex-grow"
+                                            onClick={() => setSelectedStory(story)}
+                                        >
+                                            <h3 className="font-bold">{story.key}: {story.summary}</h3>
+                                            <ReactMarkdown  >{story.description}</ReactMarkdown >
+                                            <div className="flex justify-between mt-2">
+                                                <span className="text-sm">Status: {story.status}</span>
+                                                <span className="text-sm">Priority: {story.priority}</span>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                
-                                <div className="mt-3 flex justify-between items-center">
-                                    <button
-                                        onClick={(e) => handleGenerateTests(story.key, e)}
-                                        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                                        disabled={loadingMap[story.key]}
-                                    >
-                                        {loadingMap[story.key] ? 'Generating...' : 'Generate Tests'}
-                                    </button>
                                     
-                                    <div className="space-x-2">
-                                        
+                                    <div className="mt-3 flex justify-between items-center">
                                         <button
-                                            onClick={() => handleDeleteStory(story.key)}
-                                            className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                                            onClick={(e) => handleGenerateTests(story.key, e)}
+                                            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                                            disabled={loadingMap[story.key]}
                                         >
-                                            Delete Story
+                                            {loadingMap[story.key] ? 'Generating...' : 'Generate Tests'}
                                         </button>
-                                    </div>
-                                </div>
-                                
-                                {testCasesMap[story.key] && (
-                                    <span className="text-xs text-gray-500">
-                                        Generated: {new Date(testCasesMap[story.key].timestamp).toLocaleString()}
-                                    </span>
-                                )}
-                                
-                                {/* Preview Section */}
-                                {showPreviewMap[story.key] && previewMap[story.key] && previewMap[story.key].testFiles && previewMap[story.key].testFiles.length > 0 && !editingMap[story.key] && (
-                                    <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-                                        <div className="flex justify-between items-center mb-2">
-                                            <h4 className="font-semibold">Preview Test Files</h4>
-                                            <div className="space-x-2">
+                                        
+                                        <div className="space-x-2">
                                             
-                                                <button
-                                                    onClick={() => handleCancelPreview(story.key)}
-                                                    className="px-3 py-1 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 text-sm"
-                                                >
-                                                    Cancel
-                                                </button>
-                                                <button
-                                                    onClick={() => handleEditTest(story.key)}
-                                                    className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 text-sm"
-                                                >
-                                                    Edit
-                                                </button>
-                                                <button
-                                                    onClick={() => toggleRegenerationInput(story.key)}
-                                                    className="px-3 py-1 bg-purple-500 text-white rounded hover:bg-purple-600 text-sm"
-                                                >
-                                                    Regenerate with Context
-                                                </button>
-                                                <button
-                                                    onClick={() => handleSaveAndUpload(story.key)}
-                                                    className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 text-sm"
-                                                    disabled={loadingMap[story.key]}
-                                                >
-                                                    {loadingMap[story.key] ? 'Saving...' : 'Save & Upload'}
-                                                </button>
-                                            </div>
-                                        </div>
-                                        {showRegenerationInputMap[story.key] && (
-                                            <div className="mt-4 p-3 bg-white rounded border border-gray-200">
-                                                <h4 className="font-semibold mb-2">Enter Context for Regeneration</h4>
-                                                <textarea
-                                                    value={regenerationContextMap[story.key] || ''}
-                                                    onChange={(e) => handleRegenerationContextChange(story.key, e.target.value)}
-                                                    placeholder="Enter additional context for regenerating test cases..."
-                                                    className="w-full h-32 p-2 border rounded mb-2"
-                                                />
-                                                <button
-                                                    onClick={() => handleRegenerateTests(story.key)}
-                                                    className="px-3 py-1 bg-purple-600 text-white rounded hover:bg-purple-700 text-sm"
-                                                    disabled={loadingMap[story.key]}
-                                                >
-                                                    {loadingMap[story.key] ? 'Regenerating...' : 'Regenerate'}
-                                                </button>
-                                            </div>
-                                        )}
-                                        <div className="space-y-2">
-                                            {previewMap[story.key].testFiles.map((file, index) => (
-                                                <div key={index} className="p-2 bg-white rounded border border-gray-200">
-                                                    <div className="text-xs text-gray-500 mb-1">{file.name}</div>
-                                                    <SyntaxHighlighter
-                                                        language="python"
-                                                        style={vscDarkPlus}
-                                                        customStyle={{ margin: 0, maxHeight: '300px' }}
-                                                    >
-                                                        {file.content}
-                                                    </SyntaxHighlighter>
-                                                </div>
-                                            ))}
-                                        </div>
-                                        
-                                        {/* Regeneration Context Input */}
-                                        
-                                    </div>
-                                )}
-                                
-                                {/* Edit Section */}
-                                {editingMap[story.key] && editContentMap[story.key] && (
-                                    <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-                                        <div className="flex justify-between items-center mb-2">
-                                            <h4 className="font-semibold">Edit Test Files</h4>
-                                            <div className="space-x-2">
-                                                <button
-                                                    onClick={() => setEditingMap(prev => ({ ...prev, [story.key]: false }))}
-                                                    className="px-3 py-1 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 text-sm"
-                                                >
-                                                    Cancel
-                                                </button>
-                                                <button
-                                                    onClick={() => handleSaveAndUpload(story.key)}
-                                                    className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 text-sm"
-                                                    disabled={loadingMap[story.key]}
-                                                >
-                                                    {loadingMap[story.key] ? 'Saving...' : 'Save & Upload'}
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <div className="space-y-2">
-                                            {Object.entries(editContentMap[story.key]).map(([fileName, content], index) => (
-                                                <div key={index} className="p-2 bg-white rounded border border-gray-200">
-                                                    <div className="text-xs text-gray-500 mb-1">{fileName}</div>
-                                                    <textarea
-                                                        value={content}
-                                                        onChange={(e) => handleEditContentChange(story.key, fileName, e.target.value)}
-                                                        className="w-full h-64 font-mono text-sm p-2 border border-gray-300 rounded"
-                                                    />
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-                                
-                                {/* Saved Test Cases Section */}
-                                {testCasesMap[story.key] && !showPreviewMap[story.key] && !editingMap[story.key] && testCasesMap[story.key].testFiles && testCasesMap[story.key].testFiles.length > 0 && (
-                                    <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-                                        <div className="flex justify-between items-center mb-2">
-                                            <h4 className="font-semibold">Generated Test Files</h4>
-                                            <div>
                                             <button
-                                            onClick={() => handlePushToGitHub(story.key)}
-                                            disabled={githubPushingMap[story.key]}
-                                            className="px-4 py-1 text-sm bg-green-500 text-white rounded hover:bg-green-600 disabled:opacity-50 mx-2"
-                                        >
-                                            {githubPushingMap[story.key] 
+                                                onClick={() => handleDeleteStory(story.key)}
+                                                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                                            >
+                                                Delete Story
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    {testCasesMap[story.key] && (
+                                        <span className="text-xs text-gray-500">
+                                            Generated: {new Date(testCasesMap[story.key].timestamp).toLocaleString()}
+                                        </span>
+                                    )}
+                                    
+                                    {/* Preview Section */}
+                                    {showPreviewMap[story.key] && previewMap[story.key] && previewMap[story.key].testFiles && previewMap[story.key].testFiles.length > 0 && !editingMap[story.key] && (
+                                        <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+                                            <div className="flex justify-between items-center mb-2">
+                                                <h4 className="font-semibold">Preview Test Files</h4>
+                                                <div className="space-x-2">
+                                                
+                                                    <button
+                                                        onClick={() => handleCancelPreview(story.key)}
+                                                        className="px-3 py-1 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 text-sm"
+                                                    >
+                                                        Cancel
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleEditTest(story.key)}
+                                                        className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 text-sm"
+                                                    >
+                                                        Edit
+                                                    </button>
+                                                    <button
+                                                        onClick={() => toggleRegenerationInput(story.key)}
+                                                        className="px-3 py-1 bg-purple-500 text-white rounded hover:bg-purple-600 text-sm"
+                                                    >
+                                                        Regenerate with Context
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleSaveAndUpload(story.key)}
+                                                        className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 text-sm"
+                                                        disabled={loadingMap[story.key]}
+                                                    >
+                                                        {loadingMap[story.key] ? 'Saving...' : 'Save & Upload'}
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            {showRegenerationInputMap[story.key] && (
+                                                <div className="mt-4 p-3 bg-white rounded border border-gray-200">
+                                                    <h4 className="font-semibold mb-2">Enter Context for Regeneration</h4>
+                                                    <textarea
+                                                        value={regenerationContextMap[story.key] || ''}
+                                                        onChange={(e) => handleRegenerationContextChange(story.key, e.target.value)}
+                                                        placeholder="Enter additional context for regenerating test cases..."
+                                                        className="w-full h-32 p-2 border rounded mb-2"
+                                                    />
+                                                    <button
+                                                        onClick={() => handleRegenerateTests(story.key)}
+                                                        className="px-3 py-1 bg-purple-600 text-white rounded hover:bg-purple-700 text-sm"
+                                                        disabled={loadingMap[story.key]}
+                                                    >
+                                                        {loadingMap[story.key] ? 'Regenerating...' : 'Regenerate'}
+                                                    </button>
+                                                </div>
+                                            )}
+                                            <div className="space-y-2">
+                                                {previewMap[story.key].testFiles.map((file, index) => (
+                                                    <div key={index} className="p-2 bg-white rounded border border-gray-200">
+                                                        <div className="text-xs text-gray-500 mb-1">{file.name}</div>
+                                                        <SyntaxHighlighter
+                                                            language="python"
+                                                            style={vscDarkPlus}
+                                                            customStyle={{ margin: 0, maxHeight: '300px' }}
+                                                        >
+                                                            {file.content}
+                                                        </SyntaxHighlighter>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                            
+                                            {/* Regeneration Context Input */}
+                                            
+                                        </div>
+                                    )}
+                                    
+                                    {/* Edit Section */}
+                                    {editingMap[story.key] && editContentMap[story.key] && (
+                                        <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+                                            <div className="flex justify-between items-center mb-2">
+                                                <h4 className="font-semibold">Edit Test Files</h4>
+                                                <div className="space-x-2">
+                                                    <button
+                                                        onClick={() => setEditingMap(prev => ({ ...prev, [story.key]: false }))}
+                                                        className="px-3 py-1 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 text-sm"
+                                                    >
+                                                        Cancel
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleSaveAndUpload(story.key)}
+                                                        className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 text-sm"
+                                                        disabled={loadingMap[story.key]}
+                                                    >
+                                                        {loadingMap[story.key] ? 'Saving...' : 'Save & Upload'}
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div className="space-y-2">
+                                                {Object.entries(editContentMap[story.key]).map(([fileName, content], index) => (
+                                                    <div key={index} className="p-2 bg-white rounded border border-gray-200">
+                                                        <div className="text-xs text-gray-500 mb-1">{fileName}</div>
+                                                        <textarea
+                                                            value={content}
+                                                            onChange={(e) => handleEditContentChange(story.key, fileName, e.target.value)}
+                                                            className="w-full h-64 font-mono text-sm p-2 border border-gray-300 rounded"
+                                                        />
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                    
+                                    {/* Saved Test Cases Section */}
+                                    {testCasesMap[story.key] && !showPreviewMap[story.key] && !editingMap[story.key] && testCasesMap[story.key].testFiles && testCasesMap[story.key].testFiles.length > 0 && (
+                                        <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+                                            <div className="flex justify-between items-center mb-2">
+                                                <h4 className="font-semibold">Generated Test Files</h4>
+                                                <div>
+                                                <button
+                                                onClick={() => handlePushToGitHub(testCasesMap[story.key].testFiles)}
+                                                disabled={githubPushingMap[story.key]}
+                                                className="px-4 py-1 text-sm bg-green-500 text-white rounded hover:bg-green-600 disabled:opacity-50 mx-2"
+                                            >
+                                                {githubPushingMap[story.key] 
     ? 'Pushing...' 
     : pushedMap[story.key] 
         ? 'Pushed' 
         : 'Push to GitHub'}
 
-                                        </button>
-                                            <button
-                                                onClick={() => handleEditTest(story.key)}
-                                                className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 text-sm"
-                                            >
-                                                Edits
                                             </button>
-                                            </div>
-                                        </div>
-                                        <div className="space-y-2">
-                                            {/*{testCasesMap[story.key].testFiles.map((file, index) => (
-                                                <div key={index} className="p-2 bg-white rounded border border-gray-200">
-                                                    <SyntaxHighlighter
-                                                    language="python"
-                                                    style={vscDarkPlus}
-                                                    customStyle={{ margin: 0, maxHeight: '300px' }}>
-                                                    {file}
-                                                    </SyntaxHighlighter>
-                                                </div>
-                                            ))}*/}
-                                            Test Coverage here: <CoverageComponent />
-                                        </div>
-                                        
-                                        {testCasesMap[story.key].blobUrl && (
-                                            <div className="mt-3">
-                                                <a 
-                                                    href={testCasesMap[story.key].blobUrl} 
-                                                    target="_blank" 
-                                                    rel="noopener noreferrer"
-                                                    className="text-blue-500 hover:underline text-sm"
+                                                <button
+                                                    onClick={() => handleEditTest(story.key)}
+                                                    className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 text-sm"
                                                 >
-                                                    Download Test Cases
-                                                </a>
+                                                    Edits
+                                                </button>
+                                                </div>
                                             </div>
-                                        )}
-                                        
-                                        {testCasesMap[story.key].testCaseId && (
-                                            <div className="mt-2">
-                                                <span className="text-xs text-gray-500">
-                                                    Test Case ID: {testCasesMap[story.key].testCaseId}
-                                                </span>
+                                            <div className="space-y-2">
+                                                {/*{testCasesMap[story.key].testFiles.map((file, index) => (
+                                                    <div key={index} className="p-2 bg-white rounded border border-gray-200">
+                                                        <SyntaxHighlighter
+                                                        language="python"
+                                                        style={vscDarkPlus}
+                                                        customStyle={{ margin: 0, maxHeight: '300px' }}>
+                                                        {file}
+                                                        </SyntaxHighlighter>
+                                                    </div>
+                                                ))}*/}
+                                                Test Coverage here: <CoverageComponent />
                                             </div>
-                                        )}
-                                    </div>
-                                )}
-                            </div>
-                        ))}
-                    </div>
-                )}
-            </div>
-        </div>
+                                            
+                                            {testCasesMap[story.key].blobUrl && (
+                                                <div className="mt-3">
+                                                    <a 
+                                                        href={testCasesMap[story.key].blobUrl} 
+                                                        target="_blank" 
+                                                        rel="noopener noreferrer"
+                                                        className="text-blue-500 hover:underline text-sm"
+                                                    >
+                                                        Download Test Cases
+                                                    </a>
+                                                </div>
+                                            )}
+                                            
+                                            {testCasesMap[story.key].testCaseId && (
+                                                <div className="mt-2">
+                                                    <span className="text-xs text-gray-500">
+                                                        Test Case ID: {testCasesMap[story.key].testCaseId}
+                                                    </span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            </Box>
+
+            <CodeGenSidebar 
+                open={codeGenOpen} 
+                onClose={() => setCodeGenOpen(false)} 
+            />
+
+            <Snackbar
+                open={notification.open}
+                autoHideDuration={6000}
+                onClose={handleCloseNotification}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+            >
+                <Alert 
+                    onClose={handleCloseNotification} 
+                    severity={notification.severity}
+                    sx={{ width: '100%' }}
+                >
+                    {notification.message}
+                </Alert>
+            </Snackbar>
+        </Box>
     );
 };
 
