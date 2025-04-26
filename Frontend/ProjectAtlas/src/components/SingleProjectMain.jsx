@@ -23,7 +23,7 @@ const SingleProjectMain = () => {
         <div className="flex flex-col">
             <NavbarDB title="Finance Application" byline="Manage all your projects with ease on a single page" />
             <div className='text-sm mx-2 my-1  border-b p-2 flex justify-between gap-2'>
-                <div className='flex items-center gap-2 bg-white p-2 border border-gray-400 rounded-md'>Finance Project / {category}</div>
+                <div className='flex items-center gap-2 bg-white p-2 border border-gray-400 rounded-md'>{projectId} / {category}</div>
 
                 <div className='flex items-center gap-2'>
                     <button className={category=== 'Home' ? "bg-[#00072D] text-white p-1 rounded" : ""} 

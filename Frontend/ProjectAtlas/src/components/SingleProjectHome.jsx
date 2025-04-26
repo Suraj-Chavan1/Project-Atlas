@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { DiJira } from "react-icons/di";
 import axios from 'axios';
+import KanbanBoard from './KanbanBoard';
 
 const SingleProjectHome = ({ projectId }) => {
   const [stakeholders, setStakeholders] = useState([]);
@@ -10,6 +11,7 @@ const SingleProjectHome = ({ projectId }) => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    console.log("Project ID:", projectId); // Log the projectId to check if it's being passed correctly
     const fetchStakeholders = async () => {
       try {
         setLoading(true);
@@ -46,10 +48,10 @@ const SingleProjectHome = ({ projectId }) => {
   }
 
   return (
-    <div className="flex flex-col mx-3 my-0">
-      <div className='grid grid-cols-3 grid-cols-2 gap-4 mt-2'>
+    <div className="h-screen flex flex-col mx-3 my-0">
+      <div className='grid grid-cols-6 gap-4 mt-2'>
         {/* Integrations */}
-        <div className='col-span-1 row-span-1 border border-gray-400 p-3 flex flex-col rounded-md bg-white'>
+        <div className='col-span-2 row-span-1 border border-gray-400 p-3 flex flex-col rounded-md bg-white'>
           <div className="flex items-center space-x-2">
             <DiJira className="text-blue-600 text-2xl" />
             <span className="text-lg font-semibold">Integrations</span>
@@ -70,15 +72,15 @@ const SingleProjectHome = ({ projectId }) => {
         </div>
 
         {/* Requirement Engineering Graph + List */}
-        <div className='col-span-1 row-span-1 border border-gray-400 bg-white p-3 flex flex-col rounded-md'>
+        <div className='col-span-2 row-span-1 border border-gray-400 bg-white p-3 flex flex-col rounded-md'>
           <div>Today's Schedule</div>
         </div>
 
-        <div className='col-span-1 row-span-1 border border-gray-400 bg-white p-3 flex flex-col rounded-md'>
+        <div className='col-span-2 row-span-1 border border-gray-400 bg-white p-3 flex flex-col rounded-md'>
           <div>Recent Activity</div>
         </div>
 
-        <div className='col-span-2 border border-gray-400 bg-white p-3 flex flex-col rounded-md'>
+        <div className='col-span-3 border border-gray-400 bg-white p-3 flex flex-col rounded-md'>
           <div className='flex justify-between'>
             <div className='text-lg font-bold mb-2'>Stakeholders</div>
             <div className='flex justify-center gap-2'>
@@ -123,6 +125,12 @@ const SingleProjectHome = ({ projectId }) => {
             </tbody>
           </table>
         </div>
+
+        <div className='col-span-3 border border-gray-400 bg-white p-3 flex flex-col rounded-md'>
+          <KanbanBoard projectId={projectId} />
+        </div>
+
+
       </div>
     </div>
   );

@@ -12,6 +12,7 @@
   "dependencies": {
     "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
+    "@hello-pangea/dnd": "^18.0.1",
     "@mui/icons-material": "^5.15.10",
     "@mui/material": "^5.15.10",
     "@tailwindcss/vite": "^4.0.17",
@@ -25,6 +26,7 @@
     "react-markdown": "^10.1.0",
     "react-router-dom": "^6.22.1",
     "react-syntax-highlighter": "^15.6.1",
+    "react-toastify": "^11.0.5",
     "recharts": "^2.15.1",
     "tailwindcss": "^4.0.17",
     "uuid": "^11.1.0"
