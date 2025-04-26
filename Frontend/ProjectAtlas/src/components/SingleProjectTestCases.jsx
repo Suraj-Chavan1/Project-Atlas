@@ -15,6 +15,7 @@ const SingleProjectTestCases = () => {
     const [testCasesMap, setTestCasesMap] = useState({});
     const [loadingMap, setLoadingMap] = useState({});
     const [githubPushingMap, setGithubPushingMap] = useState({});
+    const [pushedMap, setPushedMap] = useState({});
     const [previewMap, setPreviewMap] = useState({});
     const [showPreviewMap, setShowPreviewMap] = useState({});
     const [editingMap, setEditingMap] = useState({});
@@ -429,6 +430,7 @@ const SingleProjectTestCases = () => {
 
                 if (response.data.success) {
                     alert('Successfully pushed test cases to GitHub');
+                    setPushedMap(prev => ({ ...prev, [storyKey]: true })); 
                 } else {
                     alert(`Failed to push to GitHub: ${response.data.error}`);
                 }
@@ -440,6 +442,7 @@ const SingleProjectTestCases = () => {
             alert('Failed to push test cases to GitHub');
         } finally {
             setLoadingMap(prev => ({ ...prev, [storyKey]: false }));
+            setGithubPushingMap(prev => ({ ...prev, [storyKey]: false })); 
         }
     };
 
@@ -634,7 +637,12 @@ const SingleProjectTestCases = () => {
                                             disabled={githubPushingMap[story.key]}
                                             className="px-4 py-1 text-sm bg-green-500 text-white rounded hover:bg-green-600 disabled:opacity-50 mx-2"
                                         >
-                                            {githubPushingMap[story.key] ? 'Pushing...' : 'Push to GitHub'}
+                                            {githubPushingMap[story.key] 
+    ? 'Pushing...' 
+    : pushedMap[story.key] 
+        ? 'Pushed' 
+        : 'Push to GitHub'}
+
                                         </button>
                                             <button
                                                 onClick={() => handleEditTest(story.key)}
