@@ -864,19 +864,50 @@ def generate_code():
 
         # Build the prompt
         prompt = f"""
-        Generate code based on the following requirements:
-        
-        Language: {language}
-        Framework: {framework}
-        Requirements: {user_input}
-        
-        Additional Context: {context}
-        
-        Please provide:
-        1. Complete, working code
-        2. Clear comments explaining the code
-        3. Any necessary imports or dependencies
-        4. Example usage if applicable
+        Generate a complete implementation code that satisfies the following test cases:
+
+        Test File Content:
+        {user_input}
+
+        Technical Requirements:
+        - Language: {language}
+        - Framework: {framework}
+        {context if context else ''}
+
+        Instructions:
+        1. Analyze the test cases carefully to understand the required functionality
+        2. Extract all function signatures, class definitions, and expected behaviors from the tests
+        3. Implement all necessary functions and classes that will make the tests pass
+        4. Follow the exact naming conventions used in the test cases
+        5. Include all required imports and dependencies
+        6. Ensure proper error handling for edge cases shown in the tests
+        7. Add comprehensive documentation:
+           - Module-level docstring explaining the purpose
+           - Function/class docstrings with parameters and return types
+           - Inline comments for complex logic
+        8. Maintain clean code principles:
+           - Follow language-specific best practices
+           - Use meaningful variable names
+           - Keep functions focused and single-purpose
+           - Implement proper encapsulation and data validation
+
+        Expected Output Format:
+        ```{language}
+        # Imports and dependencies
+
+        # Main implementation code
+
+        # Helper functions/classes (if needed)
+
+        # Example usage (if applicable)
+        ```
+
+        IMPORTANT:
+        - The implementation must pass all test cases provided
+        - Use only standard library unless specific packages are mentioned in tests
+        - Follow the exact function/class signatures from the test file
+        - Include type hints and docstrings (if language supports)
+        - Handle all edge cases implied by the test assertions
         """
 
         # Make the API call
