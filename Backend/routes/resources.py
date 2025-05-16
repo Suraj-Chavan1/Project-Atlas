@@ -34,12 +34,12 @@ CORS(resources,
 # Azure OpenAI Configuration
 OPENAI_ENDPOINT = "https://suraj-m9lgdbv9-eastus2.cognitiveservices.azure.com/"
 OPENAI_DEPLOYMENT = "gpt-4o"
-OPENAI_API_KEY = "75PVa3SAy9S2ZR590gZesyTNDMZtb3Oa5EdHlRbqWeQ89bmoOGl4JQQJ99BDACHYHv6XJ3w3AAAAACOGUP8d"
+OPENAI_API_KEY = " "
 OPENAI_API_VERSION = "2024-12-01-preview"
 
 # Azure Storage Configuration
 ACCOUNT_NAME = 'barclaysstorage'
-ACCOUNT_KEY = 'w7fJMnkuaZR4RX9LJbTRld8v90S6KDupj1BDHNZ1+Ch9Do7Et56nQKAd2HVXJqgZYEVbcGY/CGRj+AStE2NEXQ=='
+ACCOUNT_KEY = ' '
 BLOB_CONTAINER = 'resources'
 
 # Create Blob Service Client
@@ -55,7 +55,7 @@ except Exception:
 
 # Cosmos DB Configuration
 COSMOS_URL = "https://barclaysdb.documents.azure.com:443/"
-COSMOS_KEY = "ercuc7wFNt4RPsxcx2QTzKP8AhKUDnjJrt0mpZrW2Yi2IQGAa7wDrEbhKRHsurGu0P7GuGny4IZRACDbtecfNQ=="
+COSMOS_KEY = " "
 DATABASE_NAME = "RequirementsDB"
 RESOURCES_CONTAINER = "Resources"
 
@@ -66,7 +66,7 @@ resources_container = database.get_container_client(RESOURCES_CONTAINER)
 
 # Form Recognizer Configuration
 FORM_RECOGNIZER_ENDPOINT = "https://barclaysform.cognitiveservices.azure.com/"
-FORM_RECOGNIZER_KEY = "63spGg0VYFV0kWZB3nmsFDp8yEbi40zmEnCvIl6D8Seih4YyLsp9JQQJ99BDACYeBjFXJ3w3AAALACOGh5hu"
+FORM_RECOGNIZER_KEY = " "
 
 # Initialize Azure OpenAI client
 openai_client = AzureOpenAI(
@@ -78,7 +78,7 @@ openai_client = AzureOpenAI(
 
 # Confluence Configuration
 email = "prathamgadkari@gmail.com"
-api_token = "ATATT3xFfGF0LXSWvbAlLm1lVXyxSroefrBXONpTLDg5mzfknXUUxTYAjQ0u59wKKGh3ObCEnducPVGqRwCLoxDu8oc4xx3aBAHj6A9Tzuj2OqiUszHVo3UvYrpmblYC2xHttFxo5ULieeRE2LNIfR3w_l2YNJTvACQ_zmBnkt6Tjvenqyu2pEM=99E9EA51"
+api_token = " "
 base_url = "https://prathamgadkari.atlassian.net/wiki"
 
 def validate_url(url):
