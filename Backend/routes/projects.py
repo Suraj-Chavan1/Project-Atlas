@@ -8,7 +8,7 @@ projects = Blueprint('projects', __name__, url_prefix='/projects')
 
 # Cosmos DB Configuration (reuse from auth.py)
 URL = "https://barclaysdb.documents.azure.com:443/"
-KEY = "ercuc7wFNt4RPsxcx2QTzKP8AhKUDnjJrt0mpZrW2Yi2IQGAa7wDrEbhKRHsurGu0P7GuGny4IZRACDbtecfNQ=="
+KEY = " "
 DATABASE_NAME = "RequirementsDB"
 PROJECT_CONTAINER = "Projects"
 USER_CONTAINER = "Users"
