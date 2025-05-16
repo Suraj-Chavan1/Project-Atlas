@@ -24,18 +24,18 @@ srs_brd_to_stories_bp = Blueprint('srs_brd_to_stories', __name__)
 
 # Azure OpenAI Configuration
 AZURE_ENDPOINT = "https://suraj-m9lgdbv9-eastus2.cognitiveservices.azure.com/"
-AZURE_API_KEY = "75PVa3SAy9S2ZR590gZesyTNDMZtb3Oa5EdHlRbqWeQ89bmoOGl4JQQJ99BDACHYHv6XJ3w3AAAAACOGUP8d"
+AZURE_API_KEY = " "
 AZURE_API_VERSION = "2024-02-15-preview"
 DEPLOYMENT_NAME = "gpt-4v"  # Make sure this is your vision model deployment name
 TEXT_DEPLOYMENT_NAME = "gpt-4"  # Your text model deployment name
 
 # Azure Document Intelligence Configuration
 FORM_ENDPOINT = "https://barclaysform.cognitiveservices.azure.com/"
-FORM_KEY = "63spGg0VYFV0kWZB3nmsFDp8yEbi40zmEnCvIl6D8Seih4YyLsp9JQQJ99BDACYeBjFXJ3w3AAALACOGh5hu"
+FORM_KEY = " "
 
 # Azure Cosmos DB Configuration
 COSMOS_ENDPOINT = "https://barclaysdb.documents.azure.com:443/"
-COSMOS_KEY = "ercuc7wFNt4RPsxcx2QTzKP8AhKUDnjJrt0mpZrW2Yi2IQGAa7wDrEbhKRHsurGu0P7GuGny4IZRACDbtecfNQ=="
+COSMOS_KEY = " "
 COSMOS_DATABASE = "RequirementsDB"  # Changed to match existing database
 COSMOS_CONTAINER = "UserStories"    # Changed to match existing container
 
