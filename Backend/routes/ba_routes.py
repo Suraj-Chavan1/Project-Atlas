@@ -24,14 +24,14 @@ import re
 from reportlab.pdfgen import canvas
 
 # Azure OpenAI Configuration
-AZURE_ENDPOINT = "https://suraj-m9lgdbv9-eastus2.cognitiveservices.azure.com/"
-AZURE_API_KEY = "75PVa3SAy9S2ZR590gZesyTNDMZtb3Oa5EdHlRbqWeQ89bmoOGl4JQQJ99BDACHYHv6XJ3w3AAAAACOGUP8d"
+AZURE_ENDPOINT = " "
+AZURE_API_KEY = " "
 AZURE_API_VERSION = "2024-02-15-preview"
 DEPLOYMENT_NAME = "gpt-4o"  # Updated deployment name to match v1 model
 
 # Cosmos DB Configuration
-COSMOS_URL = "https://barclaysdb.documents.azure.com:443/"
-COSMOS_KEY = "ercuc7wFNt4RPsxcx2QTzKP8AhKUDnjJrt0mpZrW2Yi2IQGAa7wDrEbhKRHsurGu0P7GuGny4IZRACDbtecfNQ=="
+COSMOS_URL = " "
+COSMOS_KEY = " "
 DATABASE_NAME = 'RequirementsDB'
 CONTAINER_NAME = 'RequirementDocs'
 
@@ -41,7 +41,7 @@ BLOB_CONTAINER_NAME = 'data'
 
 # Form Recognizer Configuration
 FORM_RECOGNIZER_ENDPOINT = "https://barclaysform.cognitiveservices.azure.com/"
-FORM_RECOGNIZER_KEY = "63spGg0VYFV0kWZB3nmsFDp8yEbi40zmEnCvIl6D8Seih4YyLsp9JQQJ99BDACYeBjFXJ3w3AAALACOGh5hu"
+FORM_RECOGNIZER_KEY = " "
 
 # Business Analyst Template Definition
 BA_TEMPLATE = """Business Analyst Team – Business Requirements Template
