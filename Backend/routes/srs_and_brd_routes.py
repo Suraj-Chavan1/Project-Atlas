@@ -37,7 +37,7 @@ logger = logging.getLogger(__name__)
 # Initialize Cosmos DB client
 cosmos_client = CosmosClient(
     "https://barclaysdb.documents.azure.com:443/",
-    "ercuc7wFNt4RPsxcx2QTzKP8AhKUDnjJrt0mpZrW2Yi2IQGAa7wDrEbhKRHsurGu0P7GuGny4IZRACDbtecfNQ=="
+    " "
 )
 database = cosmos_client.get_database_client("RequirementsDB")
 cosmos_db = database.get_container_client("StandardDocs")
@@ -48,17 +48,17 @@ CORS(srs_brd_bp)  # Enable CORS for this blueprint
 
 # Azure OpenAI Configuration
 AZURE_ENDPOINT = "https://suraj-m9lgdbv9-eastus2.cognitiveservices.azure.com/"
-AZURE_API_KEY = "75PVa3SAy9S2ZR590gZesyTNDMZtb3Oa5EdHlRbqWeQ89bmoOGl4JQQJ99BDACHYHv6XJ3w3AAAAACOGUP8d"
+AZURE_API_KEY = " "
 AZURE_API_VERSION = "2024-02-15-preview"
 DEPLOYMENT_NAME = "gpt-4o"
 
 # Azure Document Intelligence Configuration
 FORM_ENDPOINT = "https://barclaysform.cognitiveservices.azure.com/"
-FORM_KEY = "63spGg0VYFV0kWZB3nmsFDp8yEbi40zmEnCvIl6D8Seih4YyLsp9JQQJ99BDACYeBjFXJ3w3AAALACOGh5hu"
+FORM_KEY = " "
 
 # Azure Cosmos DB Configuration
 COSMOS_ENDPOINT = "https://barclaysdb.documents.azure.com:443/"
-COSMOS_KEY = "ercuc7wFNt4RPsxcx2QTzKP8AhKUDnjJrt0mpZrW2Yi2IQGAa7wDrEbhKRHsurGu0P7GuGny4IZRACDbtecfNQ=="
+COSMOS_KEY = " "
 COSMOS_DATABASE = "RequirementsDB"
 COSMOS_CONTAINER = "StandardDocs"
 
