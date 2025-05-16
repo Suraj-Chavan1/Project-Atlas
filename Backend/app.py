@@ -21,8 +21,8 @@ CORS(app, resources={r"/*": {
 }})
 
 # Azure Cosmos DB Configuration
-COSMOS_ENDPOINT = os.getenv("COSMOS_ENDPOINT", "https://barclaysdb.documents.azure.com:443/")
-COSMOS_KEY = os.getenv("COSMOS_KEY", "ercuc7wFNt4RPsxcx2QTzKP8AhKUDnjJrt0mpZrW2Yi2IQGAa7wDrEbhKRHsurGu0P7GuGny4IZRACDbtecfNQ==")
+COSMOS_ENDPOINT = os.getenv("COSMOS_ENDPOINT", " ")
+COSMOS_KEY = os.getenv("COSMOS_KEY", " ")
 COSMOS_DATABASE = "RequirementsDB"
 
 # Initialize Cosmos DB client
