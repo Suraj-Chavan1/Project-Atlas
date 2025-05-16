@@ -7,8 +7,8 @@ import uuid
 auth = Blueprint('auth', __name__, url_prefix='/auth')
 
 # Cosmos DB Configuration
-URL = "https://barclaysdb.documents.azure.com:443/"
-KEY = "ercuc7wFNt4RPsxcx2QTzKP8AhKUDnjJrt0mpZrW2Yi2IQGAa7wDrEbhKRHsurGu0P7GuGny4IZRACDbtecfNQ=="
+URL = " "
+KEY = " "
 DATABASE_NAME = "RequirementsDB"
 USER_CONTAINER = "Users"
 SESSION_CONTAINER = "Sessions"
