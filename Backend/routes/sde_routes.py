@@ -23,24 +23,24 @@ import re
 from flask_cors import CORS
 
 # Azure OpenAI Configuration
-AZURE_ENDPOINT = "https://suraj-m9lgdbv9-eastus2.cognitiveservices.azure.com/"
-AZURE_API_KEY = "75PVa3SAy9S2ZR590gZesyTNDMZtb3Oa5EdHlRbqWeQ89bmoOGl4JQQJ99BDACHYHv6XJ3w3AAAAACOGUP8d"
+AZURE_ENDPOINT = " "
+AZURE_API_KEY = " "
 AZURE_API_VERSION = "2024-02-15-preview"
 DEPLOYMENT_NAME = "gpt-4o"  # Updated deployment name to match v1 model
 
 # Cosmos DB Configuration
-COSMOS_URL = "https://barclaysdb.documents.azure.com:443/"
-COSMOS_KEY = "ercuc7wFNt4RPsxcx2QTzKP8AhKUDnjJrt0mpZrW2Yi2IQGAa7wDrEbhKRHsurGu0P7GuGny4IZRACDbtecfNQ=="
+COSMOS_URL = " "
+COSMOS_KEY = " "
 DATABASE_NAME = 'RequirementsDB'
 CONTAINER_NAME = 'RequirementDocs'
 
 # Blob Storage Configuration
-BLOB_CONNECTION_STRING = 'DefaultEndpointsProtocol=https;AccountName=barclaysstorage;AccountKey=w7fJMnkuaZR4RX9LJbTRld8v90S6KDupj1BDHNZ1+Ch9Do7Et56nQKAd2HVXJqgZYEVbcGY/CGRj+AStE2NEXQ==;EndpointSuffix=core.windows.net'
+BLOB_CONNECTION_STRING = ' '
 BLOB_CONTAINER_NAME = 'data'
 
 # Form Recognizer Configuration
 FORM_RECOGNIZER_ENDPOINT = "https://barclaysform.cognitiveservices.azure.com/"
-FORM_RECOGNIZER_KEY = "63spGg0VYFV0kWZB3nmsFDp8yEbi40zmEnCvIl6D8Seih4YyLsp9JQQJ99BDACYeBjFXJ3w3AAALACOGh5hu"
+FORM_RECOGNIZER_KEY = " "
 
 # SDE Template Definition
 SDE_TEMPLATE = """SDE Team – SRS Input Template
