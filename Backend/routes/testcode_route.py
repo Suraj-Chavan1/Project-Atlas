@@ -21,7 +21,7 @@ testcode_bp = Blueprint('testcode', __name__)
 
 # Azure OpenAI Configuration
 AZURE_ENDPOINT = "https://suraj-m9lgdbv9-eastus2.cognitiveservices.azure.com/"
-AZURE_API_KEY = "75PVa3SAy9S2ZR590gZesyTNDMZtb3Oa5EdHlRbqWeQ89bmoOGl4JQQJ99BDACHYHv6XJ3w3AAAAACOGUP8d"
+AZURE_API_KEY = " "
 AZURE_API_VERSION = "2024-12-01-preview"  # Updated API version
 DEPLOYMENT_NAME = "gpt-4.1"  # Updated deployment name
 
