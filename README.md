@@ -42,7 +42,7 @@
 
 [![Watch the demo video](https://img.youtube.com/vi/ODOydtV3UBA/hqdefault.jpg)](https://www.youtube.com/watch?v=cDJg8JisV5o)
 
-- https://www.youtube.com/watch?feature=shared&v=j-8rao7DM2g
+- https://www.youtube.com/watch?v=cDJg8JisV5o
 
 - It is a request to go through the readme first before going through the video for better understanding
 - **(For demo purposes we have only used the most accessible technology we had)**
