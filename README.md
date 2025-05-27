@@ -40,7 +40,7 @@
 ## Demo Video Project Proof of Concept
 
 
-[![Watch the demo video](https://img.youtube.com/vi/ODOydtV3UBA/hqdefault.jpg)](https://www.youtube.com/watch?feature=shared&v=j-8rao7DM2g)
+[![Watch the demo video](https://img.youtube.com/vi/ODOydtV3UBA/hqdefault.jpg)](https://www.youtube.com/watch?v=cDJg8JisV5o)
 
 - https://www.youtube.com/watch?feature=shared&v=j-8rao7DM2g
 
