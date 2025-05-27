@@ -37,7 +37,7 @@
 | [Closing Remarks](#closing-remarks)                       | Final thoughts, acknowledgments, and feedback links                    |
 
 
-## Demo Video Project Proof of Concept
+## Demo Video (Watch With Full Volume)
 
 
 [![Watch the demo video](https://img.youtube.com/vi/ODOydtV3UBA/hqdefault.jpg)](https://www.youtube.com/watch?v=cDJg8JisV5o)
