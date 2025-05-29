@@ -89,7 +89,9 @@ Moreover, **Project ATLAS** streamlines the extraction of **requirements** from 
 
 The following are the Unique Selling Propositions our Platform offers
 
-![Image](https://github.com/user-attachments/assets/25e681b8-7b60-4c8c-bfde-a9264bc9f357)
+![image](https://github.com/user-attachments/assets/8f9ccade-cea7-40ad-9104-f94abfb76d3c)
+
+
 
 ## Impact
 **Project ATLAS** delivers a robust, AI-powered solution that accelerates documentation, reduces manual intervention, and accelerates **software development cycles**. By ensuring data security and compliance through locally deployed models and secure cloud infrastructure, the platform significantly enhances operational efficiency and quality at Barclays.
