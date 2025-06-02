@@ -313,7 +313,6 @@ Security and data protection are paramount for Project ATLAS, especially when ha
 
 Thank you very much for allowing us to show our idea. We have tried to show as much implementation and documentation as we can, and we hope you like our idea.
 
-We would love to work with Barclays on this project and would greatly appreciate any feedback from the judges!
 
 [Feedback Form](https://docs.google.com/forms/d/e/1FAIpQLSeEYeO0i4gwhKAgsvP2TqNMkgJf6N86oUwLe16KCgaWIU-PBg/viewform)
 
