@@ -1,4 +1,18 @@
 
+## Demo Video (Watch With Full Volume)
+
+
+
+[![Watch the demo video](https://img.youtube.com/vi/cDJg8JisV5o/hqdefault.jpg)](https://www.youtube.com/watch?v=cDJg8JisV5o)
+
+
+
+- https://www.youtube.com/watch?v=cDJg8JisV5o
+
+- It is a request to go through the readme first before going through the video for better understanding
+- **(For demo purposes we have only used the most accessible technology we had)**
+
+
 ## Problem Statement chosen:
 ![image](https://github.com/user-attachments/assets/16b7a14a-2920-4fda-852b-4f43fdfd962e)
 
@@ -36,19 +50,6 @@
 | [Implementation UI](#implementation-ui)                   | UI snapshots, features, and navigation details                         |
 | [Closing Remarks](#closing-remarks)                       | Final thoughts, acknowledgments, and feedback links                    |
 
-
-## Demo Video (Watch With Full Volume)
-
-
-
-[![Watch the demo video](https://img.youtube.com/vi/cDJg8JisV5o/hqdefault.jpg)](https://www.youtube.com/watch?v=cDJg8JisV5o)
-
-
-
-- https://www.youtube.com/watch?v=cDJg8JisV5o
-
-- It is a request to go through the readme first before going through the video for better understanding
-- **(For demo purposes we have only used the most accessible technology we had)**
 
 
 ## Problem Statement :
