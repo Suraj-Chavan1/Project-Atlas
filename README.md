@@ -22,10 +22,6 @@
 - There is also our frontend implementation , which shows the flow , which you can go through.
 - Please also do see our architecture and user flow diagrams for clarity.
 
-## Future work:
-- We are working on a microsoft teams integration , which would directly send all the meeting documents, transcripts etc directly to Project Atlas dashboard, so that requirement documents can be formed directly from your meets.
-- We are also working on fine tuning the large language models so that the document output is precise.
-- Along with this we are also working towards github bot integration so that you can push your codes directly from project Atlas to github.
 
 # Table of Contents
 
@@ -58,7 +54,7 @@
 
 ## Introduction
 
-In today's **fast-paced** software development landscape, traditional methods for **requirement gathering**, **documentation**, and **test case generation** are labor-intensive, error-prone, and time-consuming. These challenges demand a transformative solution at **Barclays**, where **precision** and **compliance** are critical.
+In today's **fast-paced** software development landscape, traditional methods for **requirement gathering**, **documentation**, and **test case generation** are labor-intensive, error-prone, and time-consuming. These challenges demand a transformative solution, where **precision** and **compliance** are critical.
 
 **Project ATLAS** automates the entire lifecycle of **software development and documentation** using advanced **Generative AI**. 
 
@@ -95,7 +91,7 @@ The following are the Unique Selling Propositions our Platform offers
 
 
 ## Impact
-**Project ATLAS** delivers a robust, AI-powered solution that accelerates documentation, reduces manual intervention, and accelerates **software development cycles**. By ensuring data security and compliance through locally deployed models and secure cloud infrastructure, the platform significantly enhances operational efficiency and quality at Barclays.
+**Project ATLAS** delivers a robust, AI-powered solution that accelerates documentation, reduces manual intervention, and accelerates **software development cycles**. By ensuring data security and compliance through locally deployed models and secure cloud infrastructure, the platform significantly enhances operational efficiency and quality.
 
 
 # Market Analysis
@@ -140,7 +136,7 @@ User Flow Link: https://drive.google.com/file/d/1n4Zuw9-QC7NzIxbbDbrtynsAy_VaDjm
 2. **Choice of LLMs/LVMs?(PLEASE DO SEE THE TERMS AND CONDITIONS IN ARCHITECTURE)**
    - Using **Gemini/Grok APIs** would risk exposing enterprise data to third-party companies.
    - Project Atlas deals with sensitive data, so we use **Ollama** and **Azure VMs** to privately host open-source LLMs/LVMs like **LLama (3B, 7B)** and **LLAVA 7B** parameter models to handle document inputs appropriately **OR**
-   -  **Azure OpenAI** is also a choice where we have enterprise grade security and cost effectiveness with ease of integration with Barclays.(Microsoft azure gurantees that the customer info wont be used for open ai to train its outputs on...so its a choice which would depend on barclays.)
+   -  **Azure OpenAI** is also a choice where we have enterprise grade security and cost effectiveness with ease of integration with company infra.(Microsoft azure gurantees that the customer info wont be used for open ai to train its outputs on...so its a choice which would depend on company.)
    - AzureOpenAI Security Clause: https://learn.microsoft.com/en-us/legal/cognitive-services/openai/data-privacy?utm_source=chatgpt.com&tabs=azure-portal.
 
 
@@ -202,7 +198,7 @@ Security and data protection are paramount for Project ATLAS, especially when ha
 1. **Local Open-Source LLMs Deployed on Azure VMs** (Terms and conditions applied, do see the architecture diagram)
    - Deploying Ollama Local LLMs on Azure VMs (GPU/CPU) ensures that  in-house data is not leaked and **ensures integrity**.
    - Such a setup makes an LLM fully customizable; however, scaling needs to be taken care of.
-   - So current choice is of **Azure OpenAI** as Microsoft ensures security and  the cost of vms(for testing is very high) but in future if **Barclays** is concerned about security we would use the approach of privately deployed llms.
+   - So current choice is of **Azure OpenAI** as Microsoft ensures security and  the cost of vms(for testing is very high) but in future if **Company** is concerned about security we would use the approach of privately deployed llms.
    - **Microsoft Azure OpenAI Data privacy clause**
    - https://learn.microsoft.com/en-us/legal/cognitive-services/openai/data-privacy?utm_source=chatgpt.com&tabs=azure-portal
      
@@ -222,7 +218,7 @@ Security and data protection are paramount for Project ATLAS, especially when ha
 
 ![Image](https://github.com/user-attachments/assets/89059016-8319-4d97-baf7-573bda53cafd)
 
-1. **Azure Cloud** - Enterprise-grade cloud platform that seamlessly integrates with Barclays' existing tech infrastructure, **providing compliance controls** and **unified security policies** across all Project Atlas components.
+1. **Azure Cloud** - Enterprise-grade cloud platform that seamlessly integrates with Company's existing tech infrastructure, **providing compliance controls** and **unified security policies** across all Project Atlas components.
 
 2. **Azure Functions** - **Provides serverless compute resources** that automatically scale based on demand, allowing us to efficiently process document inputs, LLM requests, and user story generation without managing infrastructure.
 
@@ -314,6 +310,12 @@ Security and data protection are paramount for Project ATLAS, especially when ha
 
 Thank you very much for allowing us to show our idea. We have tried to show as much implementation and documentation as we can, and we hope you like our idea.
 
+
+
+## Future work:
+- We are working on a microsoft teams integration , which would directly send all the meeting documents, transcripts etc directly to Project Atlas dashboard, so that requirement documents can be formed directly from your meets.
+- We are also working on fine tuning the large language models so that the document output is precise.
+- Along with this we are also working towards github bot integration so that you can push your codes directly from project Atlas to github.
 
 [Feedback Form](https://docs.google.com/forms/d/e/1FAIpQLSeEYeO0i4gwhKAgsvP2TqNMkgJf6N86oUwLe16KCgaWIU-PBg/viewform)
 
