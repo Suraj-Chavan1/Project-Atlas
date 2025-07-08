@@ -13,6 +13,30 @@
 - **(For demo purposes we have only used the most accessible technology we had)**
 
 
+
+# Implementation UI(Final):
+![1_cover_page](https://github.com/user-attachments/assets/66501a24-bd9b-4998-88a2-2ba45c19eabe)
+![2_create_project](https://github.com/user-attachments/assets/0f455d7c-d154-406f-884c-ce2e77b3ff18)
+![3_dashboard](https://github.com/user-attachments/assets/63831ce3-ab83-4b89-ba1d-b7f7a67ac1aa)
+![4_project_page](https://github.com/user-attachments/assets/3d965752-8d05-468e-ab05-02e9ccf29004)
+![4_project_page1](https://github.com/user-attachments/assets/aa72eb4e-83d2-4627-ae25-57ab60cf246d)
+![6_multimodal_inputs](https://github.com/user-attachments/assets/5a311062-272d-40da-8c95-15227a046cad)
+![7_requirements_resourcespage](https://github.com/user-attachments/assets/cf1260c4-bcc8-43fb-bb7a-923ca713aba7)
+![8_audio_Transcript](https://github.com/user-attachments/assets/3031c880-735f-4219-a9b7-42b41f537a7c)
+![9_add_resources](https://github.com/user-attachments/assets/d9f71a9f-4e7e-4587-839f-e2168522e8ca)
+![10_template_generated_sde_devops_ba](https://github.com/user-attachments/assets/4bf35278-ae53-4dd0-85f8-8fc58e687831)
+![12_generated_docs_srsorbrd](https://github.com/user-attachments/assets/8598c5c0-7f9c-4b2c-abbd-1e8b38cc1384)
+![13_version_control](https://github.com/user-attachments/assets/904ca2f1-1d59-435d-bf51-3f3c1b1f5712)
+![14_srs_withedit_and_section_evaluations](https://github.com/user-attachments/assets/41919bf6-cf7a-4b69-a544-4601a133b242)
+![15_user_stories](https://github.com/user-attachments/assets/18cb83d5-a631-4e87-9390-c9c49443df94)
+![16_generated_user_stories_moscow](https://github.com/user-attachments/assets/5f2956a9-61df-4285-b5e7-54dda15ba4ee)
+![18_test_cases_Section](https://github.com/user-attachments/assets/01171114-e792-4537-8e95-75cfe80c8c28)
+![19_cconnect_github_bot](https://github.com/user-attachments/assets/27fab432-b27d-445a-87ea-c6f574b1dd36)
+![20_generate_code_and_tests](https://github.com/user-attachments/assets/489002a8-01a6-4d37-b3b0-9b6c10858225)
+![21_workflows](https://github.com/user-attachments/assets/9f12ed20-0a91-491c-97db-29338c8af9cf)
+
+
+
 ## Problem Statement chosen:
 ![image](https://github.com/user-attachments/assets/16b7a14a-2920-4fda-852b-4f43fdfd962e)
 
@@ -229,32 +253,6 @@ Security and data protection are paramount for Project ATLAS, especially when ha
 5. **Azure VMs** - Customizable virtual machines with flexible compute options that host the web application and LLMs, **allowing for rapid vertical scaling** during peak usage periods without compromising data integrity.
 
 6. **Azure Cosmos DB** - Globally distributed, multi-model database service that efficiently **stores and queries vector embeddings** with low latency, enabling fast semantic search capabilities for requirement extraction.
-
-
-
-
-# Implementation UI(Final):
-![1_cover_page](https://github.com/user-attachments/assets/66501a24-bd9b-4998-88a2-2ba45c19eabe)
-![2_create_project](https://github.com/user-attachments/assets/0f455d7c-d154-406f-884c-ce2e77b3ff18)
-![3_dashboard](https://github.com/user-attachments/assets/63831ce3-ab83-4b89-ba1d-b7f7a67ac1aa)
-![4_project_page](https://github.com/user-attachments/assets/3d965752-8d05-468e-ab05-02e9ccf29004)
-![4_project_page1](https://github.com/user-attachments/assets/aa72eb4e-83d2-4627-ae25-57ab60cf246d)
-![6_multimodal_inputs](https://github.com/user-attachments/assets/5a311062-272d-40da-8c95-15227a046cad)
-![7_requirements_resourcespage](https://github.com/user-attachments/assets/cf1260c4-bcc8-43fb-bb7a-923ca713aba7)
-![8_audio_Transcript](https://github.com/user-attachments/assets/3031c880-735f-4219-a9b7-42b41f537a7c)
-![9_add_resources](https://github.com/user-attachments/assets/d9f71a9f-4e7e-4587-839f-e2168522e8ca)
-![10_template_generated_sde_devops_ba](https://github.com/user-attachments/assets/4bf35278-ae53-4dd0-85f8-8fc58e687831)
-![12_generated_docs_srsorbrd](https://github.com/user-attachments/assets/8598c5c0-7f9c-4b2c-abbd-1e8b38cc1384)
-![13_version_control](https://github.com/user-attachments/assets/904ca2f1-1d59-435d-bf51-3f3c1b1f5712)
-![14_srs_withedit_and_section_evaluations](https://github.com/user-attachments/assets/41919bf6-cf7a-4b69-a544-4601a133b242)
-![15_user_stories](https://github.com/user-attachments/assets/18cb83d5-a631-4e87-9390-c9c49443df94)
-![16_generated_user_stories_moscow](https://github.com/user-attachments/assets/5f2956a9-61df-4285-b5e7-54dda15ba4ee)
-![18_test_cases_Section](https://github.com/user-attachments/assets/01171114-e792-4537-8e95-75cfe80c8c28)
-![19_cconnect_github_bot](https://github.com/user-attachments/assets/27fab432-b27d-445a-87ea-c6f574b1dd36)
-![20_generate_code_and_tests](https://github.com/user-attachments/assets/489002a8-01a6-4d37-b3b0-9b6c10858225)
-![21_workflows](https://github.com/user-attachments/assets/9f12ed20-0a91-491c-97db-29338c8af9cf)
-
-
 
 
 
