@@ -14,7 +14,7 @@
 
 
 
-# Implementation UI(Final):
+# Implementation Screenshots (Final):
 ![1_cover_page](https://github.com/user-attachments/assets/66501a24-bd9b-4998-88a2-2ba45c19eabe)
 ![2_create_project](https://github.com/user-attachments/assets/0f455d7c-d154-406f-884c-ce2e77b3ff18)
 ![3_dashboard](https://github.com/user-attachments/assets/63831ce3-ab83-4b89-ba1d-b7f7a67ac1aa)
