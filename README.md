@@ -1,4 +1,39 @@
 
+# Table of Contents
+
+| Section                                                   | Link/Reference                                                         |
+|-----------------------------------------------------------|------------------------------------------------------------------------|
+| [Problem Statement chosen](#problem-statement-chosen)     | Overview of the chosen problem statement                               |
+| [Demo Video](#demo-video)                                 | Video demonstration link and explanation                               |
+| [Problem Statement](#problem-statement)                   | Detailed problem statement with images                                 |
+| [Implementation UI](#implementation-ui)                   | UI snapshots, features, and navigation details                         |
+| [Introduction](#introduction)                             | Project context, background, and scope                                 |
+| [Objectives](#objectives)                                 | Project goals and deliverables                                         |
+| [USPs](#usps)                                             | Unique Selling Propositions overview                                   |
+| [Impact](#impact)                                         | Impact assessment and benefits                                         |
+| [Market Analysis](#market-analysis)                       | Comparative analysis and market positioning                            |
+| [Methodology Details](#methodology-details)               | In-depth methodology and technical approaches                          |
+| &emsp; [Architecture](#architecture)                      | Architecture diagram and detailed link                                 |
+| &emsp; [User Flow](#user-flow)                            | User flow diagram and reference link                                   |
+| &emsp; [Understanding the Flow](#understanding-the-flow)  | Visual representation of process flow                                  |
+| [Design Considerations](#design-considerations)           | Key design decisions and reasoning                                     |
+| [Tech Stack](#tech-stack)                                 | Technologies and tools used (Frontend, Backend, Cloud, etc.)           |
+| [Security Aspects](#security-aspects)                     | Security strategy and encryption methods                               |
+| [Scalability](#scalability)                               | Scalability approaches and cloud infrastructure details                |
+| [Closing Remarks](#closing-remarks)                       | Final thoughts, acknowledgments, and feedback links                    |
+
+
+
+## Problem Statement chosen:
+![image](https://github.com/user-attachments/assets/16b7a14a-2920-4fda-852b-4f43fdfd962e)
+
+
+
+## Some Points to Consider and Future Work:
+
+- It is a request to go through the readme first before going through the video for better understanding.
+- There is also our frontend implementation , which shows the flow , which you can go through.
+- Please also do see our architecture and user flow diagrams for clarity.
 ## Demo Video 
 
 
@@ -34,43 +69,6 @@
 ![19_cconnect_github_bot](https://github.com/user-attachments/assets/27fab432-b27d-445a-87ea-c6f574b1dd36)
 ![20_generate_code_and_tests](https://github.com/user-attachments/assets/489002a8-01a6-4d37-b3b0-9b6c10858225)
 ![21_workflows](https://github.com/user-attachments/assets/9f12ed20-0a91-491c-97db-29338c8af9cf)
-
-
-
-## Problem Statement chosen:
-![image](https://github.com/user-attachments/assets/16b7a14a-2920-4fda-852b-4f43fdfd962e)
-
-## Some Points to Consider and Future Work:
-
-- It is a request to go through the readme first before going through the video for better understanding.
-- There is also our frontend implementation , which shows the flow , which you can go through.
-- Please also do see our architecture and user flow diagrams for clarity.
-
-
-# Table of Contents
-
-| Section                                                   | Link/Reference                                                         |
-|-----------------------------------------------------------|------------------------------------------------------------------------|
-| [Problem Statement chosen](#problem-statement-chosen)     | Overview of the chosen problem statement                               |
-| [Demo Video](#demo-video)                                 | Video demonstration link and explanation                               |
-| [Problem Statement](#problem-statement)                   | Detailed problem statement with images                                 |
-| [Implementation UI](#implementation-ui)                   | UI snapshots, features, and navigation details                         |
-| [Introduction](#introduction)                             | Project context, background, and scope                                 |
-| [Objectives](#objectives)                                 | Project goals and deliverables                                         |
-| [USPs](#usps)                                             | Unique Selling Propositions overview                                   |
-| [Impact](#impact)                                         | Impact assessment and benefits                                         |
-| [Market Analysis](#market-analysis)                       | Comparative analysis and market positioning                            |
-| [Methodology Details](#methodology-details)               | In-depth methodology and technical approaches                          |
-| &emsp; [Architecture](#architecture)                      | Architecture diagram and detailed link                                 |
-| &emsp; [User Flow](#user-flow)                            | User flow diagram and reference link                                   |
-| &emsp; [Understanding the Flow](#understanding-the-flow)  | Visual representation of process flow                                  |
-| [Design Considerations](#design-considerations)           | Key design decisions and reasoning                                     |
-| [Tech Stack](#tech-stack)                                 | Technologies and tools used (Frontend, Backend, Cloud, etc.)           |
-| [Security Aspects](#security-aspects)                     | Security strategy and encryption methods                               |
-| [Scalability](#scalability)                               | Scalability approaches and cloud infrastructure details                |
-| [Closing Remarks](#closing-remarks)                       | Final thoughts, acknowledgments, and feedback links                    |
-
-
 
 
 ## Problem Statement :
