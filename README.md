@@ -52,7 +52,7 @@
 | Section                                                   | Link/Reference                                                         |
 |-----------------------------------------------------------|------------------------------------------------------------------------|
 | [Problem Statement chosen](#problem-statement-chosen)     | Overview of the chosen problem statement                               |
-| [Demo Video Project Proof of Concept](#demo-video-project-proof-of-concept) | Video demonstration link and explanation             |
+| [Demo Video](#demo-video)                                 | Video demonstration link and explanation                               |
 | [Problem Statement](#problem-statement)                   | Detailed problem statement with images                                 |
 | [Introduction](#introduction)                             | Project context, background, and scope                                 |
 | [Objectives](#objectives)                                 | Project goals and deliverables                                         |
