@@ -14,7 +14,7 @@
 
 
 
-# Implementation Screenshots:
+# Implementation UI:
 ![1_cover_page](https://github.com/user-attachments/assets/66501a24-bd9b-4998-88a2-2ba45c19eabe)
 ![2_create_project](https://github.com/user-attachments/assets/0f455d7c-d154-406f-884c-ce2e77b3ff18)
 ![3_dashboard](https://github.com/user-attachments/assets/63831ce3-ab83-4b89-ba1d-b7f7a67ac1aa)
@@ -54,21 +54,22 @@
 | [Problem Statement chosen](#problem-statement-chosen)     | Overview of the chosen problem statement                               |
 | [Demo Video](#demo-video)                                 | Video demonstration link and explanation                               |
 | [Problem Statement](#problem-statement)                   | Detailed problem statement with images                                 |
+| [Implementation UI](#implementation-ui)                   | UI snapshots, features, and navigation details                         |
 | [Introduction](#introduction)                             | Project context, background, and scope                                 |
 | [Objectives](#objectives)                                 | Project goals and deliverables                                         |
 | [USPs](#usps)                                             | Unique Selling Propositions overview                                   |
 | [Impact](#impact)                                         | Impact assessment and benefits                                         |
 | [Market Analysis](#market-analysis)                       | Comparative analysis and market positioning                            |
 | [Methodology Details](#methodology-details)               | In-depth methodology and technical approaches                          |
-| &emsp; [Architecture](#architecture)                     | Architecture diagram and detailed link                                 |
-| &emsp; [User Flow](#user-flow)                           | User flow diagram and reference link                                   |
-| &emsp; [Understanding the Flow](#understanding-the-flow) | Visual representation of process flow                                  |
+| &emsp; [Architecture](#architecture)                      | Architecture diagram and detailed link                                 |
+| &emsp; [User Flow](#user-flow)                            | User flow diagram and reference link                                   |
+| &emsp; [Understanding the Flow](#understanding-the-flow)  | Visual representation of process flow                                  |
 | [Design Considerations](#design-considerations)           | Key design decisions and reasoning                                     |
-| [Tech Stack](#tech-stack)                                 | Technologies and tools used (Frontend, Backend, Cloud, etc.)             |
+| [Tech Stack](#tech-stack)                                 | Technologies and tools used (Frontend, Backend, Cloud, etc.)           |
 | [Security Aspects](#security-aspects)                     | Security strategy and encryption methods                               |
 | [Scalability](#scalability)                               | Scalability approaches and cloud infrastructure details                |
-| [Implementation UI](#implementation-ui)                   | UI snapshots, features, and navigation details                         |
 | [Closing Remarks](#closing-remarks)                       | Final thoughts, acknowledgments, and feedback links                    |
+
 
 
 
