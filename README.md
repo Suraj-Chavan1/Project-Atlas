@@ -5,7 +5,6 @@
 |-----------------------------------------------------------|------------------------------------------------------------------------|
 | [Problem Statement chosen](#problem-statement-chosen)     | Overview of the chosen problem statement                               |
 | [Demo Video](#demo-video)                                 | Video demonstration link and explanation                               |
-| [Problem Statement](#problem-statement)                   | Detailed problem statement with images                                 |
 | [Implementation UI](#implementation-ui)                   | UI snapshots, features, and navigation details                         |
 | [Introduction](#introduction)                             | Project context, background, and scope                                 |
 | [Objectives](#objectives)                                 | Project goals and deliverables                                         |
