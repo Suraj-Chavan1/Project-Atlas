@@ -78,7 +78,7 @@
 
 In today's **fast-paced** software development landscape, traditional methods for **requirement gathering**, **documentation**, and **test case generation** are labor-intensive, error-prone, and time-consuming. These challenges demand a transformative solution, where **precision** and **compliance** are critical.
 
-**Project ATLAS** automates the entire lifecycle of **software development and documentation** using advanced **Generative AI**. 
+**Project ATLAS** automates the intial lifecycle of **software development and documentation** using advanced **Generative AI**. 
 
 Moreover, **Project ATLAS** streamlines the extraction of **requirements** from both **textual** and **graphical inputs**, generates structured **SRS**/**BRD** or any type of requirement documents, and seamlessly integrates with **JIRA** for automated backlog updates and efficient **workflow management**.
 
